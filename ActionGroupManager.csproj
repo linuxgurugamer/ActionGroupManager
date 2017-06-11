@@ -64,7 +64,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="src\AppLauncher.cs" />
+    <Compile Include="src\ButtonBar\AppLauncher.cs" />
+    <Compile Include="src\ButtonBar\IButtonBar.cs" />
+    <Compile Include="src\ButtonBar\ToolbarWrapper.cs" />
     <Compile Include="src\LightweightUINew.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
@@ -80,7 +82,7 @@
     <Compile Include="src\PartManager.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="src\ShortcutNew.cs">
+    <Compile Include="src\ButtonBar\ShortcutNew.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
     <Compile Include="src\ActionGroupManager.cs">

@@ -4,6 +4,7 @@
 //as published by Sam Hocevar. See the COPYING file for more details.
 
 using System.Collections.Generic;
+using ActionGroupManager.ButtonBar;
 using UnityEngine;
 
 namespace ActionGroupManager
@@ -62,12 +63,14 @@ namespace ActionGroupManager
             viewMan.Initialize();
             UiList.Add("Main", viewMan);
 
-            // Toolbar support
-            //ShortcutNew shortcut = new ShortcutNew();
-            //shortcut.Initialize(viewMan);
-            //UiList.Add("Icon", shortcut);
+            UIObject shortcut;
+            if (ToolbarManager.ToolbarAvailable)
+                // Blizzy's Toolbar support
+                shortcut = new ShortcutNew();
+            else
+                // Stock Application Launcher
+                shortcut = new AppLauncher();
 
-            AppLauncher shortcut = new AppLauncher();
             shortcut.Initialize(viewMan);
             UiList.Add("Icon", shortcut);
 
@@ -124,7 +127,7 @@ namespace ActionGroupManager
         {
             UIObject o;
             if (UiList.TryGetValue("Icon", out o))
-                (o as AppLauncher).SwitchTexture(val);
+                (o as IButtonBar).SwitchTexture(val);
         }
 
         void OnDestroy()

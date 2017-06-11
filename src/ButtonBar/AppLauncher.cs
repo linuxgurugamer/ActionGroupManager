@@ -5,9 +5,9 @@ using System.Text;
 using UnityEngine;
 using KSP.UI.Screens;
 
-namespace ActionGroupManager
+namespace ActionGroupManager.ButtonBar
 {
-    class AppLauncher : UIObject
+    class AppLauncher : UIObject , IButtonBar
     {
         ApplicationLauncherButton mainButton;
         static readonly string mainPath = "ActionGroupManager/ToolbarIcons/";
