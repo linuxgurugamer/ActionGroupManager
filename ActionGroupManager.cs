@@ -18,6 +18,7 @@ namespace ActionGroupManager
     {
         //List of current UI handle
         Dictionary<string, UIObject> UiList;
+        static private List<Callback> postDrawQueue = new List<Callback>();
 
         static ActionGroupManager _manager;
 
@@ -30,17 +31,8 @@ namespace ActionGroupManager
         }
 
         public bool ShowSettings { get; set; }
-
         public bool ShowMainWindow { get; set; }
-
         public bool ShowRecapWindow { get; set; }
-
-        static private List<Callback> postDrawQueue = new List<Callback>();
-
-        static internal void AddToPostDrawQueue(Callback c)
-        {
-            postDrawQueue.Add(c);
-        }
 
     void Awake()
         {
@@ -122,6 +114,10 @@ namespace ActionGroupManager
             }
         }
 
+        static internal void AddToPostDrawQueue(Callback c)
+        {
+            postDrawQueue.Add(c);
+        }
 
         public void UpdateIcon(bool val)
         {

@@ -4,9 +4,6 @@
 //as published by Sam Hocevar. See the COPYING file for more details.
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace ActionGroupManager.ButtonBar
 {

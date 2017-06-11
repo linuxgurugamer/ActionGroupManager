@@ -64,50 +64,50 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="src\ButtonBar\AppLauncher.cs" />
-    <Compile Include="src\ButtonBar\IButtonBar.cs" />
-    <Compile Include="src\ButtonBar\ToolbarWrapper.cs" />
-    <Compile Include="src\LightweightUINew.cs">
+    <Compile Include="ButtonBar\AppLauncher.cs" />
+    <Compile Include="ButtonBar\IButtonBar.cs" />
+    <Compile Include="ButtonBar\ToolbarWrapper.cs" />
+    <Compile Include="LightweightUINew.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="src\BaseActionManager.cs">
+    <Compile Include="BaseActionManager.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="src\Extensions.cs">
+    <Compile Include="Extensions.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="src\Highlighter.cs">
+    <Compile Include="Highlighter.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="src\PartManager.cs">
+    <Compile Include="PartManager.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="src\ButtonBar\ShortcutNew.cs">
+    <Compile Include="ButtonBar\ShortcutNew.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="src\ActionGroupManager.cs">
+    <Compile Include="ActionGroupManager.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="src\SettingsManager.cs">
+    <Compile Include="SettingsManager.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="src\SettingsView.cs">
+    <Compile Include="SettingsView.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="src\UIObject.cs">
+    <Compile Include="UIObject.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="src\VesselManager.cs">
+    <Compile Include="VesselManager.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="src\View.cs">
+    <Compile Include="View.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="src\Style.cs">
+    <Compile Include="Style.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="src\WindowRecap.cs">
+    <Compile Include="WindowRecap.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
   </ItemGroup>
@@ -117,13 +117,13 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="ToolbarIcons\iconAppLauncher.png" />
-    <Content Include="ToolbarIcons\iconOFFLarge.png" />
-    <Content Include="ToolbarIcons\iconOFFNEW.png">
+    <Content Include="Resources\iconAppLauncher.png" />
+    <Content Include="Resources\iconOFFLarge.png" />
+    <Content Include="Resources\iconOFFNEW.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="ToolbarIcons\iconONLarge.png" />
-    <Content Include="ToolbarIcons\iconONNEW.png">
+    <Content Include="Resources\iconONLarge.png" />
+    <Content Include="Resources\iconONNEW.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

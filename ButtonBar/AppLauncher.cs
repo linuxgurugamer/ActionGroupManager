@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using UnityEngine;
 using KSP.UI.Screens;
 
@@ -10,9 +7,8 @@ namespace ActionGroupManager.ButtonBar
     class AppLauncher : UIObject , IButtonBar
     {
         ApplicationLauncherButton mainButton;
-        static readonly string mainPath = "ActionGroupManager/ToolbarIcons/";
-        static readonly Texture2D offButton = GameDatabase.Instance.GetTexture(mainPath + "iconAppLauncher", false);
-        //static readonly Texture2D onButton = GameDatabase.Instance.GetTexture(mainPath + "iconONNEW", false);
+        static readonly string appPath = "ActionGroupManager/ToolbarIcons/";
+        static readonly Texture2D appLauncherButton = GameDatabase.Instance.GetTexture(appPath + "iconAppLauncher", false);
         UIObject controled;
 
         public override void Initialize(params object[] list)
@@ -20,7 +16,7 @@ namespace ActionGroupManager.ButtonBar
             if (mainButton == null)
             {
                 mainButton = ApplicationLauncher.Instance.AddModApplication(OnClick, OnClick, null, null, null, null,
-                    ApplicationLauncher.AppScenes.FLIGHT, offButton);
+                    ApplicationLauncher.AppScenes.FLIGHT, appLauncherButton);
             }
 
             if (list != null && list[0] != null)
@@ -55,12 +51,11 @@ namespace ActionGroupManager.ButtonBar
 
         public override void SetVisible(bool vis)
         {
-            //mainButton.Visible = vis;
+            // App launcher button doesn't hide
         }
 
         public void SwitchTexture(bool vis)
         {
-            //mainButton.TexturePath = vis ? mainPath + onButton : mainPath + offButton;
             if (vis)
             {
                 mainButton.SetTrue(false);
