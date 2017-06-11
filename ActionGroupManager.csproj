@@ -61,55 +61,28 @@
     </Reference>
     <Reference Include="UnityEngine.UI">
       <HintPath>..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Kerbal Space Program\KSP_x64_Data\Managed\UnityEngine.UI.dll</HintPath>
+      <Private>False</Private>
     </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ButtonBar\AppLauncher.cs" />
     <Compile Include="ButtonBar\IButtonBar.cs" />
     <Compile Include="ButtonBar\ToolbarWrapper.cs" />
-    <Compile Include="LightweightUINew.cs">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Compile>
-    <Compile Include="BaseActionManager.cs">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Compile>
-    <Compile Include="Extensions.cs">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Compile>
-    <Compile Include="Highlighter.cs">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Compile>
-    <Compile Include="PartManager.cs">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Compile>
-    <Compile Include="ButtonBar\ShortcutNew.cs">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Compile>
-    <Compile Include="ActionGroupManager.cs">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Compile>
+    <Compile Include="LightweightUINew.cs" />
+    <Compile Include="BaseActionManager.cs" />
+    <Compile Include="Extensions.cs" />
+    <Compile Include="Highlighter.cs" />
+    <Compile Include="PartManager.cs" />
+    <Compile Include="ButtonBar\ShortcutNew.cs" />
+    <Compile Include="ActionGroupManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SettingsManager.cs">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Compile>
-    <Compile Include="SettingsView.cs">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Compile>
-    <Compile Include="UIObject.cs">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Compile>
-    <Compile Include="VesselManager.cs">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Compile>
-    <Compile Include="View.cs">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Compile>
-    <Compile Include="Style.cs">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Compile>
-    <Compile Include="WindowRecap.cs">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Compile>
+    <Compile Include="SettingsManager.cs" />
+    <Compile Include="SettingsView.cs" />
+    <Compile Include="UIObject.cs" />
+    <Compile Include="VesselManager.cs" />
+    <Compile Include="View.cs" />
+    <Compile Include="Style.cs" />
+    <Compile Include="WindowRecap.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="COPYING.txt">
@@ -117,12 +90,18 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Resources\iconAppLauncher.png" />
-    <Content Include="Resources\iconOFFLarge.png" />
+    <Content Include="Resources\iconAppLauncher.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\iconOFFLarge.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Resources\iconOFFNEW.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\iconONLarge.png" />
+    <Content Include="Resources\iconONLarge.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Resources\iconONNEW.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -130,7 +109,7 @@
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>xcopy /Y /S "$(TargetDir)*.*" "C:\KSP_win_dev\GameData\ActionGroupManager\"</PostBuildEvent>
+    <PostBuildEvent>REM xcopy /Y /S "$(TargetDir)*.*" "C:\KSP_win_dev\GameData\ActionGroupManager\"</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

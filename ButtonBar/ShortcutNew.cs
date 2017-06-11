@@ -10,7 +10,7 @@ namespace ActionGroupManager.ButtonBar
     class ShortcutNew : UIObject, IButtonBar
     {
         IButton mainButton;
-        readonly string mainPath = "ActionGroupManager/ToolbarIcons/";
+        readonly string mainPath = "ActionGroupManager/Resources/";
         readonly string onButton = "iconONNEW";
         readonly string offButton = "iconOFFNEW";
         UIObject controled;

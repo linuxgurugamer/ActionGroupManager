@@ -7,7 +7,7 @@ namespace ActionGroupManager.ButtonBar
     class AppLauncher : UIObject , IButtonBar
     {
         ApplicationLauncherButton mainButton;
-        static readonly string appPath = "ActionGroupManager/ToolbarIcons/";
+        static readonly string appPath = "ActionGroupManager/Resources/";
         static readonly Texture2D appLauncherButton = GameDatabase.Instance.GetTexture(appPath + "iconAppLauncher", false);
         UIObject controled;
 
