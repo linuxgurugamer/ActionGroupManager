@@ -34,7 +34,14 @@ namespace ActionGroupManager
 
         public bool ShowRecapWindow { get; set; }
 
-        void Awake()
+        static private List<Callback> postDrawQueue = new List<Callback>();
+
+        static internal void AddToPostDrawQueue(Callback c)
+        {
+            postDrawQueue.Add(c);
+        }
+
+    void Awake()
         {
 #if DEBUG   
             Debug.Log("AGM : Action Group Manager is awake.");
@@ -55,7 +62,12 @@ namespace ActionGroupManager
             viewMan.Initialize();
             UiList.Add("Main", viewMan);
 
-            ShortcutNew shortcut = new ShortcutNew();
+            // Toolbar support
+            //ShortcutNew shortcut = new ShortcutNew();
+            //shortcut.Initialize(viewMan);
+            //UiList.Add("Icon", shortcut);
+
+            AppLauncher shortcut = new AppLauncher();
             shortcut.Initialize(viewMan);
             UiList.Add("Icon", shortcut);
 
@@ -99,12 +111,20 @@ namespace ActionGroupManager
             }
         }
 
+        public void OnGUI()
+        {
+            for(int x = 0; x < postDrawQueue.Count; x++)
+            {
+                postDrawQueue[x]();
+            }
+        }
+
 
         public void UpdateIcon(bool val)
         {
             UIObject o;
             if (UiList.TryGetValue("Icon", out o))
-                (o as ShortcutNew).SwitchTexture(val);
+                (o as AppLauncher).SwitchTexture(val);
         }
 
         void OnDestroy()

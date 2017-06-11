@@ -26,7 +26,7 @@ namespace ActionGroupManager
                 (p) =>
                 {
                     p.SetHighlightColor(Color.blue);
-                    p.SetHighlight(true);
+                    p.SetHighlight(true, false);
                 });
         }
 
@@ -37,7 +37,7 @@ namespace ActionGroupManager
 
             internalHighlight.Add(p);
             p.highlightColor = Color.blue;
-            p.SetHighlight(true);
+            p.SetHighlight(true, false);
         }
 
         public void Add(BaseAction bA)

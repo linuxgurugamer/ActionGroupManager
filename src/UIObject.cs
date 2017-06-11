@@ -29,14 +29,16 @@ namespace ActionGroupManager
             {
                 if (!visible)
                 {
-                    RenderingManager.AddToPostDrawQueue(3, new Callback(DoUILogic));
+                    ActionGroupManager.AddToPostDrawQueue(DoUILogic);
+                    //RenderingManager.AddToPostDrawQueue(3, new Callback(DoUILogic));
                 }
             }
             else
             {
                 if (visible)
                 {
-                    RenderingManager.RemoveFromPostDrawQueue(3, new Callback(DoUILogic));
+                    ActionGroupManager.AddToPostDrawQueue(DoUILogic);
+                    //RenderingManager.RemoveFromPostDrawQueue(3, new Callback(DoUILogic));
                 }
             }
 

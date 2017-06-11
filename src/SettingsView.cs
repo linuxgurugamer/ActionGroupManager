@@ -5,6 +5,7 @@
 
 using System.Reflection;
 using UnityEngine;
+using KSP.UI.Dialogs;
 
 namespace ActionGroupManager
 {

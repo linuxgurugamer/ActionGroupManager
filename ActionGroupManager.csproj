@@ -46,7 +46,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Assembly-CSharp">
-      <HintPath>..\..\..\..\..\..\..\KSP_win_dev\KSP_Data\Managed\Assembly-CSharp.dll</HintPath>
+      <HintPath>..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Kerbal Space Program\KSP_x64_Data\Managed\Assembly-CSharp.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="System" />
@@ -55,16 +55,20 @@
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
-    <Reference Include="Toolbar">
-      <HintPath>..\..\..\..\..\..\..\KSP_win_dev\GameData\000_Toolbar\Toolbar.dll</HintPath>
-      <Private>False</Private>
+    <Reference Include="Toolbar, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>D:\Users\Kevin Seiden\Desktop\Toolbar-1.7.13\GameData\000_Toolbar\Toolbar.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine">
-      <HintPath>..\..\..\..\..\..\..\KSP_win_dev\KSP_Data\Managed\UnityEngine.dll</HintPath>
+      <HintPath>..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Kerbal Space Program\KSP_x64_Data\Managed\UnityEngine.dll</HintPath>
       <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine.UI">
+      <HintPath>..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Kerbal Space Program\KSP_x64_Data\Managed\UnityEngine.UI.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="src\AppLauncher.cs" />
     <Compile Include="src\LightweightUINew.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
@@ -115,9 +119,12 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="ToolbarIcons\iconAppLauncher.png" />
+    <Content Include="ToolbarIcons\iconOFFLarge.png" />
     <Content Include="ToolbarIcons\iconOFFNEW.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="ToolbarIcons\iconONLarge.png" />
     <Content Include="ToolbarIcons\iconONNEW.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

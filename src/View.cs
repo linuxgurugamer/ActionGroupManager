@@ -6,7 +6,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-
+using KSP.UI.Dialogs;
+using KSP.UI.Screens;
 using UnityEngine;
 
 namespace ActionGroupManager
@@ -265,7 +266,7 @@ namespace ActionGroupManager
             }
             else
             {
-                int currentStage = Staging.lastStage;
+                int currentStage = StageManager.LastStage;
 
                 for (int i = -1; i <= currentStage; i++)
                 {
