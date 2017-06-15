@@ -4,14 +4,14 @@ using KSP.UI.Screens;
 
 namespace ActionGroupManager.UI.ButtonBar
 {
-    class AppLauncher : UIObject , IButtonBar
+    class AppLauncher : UiObject , IButtonBar
     {
         ApplicationLauncherButton mainButton;
         static readonly string appPath = "ActionGroupManager/Resources/";
         static readonly Texture2D appLauncherButton = GameDatabase.Instance.GetTexture(appPath + "AppLauncher", false);
-        UIObject controled;
+        UiObject controled;
 
-        public override void Initialize(params object[] list)
+        public AppLauncher(params object[] list)
         {
             if (mainButton == null)
             {
@@ -21,7 +21,7 @@ namespace ActionGroupManager.UI.ButtonBar
 
             if (list != null && list[0] != null)
             {
-                controled = list[0] as UIObject;
+                controled = list[0] as UiObject;
             }
         }
 

@@ -7,19 +7,19 @@ using System;
 
 namespace ActionGroupManager.UI.ButtonBar
 {
-    class Toolbar : UIObject, IButtonBar
+    class Toolbar : UiObject, IButtonBar
     {
         IButton mainButton;
         readonly string mainPath = "ActionGroupManager/Resources/";
         readonly string onButton = "ToolbarOn";
         readonly string offButton = "ToolbarOff";
-        UIObject controled;
+        UiObject controled;
 
-        public override void Initialize(params object[] list)
+        public Toolbar(params object[] list)
         {
             if (list != null && list[0] != null)
             {
-                controled = list[0] as UIObject;
+                controled = list[0] as UiObject;
             }
             mainButton = ToolbarManager.Instance.add("AGM", "AGMMainSwitch");
             string str = SettingsManager.Settings.GetValue<bool>( SettingsManager.IsMainWindowVisible, true) ? 

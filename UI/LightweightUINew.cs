@@ -488,13 +488,13 @@ namespace ActionGroupManager.UI
     }
 
 
-    class LightweightUINew : UIObject
+    class LightweightUiNew : UiObject
     {
         public bool Active { get; set; }
         Dictionary<Part, UIPartManager> cache;
         UIRootManager rootManager;
 
-        public override void Initialize(params object[] list)
+        public LightweightUiNew()
         {
             cache = new Dictionary<Part, UIPartManager>();
             Active = false;

@@ -10,7 +10,7 @@ using KSP.UI.Dialogs;
 namespace ActionGroupManager.UI
 {
     //Window to show available settings
-    class SettingsUI : UIObject
+    class SettingsUi : UiObject
     {
         Rect settingsWindowPositon;
 
@@ -44,9 +44,10 @@ namespace ActionGroupManager.UI
             GUI.DragWindow();
         }
 
-        public override void Initialize(params object[] list)
+        public SettingsUi(bool visible)
         {
             settingsWindowPositon = new Rect(Screen.width / 2f - 100, Screen.height / 2f - 100, 200, 150);
+            SetVisible(visible);
         }
 
         public override void Terminate()

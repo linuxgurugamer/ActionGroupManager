@@ -68,7 +68,7 @@
     <Compile Include="UI\ButtonBar\AppLauncher.cs" />
     <Compile Include="UI\ButtonBar\IButtonBar.cs" />
     <Compile Include="UI\ButtonBar\ToolbarWrapper.cs" />
-    <Compile Include="UI\LightweightUINew.cs" />
+    <Compile Include="UI\LightweightUiNew.cs" />
     <Compile Include="BaseActionManager.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="Highlighter.cs" />
@@ -77,12 +77,12 @@
     <Compile Include="ActionGroupManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SettingsManager.cs" />
-    <Compile Include="UI\SettingsUI.cs" />
-    <Compile Include="UI\UIObject.cs" />
+    <Compile Include="UI\SettingsUi.cs" />
+    <Compile Include="UI\UiObject.cs" />
     <Compile Include="VesselManager.cs" />
-    <Compile Include="UI\MainUI.cs" />
+    <Compile Include="UI\MainUi.cs" />
     <Compile Include="Style.cs" />
-    <Compile Include="UI\RecapUI.cs" />
+    <Compile Include="UI\RecapUi.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="COPYING.txt">

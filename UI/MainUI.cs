@@ -12,7 +12,7 @@ using UnityEngine;
 
 namespace ActionGroupManager.UI
 {
-    class MainUI : UIObject
+    class MainUi : UiObject
     {
         #region Util types
         enum ViewType
@@ -56,7 +56,12 @@ namespace ActionGroupManager.UI
         #endregion
 
         #region override Base class
-        public override void Initialize(params object[] list)
+        public MainUi()
+        {
+            Initialize();
+        }
+
+        private void Initialize()
         {
             mainWindowSize = SettingsManager.Settings.GetValue<Rect>(SettingsManager.MainWindowRect, new Rect(200, 200, 500, 400));
             mainWindowSize.width = mainWindowSize.width > 500 ? 500 : mainWindowSize.width;
@@ -579,7 +584,7 @@ namespace ActionGroupManager.UI
 
             foreach (KSPActionGroup ag in VesselManager.Instance.AllActionGroups)
             {
-                if (ag == KSPActionGroup.None)
+                if (ag == KSPActionGroup.None || ag == KSPActionGroup.REPLACEWITHDEFAULT)
                     continue;
 
                 List<BaseAction> list = partFilter.GetBaseActionAttachedToActionGroup(ag).ToList();

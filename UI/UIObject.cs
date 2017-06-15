@@ -6,11 +6,11 @@
 namespace ActionGroupManager.UI
 {
     //Interface for all UI object
-    abstract class UIObject
+    abstract class UiObject
     {
         bool visible;
 
-        public abstract void Initialize(params object[] list);
+        //public abstract void Initialize(params object[] list);
 
         public abstract void Terminate();
 

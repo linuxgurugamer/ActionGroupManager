@@ -18,7 +18,7 @@ namespace ActionGroupManager
     public class ActionGroupManager : MonoBehaviour
     {
         //List of current UI handle
-        Dictionary<string, UIObject> UiList;
+        Dictionary<string, UiObject> UiList;
         static private List<Callback> postDrawQueue = new List<Callback>();
 
         static ActionGroupManager _manager;
@@ -46,28 +46,20 @@ namespace ActionGroupManager
         {
             _manager = this;
 
-            UiList = new Dictionary<string, UIObject>();
+            UiList = new Dictionary<string, UiObject>();
 
-            LightweightUINew light = new LightweightUINew();
-            light.Initialize();
-            UiList.Add("Light", light);
+            MainUi main = new MainUi();
+            UiList.Add("Main", main);
+            UiList.Add("Light", new LightweightUiNew());
 
-            MainUI viewMan = new MainUI();
-            viewMan.Initialize();
-            UiList.Add("Main", viewMan);
-
-            UIObject shortcut;
             if (ToolbarManager.ToolbarAvailable)
                 // Blizzy's Toolbar support
-                shortcut = new Toolbar();
+                UiList.Add("Icon", new Toolbar(main));
             else
                 // Stock Application Launcher
-                shortcut = new AppLauncher();
+                UiList.Add("Icon", new AppLauncher(main));
 
-            shortcut.Initialize(viewMan);
-            UiList.Add("Icon", shortcut);
-
-            viewMan.SetVisible(SettingsManager.Settings.GetValue<bool>(SettingsManager.IsMainWindowVisible));
+            main.SetVisible(SettingsManager.Settings.GetValue<bool>(SettingsManager.IsMainWindowVisible));
 
             ShowRecapWindow = SettingsManager.Settings.GetValue<bool>(SettingsManager.IsRecapWindowVisible, false);
 
@@ -80,10 +72,7 @@ namespace ActionGroupManager
         {
             if (ShowSettings && !UiList.ContainsKey("Settings"))
             {
-                SettingsUI setting = new SettingsUI();
-                setting.Initialize();
-                setting.SetVisible(true);
-                UiList.Add("Settings", setting);
+                UiList.Add("Settings", new SettingsUi(true));
             }
             else if (!ShowSettings && UiList.ContainsKey("Settings"))
             {
@@ -94,10 +83,7 @@ namespace ActionGroupManager
 
             if (ShowRecapWindow && !UiList.ContainsKey("Recap"))
             {
-                RecapUI recap = new RecapUI();
-                recap.Initialize();
-                recap.SetVisible(true);
-                UiList.Add("Recap", recap);
+                UiList.Add("Recap", new RecapUi(true));
             }
             else if (!ShowRecapWindow && UiList.ContainsKey("Recap"))
             {
@@ -105,6 +91,13 @@ namespace ActionGroupManager
                 UiList["Recap"].Terminate();
                 UiList.Remove("Recap");
             }
+        }
+
+        public void UpdateIcon(bool val)
+        {
+            UiObject o;
+            if (UiList.TryGetValue("Icon", out o))
+                (o as IButtonBar).SwitchTexture(val);
         }
 
         public void OnGUI()
@@ -118,17 +111,10 @@ namespace ActionGroupManager
             postDrawQueue.Add(c);
         }
 
-        public void UpdateIcon(bool val)
-        {
-            UIObject o;
-            if (UiList.TryGetValue("Icon", out o))
-                (o as IButtonBar).SwitchTexture(val);
-        }
-
         void OnDestroy()
         {
             //Terminate all UI
-            foreach (KeyValuePair<string, UIObject> ui in UiList)
+            foreach (KeyValuePair<string, UiObject> ui in UiList)
                 ui.Value.Terminate();
             //Save settings to disk
             SettingsManager.Settings.save();

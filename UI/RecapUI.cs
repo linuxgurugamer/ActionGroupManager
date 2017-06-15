@@ -10,14 +10,15 @@ using KSP.UI.Dialogs;
 
 namespace ActionGroupManager.UI
 {
-    class RecapUI : UIObject
+    class RecapUi : UiObject
     {
         Rect recapWindowSize;
         Vector2 recapWindowScrollposition;
 
-        public override void Initialize(params object[] list)
+        public RecapUi(bool visible)
         {
             recapWindowSize = SettingsManager.Settings.GetValue<Rect>(SettingsManager.RecapWindocRect, new Rect(200, 200, 400, 500));
+            SetVisible(visible);
         }
 
         public override void Terminate()
