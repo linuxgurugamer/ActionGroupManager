@@ -10,9 +10,9 @@ using KSP.UI.Dialogs;
 using KSP.UI.Screens;
 using UnityEngine;
 
-namespace ActionGroupManager
+namespace ActionGroupManager.UI
 {
-    class View : UIObject
+    class MainUI : UIObject
     {
         #region Util types
         enum ViewType

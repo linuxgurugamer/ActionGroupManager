@@ -1,4 +1,4 @@
-﻿namespace ActionGroupManager.ButtonBar
+﻿namespace ActionGroupManager.UI.ButtonBar
 {
     interface IButtonBar
     {

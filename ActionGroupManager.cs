@@ -4,8 +4,9 @@
 //as published by Sam Hocevar. See the COPYING file for more details.
 
 using System.Collections.Generic;
-using ActionGroupManager.ButtonBar;
 using UnityEngine;
+using ActionGroupManager.UI;
+using ActionGroupManager.UI.ButtonBar;
 
 namespace ActionGroupManager
 {
@@ -34,11 +35,11 @@ namespace ActionGroupManager
         public bool ShowMainWindow { get; set; }
         public bool ShowRecapWindow { get; set; }
 
-    void Awake()
+        void Awake()
         {
-#if DEBUG   
-            Debug.Log("AGM : Action Group Manager is awake.");
-#endif
+            #if DEBUG   
+                Debug.Log("AGM : Action Group Manager is awake.");
+            #endif
         }
 
         void Start()
@@ -51,14 +52,14 @@ namespace ActionGroupManager
             light.Initialize();
             UiList.Add("Light", light);
 
-            View viewMan = new View();
+            MainUI viewMan = new MainUI();
             viewMan.Initialize();
             UiList.Add("Main", viewMan);
 
             UIObject shortcut;
             if (ToolbarManager.ToolbarAvailable)
                 // Blizzy's Toolbar support
-                shortcut = new ShortcutNew();
+                shortcut = new Toolbar();
             else
                 // Stock Application Launcher
                 shortcut = new AppLauncher();
@@ -70,16 +71,16 @@ namespace ActionGroupManager
 
             ShowRecapWindow = SettingsManager.Settings.GetValue<bool>(SettingsManager.IsRecapWindowVisible, false);
 
-#if DEBUG
-            Debug.Log("AGM : Action Group Manager has started.");
-#endif
+            #if DEBUG
+                Debug.Log("AGM : Action Group Manager has started.");
+            #endif
         }      
 
         void Update()
         {
             if (ShowSettings && !UiList.ContainsKey("Settings"))
             {
-                SettingsView setting = new SettingsView();
+                SettingsUI setting = new SettingsUI();
                 setting.Initialize();
                 setting.SetVisible(true);
                 UiList.Add("Settings", setting);
@@ -93,7 +94,7 @@ namespace ActionGroupManager
 
             if (ShowRecapWindow && !UiList.ContainsKey("Recap"))
             {
-                WindowRecap recap = new WindowRecap();
+                RecapUI recap = new RecapUI();
                 recap.Initialize();
                 recap.SetVisible(true);
                 UiList.Add("Recap", recap);
@@ -109,9 +110,7 @@ namespace ActionGroupManager
         public void OnGUI()
         {
             for(int x = 0; x < postDrawQueue.Count; x++)
-            {
                 postDrawQueue[x]();
-            }
         }
 
         static internal void AddToPostDrawQueue(Callback c)
@@ -136,9 +135,9 @@ namespace ActionGroupManager
 
             VesselManager.Terminate();
 
-#if DEBUG
-            Debug.Log("AGM : Terminated.");
-#endif
+            #if DEBUG
+                Debug.Log("AGM : Terminated.");
+            #endif
         }
     }
 }

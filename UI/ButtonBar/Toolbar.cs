@@ -5,14 +5,14 @@
 
 using System;
 
-namespace ActionGroupManager.ButtonBar
+namespace ActionGroupManager.UI.ButtonBar
 {
-    class ShortcutNew : UIObject, IButtonBar
+    class Toolbar : UIObject, IButtonBar
     {
         IButton mainButton;
         readonly string mainPath = "ActionGroupManager/Resources/";
-        readonly string onButton = "iconONNEW";
-        readonly string offButton = "iconOFFNEW";
+        readonly string onButton = "ToolbarOn";
+        readonly string offButton = "ToolbarOff";
         UIObject controled;
 
         public override void Initialize(params object[] list)

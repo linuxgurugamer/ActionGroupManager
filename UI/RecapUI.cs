@@ -6,10 +6,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using KSP.UI.Dialogs;
 
-namespace ActionGroupManager
+namespace ActionGroupManager.UI
 {
-    class WindowRecap : UIObject
+    class RecapUI : UIObject
     {
         Rect recapWindowSize;
         Vector2 recapWindowScrollposition;
@@ -27,15 +28,22 @@ namespace ActionGroupManager
 
         public override void DoUILogic()
         {
-            GUI.skin = HighLogic.Skin;
+            if (!IsVisible() || PauseMenu.isOpen || FlightResultsDialog.isDisplaying)
+            {
+                return;
+            }
 
+            GUI.skin = HighLogic.Skin;
             recapWindowSize = GUILayout.Window(this.GetHashCode(), recapWindowSize, new GUI.WindowFunction(DoMyRecapView), "AGM : Recap", HighLogic.Skin.window, GUILayout.Width(200));
         }
 
         private void DoMyRecapView(int id)
         {
             if (GUI.Button(new Rect(recapWindowSize.width - 24, 4, 20, 20), new GUIContent("X", "Close the window."), Style.CloseButtonStyle))
+            {
                 ActionGroupManager.Manager.ShowRecapWindow = false;
+                return;
+            }
 
 
             recapWindowScrollposition = GUILayout.BeginScrollView(recapWindowScrollposition, Style.ScrollViewStyle);

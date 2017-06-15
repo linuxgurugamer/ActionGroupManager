@@ -2,13 +2,13 @@
 using UnityEngine;
 using KSP.UI.Screens;
 
-namespace ActionGroupManager.ButtonBar
+namespace ActionGroupManager.UI.ButtonBar
 {
     class AppLauncher : UIObject , IButtonBar
     {
         ApplicationLauncherButton mainButton;
         static readonly string appPath = "ActionGroupManager/Resources/";
-        static readonly Texture2D appLauncherButton = GameDatabase.Instance.GetTexture(appPath + "iconAppLauncher", false);
+        static readonly Texture2D appLauncherButton = GameDatabase.Instance.GetTexture(appPath + "AppLauncher", false);
         UIObject controled;
 
         public override void Initialize(params object[] list)

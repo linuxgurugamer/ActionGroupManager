@@ -65,24 +65,24 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ButtonBar\AppLauncher.cs" />
-    <Compile Include="ButtonBar\IButtonBar.cs" />
-    <Compile Include="ButtonBar\ToolbarWrapper.cs" />
-    <Compile Include="LightweightUINew.cs" />
+    <Compile Include="UI\ButtonBar\AppLauncher.cs" />
+    <Compile Include="UI\ButtonBar\IButtonBar.cs" />
+    <Compile Include="UI\ButtonBar\ToolbarWrapper.cs" />
+    <Compile Include="UI\LightweightUINew.cs" />
     <Compile Include="BaseActionManager.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="Highlighter.cs" />
     <Compile Include="PartManager.cs" />
-    <Compile Include="ButtonBar\ShortcutNew.cs" />
+    <Compile Include="UI\ButtonBar\Toolbar.cs" />
     <Compile Include="ActionGroupManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SettingsManager.cs" />
-    <Compile Include="SettingsView.cs" />
-    <Compile Include="UIObject.cs" />
+    <Compile Include="UI\SettingsUI.cs" />
+    <Compile Include="UI\UIObject.cs" />
     <Compile Include="VesselManager.cs" />
-    <Compile Include="View.cs" />
+    <Compile Include="UI\MainUI.cs" />
     <Compile Include="Style.cs" />
-    <Compile Include="WindowRecap.cs" />
+    <Compile Include="UI\RecapUI.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="COPYING.txt">
@@ -90,19 +90,19 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Resources\iconAppLauncher.png">
+    <Content Include="Resources\AppLauncher.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\iconOFFLarge.png">
+    <Content Include="Resources\ToolbarOffLarge.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\iconOFFNEW.png">
+    <Content Include="Resources\ToolbarOff.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\iconONLarge.png">
+    <Content Include="Resources\ToolbarOnLarge.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\iconONNEW.png">
+    <Content Include="Resources\ToolbarOn.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

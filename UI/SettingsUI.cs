@@ -7,10 +7,10 @@ using System.Reflection;
 using UnityEngine;
 using KSP.UI.Dialogs;
 
-namespace ActionGroupManager
+namespace ActionGroupManager.UI
 {
     //Window to show available settings
-    class SettingsView : UIObject
+    class SettingsUI : UIObject
     {
         Rect settingsWindowPositon;
 

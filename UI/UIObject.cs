@@ -3,7 +3,7 @@
 //terms of the Do What The Fuck You Want To Public License, Version 2,
 //as published by Sam Hocevar. See the COPYING file for more details.
 
-namespace ActionGroupManager
+namespace ActionGroupManager.UI
 {
     //Interface for all UI object
     abstract class UIObject

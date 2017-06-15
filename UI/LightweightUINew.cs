@@ -7,7 +7,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace ActionGroupManager
+namespace ActionGroupManager.UI
 {
     class UIActionGroupManager : PartModule
     {
