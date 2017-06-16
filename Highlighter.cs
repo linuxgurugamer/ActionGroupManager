@@ -3,10 +3,7 @@
 //terms of the Do What The Fuck You Want To Public License, Version 2,
 //as published by Sam Hocevar. See the COPYING file for more details.
 
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using UnityEngine;
 
 namespace ActionGroupManager
@@ -22,12 +19,11 @@ namespace ActionGroupManager
 
         public void Update()
         {
-            internalHighlight.ForEach(
-                (p) =>
-                {
-                    p.SetHighlightColor(Color.blue);
-                    p.SetHighlight(true, false);
-                });
+            for(int i = 0; i < internalHighlight.Count; i++)
+            {
+                internalHighlight[i].SetHighlightColor(Color.blue);
+                internalHighlight[i].SetHighlight(true, false);
+            }
         }
 
         public void Add(Part p)
@@ -61,6 +57,14 @@ namespace ActionGroupManager
 
         public void Remove(BaseAction bA)
         {
+            for(int i = 0; i < internalHighlight.Count; i++)
+            {
+                if(internalHighlight[i] == bA.listParent.part)
+                {
+                    Remove(bA.listParent.part);
+                }
+            }
+            /*
             if (!internalHighlight.Any(
                 (e) =>
                 {
@@ -69,6 +73,7 @@ namespace ActionGroupManager
             {
                 Remove(bA.listParent.part);
             }
+            */
         }
 
         public void Switch(Part p)
@@ -81,12 +86,10 @@ namespace ActionGroupManager
 
         public void Clear()
         {
-            internalHighlight.ForEach(
-                (e =>
-                {
-                    e.SetHighlightDefault();
-                }));
-
+            for (int i = 0; i < internalHighlight.Count; i++)
+            {
+                internalHighlight[i].SetHighlightDefault();
+            }
             internalHighlight.Clear();
         }
     }
