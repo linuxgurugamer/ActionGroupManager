@@ -89,7 +89,7 @@
     <Compile Include="UI\RecapUi.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="COPYING.txt">
+    <None Include="License.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
