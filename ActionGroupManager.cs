@@ -37,9 +37,10 @@ namespace ActionGroupManager
 
         void Awake()
         {
-            #if DEBUG   
+#if DEBUG
                 Debug.Log("AGM : Action Group Manager is awake.");
-            #endif
+#endif
+            //GameEvents.onHideUI.Add(HideUI);
         }
 
         void Start()
@@ -50,7 +51,7 @@ namespace ActionGroupManager
 
             MainUi main = new MainUi();
             UiList.Add("Main", main);
-            UiList.Add("Light", new LightweightUiNew());
+            UiList.Add("Light", new TweakableUi());
 
             if (ToolbarManager.ToolbarAvailable)
                 // Blizzy's Toolbar support
@@ -98,6 +99,19 @@ namespace ActionGroupManager
             UiObject o;
             if (UiList.TryGetValue("Icon", out o))
                 (o as IButtonBar).SwitchTexture(val);
+        }
+
+        public void HideUI()
+        {
+            UiObject o;
+            if (UiList.TryGetValue("Recap", out o))
+                (o as UiObject).SetVisible(false);
+
+            if (UiList.TryGetValue("Settings", out o))
+                (o as UiObject).SetVisible(false);
+
+            if (UiList.TryGetValue("Main", out o))
+                (o as UiObject).SetVisible(false);
         }
 
         public void OnGUI()

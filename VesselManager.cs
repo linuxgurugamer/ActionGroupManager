@@ -5,6 +5,7 @@
 
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace ActionGroupManager
 {
@@ -128,10 +129,6 @@ namespace ActionGroupManager
         {
             AllActionGroups = new List<KSPActionGroup>();
             AllActionGroups.AddRange(Enum.GetValues(typeof(KSPActionGroup)) as KSPActionGroup[]);
-            /*
-            foreach (KSPActionGroup ag in Enum.GetValues(typeof(KSPActionGroup)) as KSPActionGroup[])
-                AllActionGroups.Add(ag);
-                */
         }
 
         /*Assign or switch active vessel

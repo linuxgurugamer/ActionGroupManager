@@ -488,13 +488,13 @@ namespace ActionGroupManager.UI
     }
 
 
-    class LightweightUiNew : UiObject
+    class TweakableUi : UiObject
     {
         public bool Active { get; set; }
         Dictionary<Part, UIPartManager> cache;
         UIRootManager rootManager;
 
-        public LightweightUiNew()
+        public TweakableUi()
         {
             cache = new Dictionary<Part, UIPartManager>();
             Active = false;

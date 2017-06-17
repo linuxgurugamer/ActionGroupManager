@@ -39,6 +39,12 @@ namespace ActionGroupManager.UI
             if (final != initial)
                 SettingsManager.Settings.SetValue(SettingsManager.OrderByStage, final);
 
+            initial = SettingsManager.Settings.GetValue<bool>(SettingsManager.ClassicView);
+            GUILayout.Label("Requires Return to Space Center:");
+            final = GUILayout.Toggle(initial, "Classic View", Style.ButtonToggleStyle);
+            if (final != initial)
+                SettingsManager.Settings.SetValue(SettingsManager.ClassicView, final);
+
             GUILayout.EndVertical();
 
             GUI.DragWindow();

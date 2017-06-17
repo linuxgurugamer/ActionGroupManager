@@ -20,6 +20,7 @@ namespace ActionGroupManager
         public static readonly string AutomaticPartCheck = "AutomaticPartCheck";
         public static readonly string FrequencyOfAutomaticUpdate = "FrequencyOfAutomaticUpdate";
         public static readonly string OrderByStage = "OrderByStage";
+        public static readonly string ClassicView = "ClassicView";
         public static readonly string QuietMode = "QuietMode";
         public static readonly string RecapWindocRect = "RecapWindowRect";
         public static readonly string IsRecapWindowVisible = "IsRecapWindowVisible";

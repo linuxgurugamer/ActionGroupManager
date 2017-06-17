@@ -68,7 +68,8 @@
     <Compile Include="UI\ButtonBar\AppLauncher.cs" />
     <Compile Include="UI\ButtonBar\IButtonBar.cs" />
     <Compile Include="UI\ButtonBar\ToolbarWrapper.cs" />
-    <Compile Include="UI\LightweightUiNew.cs" />
+    <Compile Include="UI\CategoryIcons.cs" />
+    <Compile Include="UI\TweakableUi.cs" />
     <Compile Include="BaseActionManager.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="Highlighter.cs" />
@@ -109,7 +110,7 @@
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>REM xcopy /Y /S "$(TargetDir)*.*" "C:\KSP_win_dev\GameData\ActionGroupManager\"</PostBuildEvent>
+    <PostBuildEvent>xcopy /Y /S "$(TargetDir)*.*" "C:\KSP_win_dev\GameData\ActionGroupManager\"</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -49,6 +49,8 @@ namespace ActionGroupManager.UI
         Vector2 mainWindowScroll;
         Vector2 secondaryWindowScroll;
 
+        bool classicView = SettingsManager.Settings.GetValue<bool>(SettingsManager.ClassicView);
+
         bool listIsDirty = false;
         bool actionGroupViewHighlightAll;
         bool allActionGroupSelected = false;
@@ -63,6 +65,7 @@ namespace ActionGroupManager.UI
 
         private void Initialize()
         {
+
             mainWindowSize = SettingsManager.Settings.GetValue<Rect>(SettingsManager.MainWindowRect, new Rect(200, 200, 500, 400));
             mainWindowSize.width = mainWindowSize.width > 500 ? 500 : mainWindowSize.width;
             mainWindowSize.height = mainWindowSize.height > 400 ? 400 : mainWindowSize.height;
@@ -138,67 +141,45 @@ namespace ActionGroupManager.UI
             if (GUI.Button(new Rect(mainWindowSize.width - 24, 4, 20, 20), new GUIContent("X", "Close the window."), Style.CloseButtonStyle))
                 SetVisible(!IsVisible());
 
-//            GUILayout.BeginHorizontal();
-//            foreach(ViewType vt in Enum.GetValues(typeof(ViewType)))
-//            {
-//                bool initial = vt == currentView;
-//                bool final = GUILayout.Toggle(initial, vt.ToString(), Style.ButtonToggleStyle);
-//                if (initial != final)
-//                {
-//                    currentView = vt;
-//                    mainWindowScroll = Vector2.zero;
-//#if DEBUG
-//                    Debug.Log("View Changed");
-//#endif
-//                    OnUpdate(FilterModification.All, null);
-//                    currentSelectedActionGroup = KSPActionGroup.None;
-//                    highlighter.Clear();
-//                    currentSelectedBaseAction.Clear();
-//                }
-//            }
-//            GUILayout.EndHorizontal();
+            //            GUILayout.BeginHorizontal();
+            //            foreach(ViewType vt in Enum.GetValues(typeof(ViewType)))
+            //            {
+            //                bool initial = vt == currentView;
+            //                bool final = GUILayout.Toggle(initial, vt.ToString(), Style.ButtonToggleStyle);
+            //                if (initial != final)
+            //                {
+            //                    currentView = vt;
+            //                    mainWindowScroll = Vector2.zero;
+            //#if DEBUG
+            //                    Debug.Log("View Changed");
+            //#endif
+            //                    OnUpdate(FilterModification.All, null);
+            //                    currentSelectedActionGroup = KSPActionGroup.None;
+            //                    highlighter.Clear();
+            //                    currentSelectedBaseAction.Clear();
+            //                }
+            //            }
+            //            GUILayout.EndHorizontal();
 
-            #region Categories Draw
-#if DEBUG_VERBOSE
-            Debug.Log("AGM : Categories Draw.");
-#endif
-            GUILayout.BeginHorizontal();
-            Dictionary<PartCategories, int> dic = partFilter.GetNumberOfPartByCategory();
 
-            foreach (PartCategories pc in dic.Keys)
-            {
-                if (pc == PartCategories.none)
-                    continue;
-
-                bool initial = pc == partFilter.CurrentPartCategory;
-                string str = pc.ToString();
-                if(dic[pc] > 0)
-                {
-                    str += " (" + dic[pc] + ")";
-                }
-
-                GUI.enabled = (dic[pc] > 0);
-                bool result = GUILayout.Toggle(initial, new GUIContent(str, "Show only " + pc.ToString() + " parts."), Style.ButtonToggleStyle);
-                GUI.enabled = true;
-
-                if (initial != result)
-                {
-                    if (!result)
-                        OnUpdate(FilterModification.Category, PartCategories.none);
-                    else
-                        OnUpdate(FilterModification.Category, pc);
-                }
-
-            }
-            GUILayout.EndHorizontal();
-            #endregion
+            DrawCategories();
 
             if (currentView == ViewType.Parts)
                 DoMyPartView();
             else if (currentView == ViewType.ActionGroup)
                 DoMyActionGroupView();
 
+            if (!classicView)
+            {
+                GUILayout.BeginVertical();
+                DrawSelectedActionGroup();
+                GUILayout.EndVertical();
+
+                GUILayout.EndHorizontal();
+                GUILayout.Space(10);
+            }
             GUILayout.BeginHorizontal();
+            GUILayout.Label("Part Search:");
             string newString = GUILayout.TextField(partFilter.CurrentSearch);
             if (partFilter.CurrentSearch != newString)
                 OnUpdate(FilterModification.Search, newString);
@@ -206,12 +187,92 @@ namespace ActionGroupManager.UI
             GUILayout.Space(5);
             if (GUILayout.Button(new GUIContent("X", "Remove all text from the input box."), Style.ButtonToggleStyle, GUILayout.Width(Style.ButtonToggleStyle.fixedHeight)))
                 OnUpdate(FilterModification.Search, string.Empty);
-
+     
             GUILayout.EndHorizontal();
 
             GUILayout.Label(GUI.tooltip, GUILayout.Height(15));
 
             GUI.DragWindow();
+        }
+
+        private void DrawCategories()
+        {
+            #if DEBUG_VERBOSE
+                Debug.Log("AGM : Categories Draw.");
+            #endif
+
+            GUILayout.BeginHorizontal();
+            if (!classicView)
+            {
+                GUILayout.BeginVertical();
+                GUILayout.Label("Category Filter");
+            }
+
+            Dictionary<PartCategories, int> dic = partFilter.GetNumberOfPartByCategory();
+
+            int iconCount = 0;
+            foreach (PartCategories category in dic.Keys)
+            {
+                if (category == PartCategories.none)
+                    continue;
+
+                bool initial = category == partFilter.CurrentPartCategory;
+                string buttonText;
+
+                iconCount++;
+                if (!classicView)
+                {
+                    if (iconCount % 2 == 1)
+                        GUILayout.BeginHorizontal();
+                }
+
+
+                if (classicView)
+                {
+                    buttonText = category.ToString();
+                    if (dic[category] > 0)
+                        buttonText += " (" + dic[category] + ")";
+                }
+                else
+                {
+                    buttonText = "";
+                    if (dic[category] > 0)
+                        buttonText = dic[category].ToString();
+                }
+
+                GUI.enabled = (dic[category] > 0);
+                bool result;
+                if (classicView)
+                    result = GUILayout.Toggle(initial, new GUIContent(buttonText, "Show only " + category.ToString() + " parts."), Style.ButtonToggleStyle);
+                else
+                {
+                    result = GUILayout.Toggle(initial, new GUIContent(buttonText, GameDatabase.Instance.GetTexture(CategoryIcons.GetIcon(category), false), "Show only " + category.ToString() + " parts."), Style.ButtonCategoryStyle);
+                }
+                GUI.enabled = true;
+
+                if (initial != result)
+                {
+                    if (!result)
+                        OnUpdate(FilterModification.Category, PartCategories.none);
+                    else
+                        OnUpdate(FilterModification.Category, category);
+                }
+
+                if (!classicView)
+                {
+                    if (iconCount % 2 == 0) GUILayout.EndHorizontal();
+                }
+
+            }
+
+            if (classicView)
+                GUILayout.EndHorizontal();
+            else
+            {
+                if (iconCount % 2 == 1) GUILayout.EndHorizontal();
+                GUILayout.EndVertical();
+            }
+
         }
 
         #region Parts view
@@ -224,7 +285,7 @@ namespace ActionGroupManager.UI
 
             highlighter.Update();
 
-            GUILayout.BeginVertical();
+            if(classicView) GUILayout.BeginVertical();
 
             GUILayout.BeginHorizontal();
 
@@ -237,8 +298,11 @@ namespace ActionGroupManager.UI
             GUILayout.EndScrollView();
             
             GUILayout.Space(10);
+            if(classicView)
+                secondaryWindowScroll = GUILayout.BeginScrollView(secondaryWindowScroll, Style.ScrollViewStyle);
+            else
+                secondaryWindowScroll = GUILayout.BeginScrollView(secondaryWindowScroll, Style.ScrollViewStyle, GUILayout.Width(300));
 
-            secondaryWindowScroll = GUILayout.BeginScrollView(secondaryWindowScroll, Style.ScrollViewStyle);
             GUILayout.BeginVertical();
 
             DrawSelectedAction();
@@ -249,11 +313,13 @@ namespace ActionGroupManager.UI
 
             GUILayout.EndHorizontal();
 
-            GUILayout.Space(10);
+            if (classicView)
+            {
+                GUILayout.Space(10);
+                DrawSelectedActionGroup();
 
-            DrawSelectedActionGroup();
-
-            GUILayout.EndVertical();
+                GUILayout.EndVertical();
+            }
 #if DEBUG_VERBOSE
             Debug.Log("AGM : End DoPartView.");
 #endif
@@ -578,9 +644,10 @@ namespace ActionGroupManager.UI
             Debug.Log("AGM : Draw Action Group list");
 #endif
             bool selectMode = currentSelectedBaseAction.Count == 0;
-               
-            GUILayout.BeginVertical();
-            GUILayout.BeginHorizontal();
+            if (classicView) {
+                GUILayout.BeginVertical();
+                GUILayout.BeginHorizontal();
+            }
 
             foreach (KSPActionGroup ag in VesselManager.Instance.AllActionGroups)
             {
@@ -638,17 +705,19 @@ namespace ActionGroupManager.UI
 
                 GUI.enabled = true;
 
-                if (ag == KSPActionGroup.Custom02)
+                if (classicView && ag == KSPActionGroup.Custom02)
                 {
                     GUILayout.EndHorizontal();
                     GUILayout.BeginHorizontal();
                 }
 
             }
+            if (classicView)
+            {
+                GUILayout.EndHorizontal();
 
-            GUILayout.EndHorizontal();
-
-            GUILayout.EndVertical();
+                GUILayout.EndVertical();
+            }
             GUI.enabled = true;
         }
         #endregion

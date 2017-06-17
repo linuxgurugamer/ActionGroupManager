@@ -63,7 +63,6 @@ namespace ActionGroupManager.UI.ButtonBar
             {
                 mainButton.SetFalse(false);
             }
-            //mainButton.SetTexture(vis ? onButton : offButton);
         }
 
     }

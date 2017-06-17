@@ -64,16 +64,6 @@ namespace ActionGroupManager
                     Remove(bA.listParent.part);
                 }
             }
-            /*
-            if (!internalHighlight.Any(
-                (e) =>
-                {
-                    return e == bA.listParent.part;
-                }))
-            {
-                Remove(bA.listParent.part);
-            }
-            */
         }
 
         public void Switch(Part p)

@@ -105,6 +105,62 @@ namespace ActionGroupManager
 
                 if (CurrentStage != int.MinValue)
                     baseList = baseList.Where(FilterStage);
+                /*
+                if (CurrentPartCategory != PartCategories.none)
+                {
+                    List<Part> filteredList = new List<Part>();
+                    for (int i = 0; i < baseList.Count; i++)
+                    {
+                        if (FilterCategory(baseList[i]))
+                        {
+                            filteredList.Add(baseList[i]);
+                        }
+                    }
+                    baseList = filteredList;
+                }
+
+
+
+                if (CurrentActionGroup != KSPActionGroup.None)
+                {
+                    List<Part> filteredList = new List<Part>();
+                    for (int i = 0; i < baseList.Count; i++)
+                    {
+                        if (FilterActionGroup(baseList[i]))
+                        {
+                            filteredList.Add(baseList[i]);
+                        }
+                    }
+                    baseList = filteredList;
+                }
+
+
+                if (CurrentSearch != string.Empty)
+                {
+                    List<Part> filteredList = new List<Part>();
+                    for (int i = 0; i < baseList.Count; i++)
+                    {
+                        if (FilterString(baseList[i]))
+                        {
+                            filteredList.Add(baseList[i]);
+                        }
+                    }
+                    baseList = filteredList;
+                }
+
+                if (CurrentStage != int.MinValue)
+                {
+                    List<Part> filteredList = new List<Part>();
+                    for (int i = 0; i < baseList.Count; i++)
+                    {
+                        if (FilterStage(baseList[i]))
+                        {
+                            filteredList.Add(baseList[i]);
+                        }
+                    }
+                    baseList = filteredList;
+                }
+                */
 
                 returnPart.AddRange(baseList);
 
