@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -24,6 +24,7 @@
     <WarningLevel>4</WarningLevel>
     <RunCodeAnalysis>false</RunCodeAnalysis>
     <CodeAnalysisIgnoreGeneratedCode>false</CodeAnalysisIgnoreGeneratedCode>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>none</DebugType>
@@ -33,6 +34,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'debug_verbose|AnyCPU'">
     <DebugSymbols>true</DebugSymbols>
@@ -43,6 +45,7 @@
     <RunCodeAnalysis>true</RunCodeAnalysis>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>ManagedMinimumRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Assembly-CSharp">
@@ -68,7 +71,7 @@
     <Compile Include="UI\ButtonBar\AppLauncher.cs" />
     <Compile Include="UI\ButtonBar\IButtonBar.cs" />
     <Compile Include="UI\ButtonBar\ToolbarWrapper.cs" />
-    <Compile Include="UI\CategoryIcons.cs" />
+    <Compile Include="UI\ButtonIcons.cs" />
     <Compile Include="UI\TweakableUi.cs" />
     <Compile Include="BaseActionManager.cs" />
     <Compile Include="Extensions.cs" />
@@ -91,7 +94,13 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Resources\Abort.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Resources\AppLauncher.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\number0.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\ToolbarOffLarge.png">

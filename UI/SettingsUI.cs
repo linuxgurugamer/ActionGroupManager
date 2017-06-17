@@ -39,13 +39,27 @@ namespace ActionGroupManager.UI
             if (final != initial)
                 SettingsManager.Settings.SetValue(SettingsManager.OrderByStage, final);
 
-            initial = SettingsManager.Settings.GetValue<bool>(SettingsManager.ClassicView);
             GUILayout.Label("Requires Return to Space Center:");
+            initial = SettingsManager.Settings.GetValue<bool>(SettingsManager.ClassicView);
             final = GUILayout.Toggle(initial, "Classic View", Style.ButtonToggleStyle);
             if (final != initial)
+            {
                 SettingsManager.Settings.SetValue(SettingsManager.ClassicView, final);
+                // Icon categories are exclusive to the new UI
+                if (final) SettingsManager.Settings.SetValue(SettingsManager.IconCategories, false);
+            }
 
-            GUILayout.EndVertical();
+            initial = SettingsManager.Settings.GetValue<bool>(SettingsManager.IconCategories);
+            final = GUILayout.Toggle(initial, "Use Category Icons", Style.ButtonToggleStyle);
+            if (final != initial)
+            {
+                SettingsManager.Settings.SetValue(SettingsManager.IconCategories, final);
+                // Icon categories are exclusive to the new UI
+                if (final) SettingsManager.Settings.SetValue(SettingsManager.ClassicView, false);
+            }
+
+
+                GUILayout.EndVertical();
 
             GUI.DragWindow();
         }

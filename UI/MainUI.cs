@@ -50,6 +50,7 @@ namespace ActionGroupManager.UI
         Vector2 secondaryWindowScroll;
 
         bool classicView = SettingsManager.Settings.GetValue<bool>(SettingsManager.ClassicView);
+        bool iconCategories = SettingsManager.Settings.GetValue<bool>(SettingsManager.IconCategories);
 
         bool listIsDirty = false;
         bool actionGroupViewHighlightAll;
@@ -172,7 +173,7 @@ namespace ActionGroupManager.UI
             if (!classicView)
             {
                 GUILayout.BeginVertical();
-                DrawSelectedActionGroup();
+                    DrawSelectedActionGroup();
                 GUILayout.EndVertical();
 
                 GUILayout.EndHorizontal();
@@ -220,14 +221,14 @@ namespace ActionGroupManager.UI
                 string buttonText;
 
                 iconCount++;
-                if (!classicView)
+                if (!classicView && iconCategories)
                 {
                     if (iconCount % 2 == 1)
                         GUILayout.BeginHorizontal();
                 }
 
 
-                if (classicView)
+                if (classicView || !iconCategories)
                 {
                     buttonText = category.ToString();
                     if (dic[category] > 0)
@@ -242,11 +243,11 @@ namespace ActionGroupManager.UI
 
                 GUI.enabled = (dic[category] > 0);
                 bool result;
-                if (classicView)
+                if (classicView || !iconCategories)
                     result = GUILayout.Toggle(initial, new GUIContent(buttonText, "Show only " + category.ToString() + " parts."), Style.ButtonToggleStyle);
                 else
                 {
-                    result = GUILayout.Toggle(initial, new GUIContent(buttonText, GameDatabase.Instance.GetTexture(CategoryIcons.GetIcon(category), false), "Show only " + category.ToString() + " parts."), Style.ButtonCategoryStyle);
+                    result = GUILayout.Toggle(initial, new GUIContent(buttonText, GameDatabase.Instance.GetTexture(ButtonIcons.GetIcon(category), false), "Show only " + category.ToString() + " parts."), Style.ButtonCategoryStyle);
                 }
                 GUI.enabled = true;
 
@@ -258,7 +259,7 @@ namespace ActionGroupManager.UI
                         OnUpdate(FilterModification.Category, category);
                 }
 
-                if (!classicView)
+                if (!classicView && iconCategories)
                 {
                     if (iconCount % 2 == 0) GUILayout.EndHorizontal();
                 }
@@ -267,12 +268,13 @@ namespace ActionGroupManager.UI
 
             if (classicView)
                 GUILayout.EndHorizontal();
-            else
+            else if(iconCategories)
             {
                 if (iconCount % 2 == 1) GUILayout.EndHorizontal();
                 GUILayout.EndVertical();
             }
-
+            else
+                GUILayout.EndVertical();
         }
 
         #region Parts view

@@ -48,7 +48,6 @@ namespace ActionGroupManager
             _manager = this;
 
             UiList = new Dictionary<string, UiObject>();
-
             MainUi main = new MainUi();
             UiList.Add("Main", main);
             UiList.Add("Light", new TweakableUi());
