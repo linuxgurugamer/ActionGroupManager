@@ -46,27 +46,39 @@ namespace ActionGroupManager.UI
             {
                 SettingsManager.Settings.SetValue(SettingsManager.ClassicView, final);
                 // Icon categories are exclusive to the new UI
-                if (final) SettingsManager.Settings.SetValue(SettingsManager.IconCategories, false);
+                if (final)
+                {
+                    SettingsManager.Settings.SetValue(SettingsManager.TextCategories, false);
+                    SettingsManager.Settings.SetValue(SettingsManager.TextActionGroups, false);
+                }
             }
 
-            initial = SettingsManager.Settings.GetValue<bool>(SettingsManager.IconCategories);
-            final = GUILayout.Toggle(initial, "Use Category Icons", Style.ButtonToggleStyle);
+            initial = SettingsManager.Settings.GetValue<bool>(SettingsManager.TextCategories);
+            final = GUILayout.Toggle(initial, "Use Text Category Buttons", Style.ButtonToggleStyle);
             if (final != initial)
             {
-                SettingsManager.Settings.SetValue(SettingsManager.IconCategories, final);
+                SettingsManager.Settings.SetValue(SettingsManager.TextCategories, final);
                 // Icon categories are exclusive to the new UI
                 if (final) SettingsManager.Settings.SetValue(SettingsManager.ClassicView, false);
             }
 
+            initial = SettingsManager.Settings.GetValue<bool>(SettingsManager.TextActionGroups);
+            final = GUILayout.Toggle(initial, "Use Action Group Icons", Style.ButtonToggleStyle);
+            if (final != initial)
+            {
+                SettingsManager.Settings.SetValue(SettingsManager.TextActionGroups, final);
+                // Icon categories are exclusive to the new UI
+                if (final) SettingsManager.Settings.SetValue(SettingsManager.ClassicView, false);
+            }
 
-                GUILayout.EndVertical();
+            GUILayout.EndVertical();
 
             GUI.DragWindow();
         }
 
         public SettingsUi(bool visible)
         {
-            settingsWindowPositon = new Rect(Screen.width / 2f - 100, Screen.height / 2f - 100, 200, 150);
+            settingsWindowPositon = new Rect(Screen.width / 2f - 100, Screen.height / 2f - 100, 250, 150);
             SetVisible(visible);
         }
 

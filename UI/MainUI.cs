@@ -50,7 +50,8 @@ namespace ActionGroupManager.UI
         Vector2 secondaryWindowScroll;
 
         bool classicView = SettingsManager.Settings.GetValue<bool>(SettingsManager.ClassicView);
-        bool iconCategories = SettingsManager.Settings.GetValue<bool>(SettingsManager.IconCategories);
+        bool textCategories = SettingsManager.Settings.GetValue<bool>(SettingsManager.TextCategories);
+        bool textActionGroups = SettingsManager.Settings.GetValue<bool>(SettingsManager.TextActionGroups);
 
         bool listIsDirty = false;
         bool actionGroupViewHighlightAll;
@@ -173,7 +174,7 @@ namespace ActionGroupManager.UI
             if (!classicView)
             {
                 GUILayout.BeginVertical();
-                    DrawSelectedActionGroup();
+                DrawSelectedActionGroup();
                 GUILayout.EndVertical();
 
                 GUILayout.EndHorizontal();
@@ -221,14 +222,14 @@ namespace ActionGroupManager.UI
                 string buttonText;
 
                 iconCount++;
-                if (!classicView && iconCategories)
+                if (!classicView && !textCategories)
                 {
                     if (iconCount % 2 == 1)
                         GUILayout.BeginHorizontal();
                 }
 
 
-                if (classicView || !iconCategories)
+                if (classicView || textCategories)
                 {
                     buttonText = category.ToString();
                     if (dic[category] > 0)
@@ -243,7 +244,7 @@ namespace ActionGroupManager.UI
 
                 GUI.enabled = (dic[category] > 0);
                 bool result;
-                if (classicView || !iconCategories)
+                if (classicView || textCategories)
                     result = GUILayout.Toggle(initial, new GUIContent(buttonText, "Show only " + category.ToString() + " parts."), Style.ButtonToggleStyle);
                 else
                 {
@@ -259,7 +260,7 @@ namespace ActionGroupManager.UI
                         OnUpdate(FilterModification.Category, category);
                 }
 
-                if (!classicView && iconCategories)
+                if (!classicView && !textCategories)
                 {
                     if (iconCount % 2 == 0) GUILayout.EndHorizontal();
                 }
@@ -268,7 +269,7 @@ namespace ActionGroupManager.UI
 
             if (classicView)
                 GUILayout.EndHorizontal();
-            else if(iconCategories)
+            else if(!textCategories)
             {
                 if (iconCount % 2 == 1) GUILayout.EndHorizontal();
                 GUILayout.EndVertical();
@@ -651,18 +652,36 @@ namespace ActionGroupManager.UI
                 GUILayout.BeginHorizontal();
             }
 
+            int iconCount = 0;
             foreach (KSPActionGroup ag in VesselManager.Instance.AllActionGroups)
             {
                 if (ag == KSPActionGroup.None || ag == KSPActionGroup.REPLACEWITHDEFAULT)
                     continue;
 
+                iconCount++;
+                if (!classicView && !textActionGroups)
+                {
+                    if (iconCount % 2 == 1)
+                        GUILayout.BeginHorizontal();
+                }
+
                 List<BaseAction> list = partFilter.GetBaseActionAttachedToActionGroup(ag).ToList();
 
-                string buttonTitle = ag.ToString();
-
-                if (list.Count > 0)
+                string buttonTitle = "";
+                if (classicView || textActionGroups)
                 {
-                    buttonTitle += " (" + list.Count + ")";
+                    buttonTitle = ag.ToString();
+                    if (list.Count > 0)
+                    {
+                        buttonTitle += " (" + list.Count + ")";
+                    }
+                }
+                else
+                {
+                    if(list.Count > 0)
+                    {
+                        buttonTitle = list.Count.ToString();
+                    }
                 }
 
                 string tooltip;
@@ -677,8 +696,21 @@ namespace ActionGroupManager.UI
                 if (selectMode && list.Count == 0)
                     GUI.enabled = false;
 
+                GUIContent content;
+                GUIStyle style;
+                if (classicView || textActionGroups)
+                {
+                    content = new GUIContent(buttonTitle, tooltip);
+                    style = Style.ButtonToggleStyle;
+                }
+                else
+                {
+                    content = new GUIContent(buttonTitle, GameDatabase.Instance.GetTexture(ButtonIcons.GetIcon(ag), false), tooltip);
+                    style = Style.ButtonCategoryStyle;
+                }
+
                 //Push the button will replace the actual action group list with all the selected action
-                if(GUILayout.Button(new GUIContent(buttonTitle, tooltip), Style.ButtonToggleStyle))
+                if (GUILayout.Button(content, style))
                 {
 
                     if (!selectMode)
@@ -711,6 +743,9 @@ namespace ActionGroupManager.UI
                 {
                     GUILayout.EndHorizontal();
                     GUILayout.BeginHorizontal();
+                } else if (!classicView && !textActionGroups)
+                { 
+                    if (iconCount % 2 == 0) GUILayout.EndHorizontal();
                 }
 
             }
@@ -719,6 +754,9 @@ namespace ActionGroupManager.UI
                 GUILayout.EndHorizontal();
 
                 GUILayout.EndVertical();
+            } else if (!textActionGroups)
+            {
+                if (iconCount % 2 == 1) GUILayout.EndHorizontal();
             }
             GUI.enabled = true;
         }
