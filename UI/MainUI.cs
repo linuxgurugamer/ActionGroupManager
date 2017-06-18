@@ -102,21 +102,17 @@ namespace ActionGroupManager.UI
                 GUILayout.BeginHorizontal(); // Begin Collection area to include Category Buttons, Scroll Lists, and Action Group Buttons (New View)
 
             DrawCategoryButtons();
-
             if (classicView)
                 GUILayout.BeginHorizontal(); // Begin Collection Area for Scroll Lists (Classic View)
 
             DrawPartsScrollList();
-
             GUILayout.Space(10);
-
             DrawActionsScrollList();
 
             if (classicView)
                 GUILayout.EndHorizontal(); // End Collection Area for Scroll Lists (Classic View)
 
             DrawActionGroupButtons();
-
             if (!classicView)
                 GUILayout.EndHorizontal(); // End Collection Area for Category buttons, Scroll Lists, and Action Group Buttons (New View)
 
@@ -218,7 +214,120 @@ namespace ActionGroupManager.UI
             }
         }
 
-        #region Parts view
+        //Draw the Action groups grid in Part View
+        private void DrawActionGroupButtons()
+        {
+            List<BaseAction> list;
+            string tooltip, buttonTitle;
+            bool selectMode = currentSelectedBaseAction.Count == 0;
+
+            GUILayout.BeginVertical();  // Begin Action Group Collection (All Views)
+            if (classicView)
+            {
+                GUILayout.BeginHorizontal();  // Begin First Row of Action Group Buttons (Classic View)
+            }
+
+            int iconCount = 0;
+            List<KSPActionGroup> actionGroups = VesselManager.Instance.AllActionGroups;
+            for (int i = 0; i < actionGroups.Count; i++)
+            {
+                if (actionGroups[i] == KSPActionGroup.None || actionGroups[i] == KSPActionGroup.REPLACEWITHDEFAULT)
+                    continue;
+
+                list = partFilter.GetBaseActionAttachedToActionGroup(actionGroups[i]);
+                tooltip = string.Empty;
+                buttonTitle = string.Empty;
+
+                iconCount++;
+                if (classicView || textActionGroups)
+                {
+                    buttonTitle = actionGroups[i].ToString();
+                    if (list.Count > 0)
+                        buttonTitle += " (" + list.Count + ")";
+                }
+                else
+                {
+                    if (iconCount % 2 == 1)
+                        GUILayout.BeginHorizontal();  // Begin 2 Button Row (New View with Icons)
+
+                    if (list.Count > 0)
+                        buttonTitle = list.Count.ToString();
+                }
+
+                if (selectMode)
+                    if (list.Count > 0)
+                        tooltip = "Put all the parts linked to " + actionGroups[i].ToString() + " in the selection.";
+                    else
+                        tooltip = "Link all parts selected to " + actionGroups[i].ToString();
+
+                if (selectMode && list.Count == 0)
+                    GUI.enabled = false;
+
+                GUIStyle style;
+                if (classicView || textActionGroups)
+                {
+                    guiContent = SetupGuiContent(buttonTitle, tooltip);
+                    style = Style.ButtonToggleStyle;
+                }
+                else
+                {
+                    guiContent = SetupGuiContent(buttonTitle, GameDatabase.Instance.GetTexture(ButtonIcons.GetIcon(actionGroups[i]), false), tooltip);
+                    style = Style.ButtonIconStyle;
+                }
+
+                //Push the button will replace the actual action group list with all the selected action
+                if (GUILayout.Button(guiContent, style))
+                {
+
+                    if (!selectMode)
+                    {
+                        //TODO: Remvoe foreach
+                        foreach (BaseAction ba in list)
+                            ba.RemoveActionToAnActionGroup(actionGroups[i]);
+
+                        foreach (BaseAction ba in currentSelectedBaseAction)
+                            ba.AddActionToAnActionGroup(actionGroups[i]);
+
+                        currentSelectedBaseAction.Clear();
+
+                        currentSelectedPart = null;
+                        confirmDelete = false;
+                    }
+                    else
+                    {
+                        if (list.Count > 0)
+                        {
+                            currentSelectedBaseAction = list;
+                            allActionGroupSelected = true;
+                            currentSelectedActionGroup = actionGroups[i];
+                        }
+                    }
+                }
+
+                GUI.enabled = true;
+
+                if (classicView && actionGroups[i] == KSPActionGroup.Custom02)
+                {
+                    GUILayout.EndHorizontal();  // End Button Row (Classic View)
+                    GUILayout.BeginHorizontal(); // Begin button Row (Classic View)
+                }
+                else if (!classicView && !textActionGroups)
+                {
+                    if (iconCount % 2 == 0) GUILayout.EndHorizontal(); // End 2 Button Row (New View with Icons)
+                }
+
+            }
+            if (classicView)
+            {
+                GUILayout.EndHorizontal();  // End Button Row (Classic View)
+            }
+            else if (!textActionGroups)
+            {
+                if (iconCount % 2 == 1) GUILayout.EndHorizontal(); // End 2 Button Row if number of Buttons is Odd (New View with Icons)
+            }
+            GUILayout.EndVertical(); // End Button Collection Area
+            GUI.enabled = true;
+        }
 
         //Entry of action group view draw
         private void DrawPartsScrollList()
@@ -259,168 +368,6 @@ namespace ActionGroupManager.UI
 
             GUILayout.EndVertical(); // End Parts List
             GUILayout.EndScrollView(); // End Parts List
-        }
-
-        //Internal draw routine for DrawAllParts()
-        private void InternalDrawParts(List<Part> list)
-        {
-            bool initial, final;
-            string str = string.Empty;
-            List<KSPActionGroup> currentAG;
-
-            for (int i = 0; i < list.Count; i++)
-            {
-                currentAG = partFilter.GetActionGroupAttachedToPart(list[i]);
-                GUILayout.BeginHorizontal();
-
-                initial = highlighter.Contains(list[i]);
-                
-                final = GUILayout.Toggle(initial, SetupGuiContent("!", "Highlight the part."), Style.ButtonToggleStyle, GUILayout.Width(20));
-
-                if (final != initial)
-                    highlighter.Switch(list[i]);
-
-                initial = list[i] == currentSelectedPart;
-                str = list[i].partInfo.title;
-
-                final = GUILayout.Toggle(initial, str, Style.ButtonPartStyle);
-                if (initial != final)
-                {
-                    if (final)
-                        currentSelectedPart = list[i];
-                    else
-                        currentSelectedPart = null;
-                }
-
-                if (currentAG.Count > 0)
-                {
-                    for(int j = 0; j < currentAG.Count; j++)
-                    {
-                        if (currentAG[j] == KSPActionGroup.None)
-                            continue;
-
-                         if (list[i] != currentSelectedPart)
-                        {
-                            if (GUILayout.Button(SetupGuiContent(currentAG[j].ToShortString(), "Part has an action linked to action group " + currentAG[j].ToString()), Style.ButtonToggleStyle, GUILayout.Width(20)))
-                            {
-                                currentSelectedBaseAction = partFilter.GetBaseActionAttachedToActionGroup(currentAG[j]);
-                                currentSelectedActionGroup = currentAG[j];
-                                allActionGroupSelected = true;
-                            }
-                        }
-                    }
-
-                }
-
-                GUILayout.EndHorizontal();
-
-                if (currentSelectedPart == list[i])
-                    DrawActionGroupList();
-            }
-        }
-
-        #endregion
-
-        //Draw the selected part available actions in Part View
-        private void DrawActionGroupList()
-        {
-            if (currentSelectedPart)
-            {
-                List<BaseAction> baseActions = BaseActionFilter.FromParts(currentSelectedPart);
-                List<KSPActionGroup> actionGroups;
-                GUILayout.BeginVertical();
-
-                for(int i = 0; i < baseActions.Count; i++)
-                {
-                    GUILayout.BeginHorizontal();
-                    GUILayout.Space(20);
-                    GUILayout.Label(baseActions[i].guiName, Style.LabelExpandStyle);
-                    GUILayout.FlexibleSpace();
-
-                    if (BaseActionFilter.GetActionGroupList(baseActions[i]).Count > 0)
-                    {
-                        actionGroups = BaseActionFilter.GetActionGroupList(baseActions[i]);
-                        for(int j = 0; j < actionGroups.Count; j++)
-                        {
-                            if (GUILayout.Button(SetupGuiContent(actionGroups[j].ToShortString(), actionGroups[j].ToString()), Style.ButtonToggleStyle, GUILayout.Width(20)))
-                            {
-                                currentSelectedBaseAction = partFilter.GetBaseActionAttachedToActionGroup(actionGroups[j]);
-                                currentSelectedActionGroup = actionGroups[j];
-                                allActionGroupSelected = true;
-                            }
-                        }
-                    }
-
-
-                    if (currentSelectedBaseAction.Contains(baseActions[i]))
-                    {
-                        if (GUILayout.Button(SetupGuiContent("<", "Remove from selection."), Style.ButtonToggleStyle, GUILayout.Width(20)))
-                        {
-                            if (allActionGroupSelected)
-                                allActionGroupSelected = false;
-                            currentSelectedBaseAction.Remove(baseActions[i]);
-                            listIsDirty = true;
-                        }
-
-                        //Remove all symetry parts.
-                        if (currentSelectedPart.symmetryCounterparts.Count > 0)
-                        {
-                            if (GUILayout.Button(SetupGuiContent("<<", "Remove part and all symmetry linked parts from selection."), Style.ButtonToggleStyle, GUILayout.Width(20)))
-                            {
-                                if (allActionGroupSelected)
-                                    allActionGroupSelected = false;
-
-                                currentSelectedBaseAction.Remove(baseActions[i]);
-
-                                //TODO: Remove foreach
-                                foreach (BaseAction removeAll in BaseActionFilter.FromParts(currentSelectedPart.symmetryCounterparts))
-                                {
-                                    if (removeAll.name == baseActions[i].name && currentSelectedBaseAction.Contains(removeAll))
-                                        currentSelectedBaseAction.Remove(removeAll);
-                                }
-                                listIsDirty = true;
-                            }
-                        }
-
-                    }
-                    else
-                    {
-                        if (GUILayout.Button(SetupGuiContent(">", "Add to selection."), Style.ButtonToggleStyle, GUILayout.Width(20)))
-                        {
-                            if (allActionGroupSelected)
-                                allActionGroupSelected = false;
-                            currentSelectedBaseAction.Add(baseActions[i]);
-                            listIsDirty = true;
-                        }
-
-                        //Add all symetry parts.
-                        if (currentSelectedPart.symmetryCounterparts.Count > 0)
-                        {
-                            if (GUILayout.Button(SetupGuiContent(">>", "Add part and all symmetry linked parts to selection."), Style.ButtonToggleStyle, GUILayout.Width(20)))
-                            {
-                                if (allActionGroupSelected)
-                                    allActionGroupSelected = false;
-                                if (!currentSelectedBaseAction.Contains(baseActions[i]))
-                                    currentSelectedBaseAction.Add(baseActions[i]);
-
-                                //TODO: Remove foreach
-                                foreach (BaseAction addAll in BaseActionFilter.FromParts(currentSelectedPart.symmetryCounterparts))
-                                {
-                                    if (addAll.name == baseActions[i].name && !currentSelectedBaseAction.Contains(addAll))
-                                        currentSelectedBaseAction.Add(addAll);
-                                }
-                                listIsDirty = true;
-                            }
-                        }
-
-                    }
-
-                    GUILayout.EndHorizontal();
-
-                }
-
-                GUILayout.EndVertical();
-            }
         }
 
         //Draw all the current selected action
@@ -541,119 +488,164 @@ namespace ActionGroupManager.UI
             GUILayout.EndScrollView(); // End Actions List
         }
 
-        //Draw the Action groups grid in Part View
-        private void DrawActionGroupButtons()
+        //Internal draw routine for DrawAllParts()
+        private void InternalDrawParts(List<Part> list)
         {
-            List<BaseAction> list;
-            string tooltip, buttonTitle;
-            bool selectMode = currentSelectedBaseAction.Count == 0;
+            bool initial, final;
+            string str = string.Empty;
+            List<KSPActionGroup> currentAG;
 
-            GUILayout.BeginVertical();  // Begin Action Group Collection (All Views)
-            if (classicView)
+            for (int i = 0; i < list.Count; i++)
             {
-                GUILayout.BeginHorizontal();  // Begin First Row of Action Group Buttons (Classic View)
-            }
+                currentAG = partFilter.GetActionGroupAttachedToPart(list[i]);
+                GUILayout.BeginHorizontal();
 
-            int iconCount = 0;
-            List<KSPActionGroup> actionGroups = VesselManager.Instance.AllActionGroups;
-            for (int i = 0; i < actionGroups.Count; i++)
-            {
-                if (actionGroups[i] == KSPActionGroup.None || actionGroups[i] == KSPActionGroup.REPLACEWITHDEFAULT)
-                    continue;
+                initial = highlighter.Contains(list[i]);
 
-                list = partFilter.GetBaseActionAttachedToActionGroup(actionGroups[i]);
-                tooltip = string.Empty;
-                buttonTitle = string.Empty;
+                final = GUILayout.Toggle(initial, SetupGuiContent("!", "Highlight the part."), Style.ButtonToggleStyle, GUILayout.Width(20));
 
-                iconCount++;
-                if (classicView || textActionGroups)
+                if (final != initial)
+                    highlighter.Switch(list[i]);
+
+                initial = list[i] == currentSelectedPart;
+                str = list[i].partInfo.title;
+
+                final = GUILayout.Toggle(initial, str, Style.ButtonPartStyle);
+                if (initial != final)
                 {
-                    buttonTitle = actionGroups[i].ToString();
-                    if (list.Count > 0)
-                        buttonTitle += " (" + list.Count + ")";
-                }
-                else
-                {
-                    if (iconCount % 2 == 1)
-                        GUILayout.BeginHorizontal();  // Begin 2 Button Row (New View with Icons)
-
-                    if (list.Count > 0)
-                        buttonTitle = list.Count.ToString();
-                }
-
-                if (selectMode)
-                    if (list.Count > 0)
-                        tooltip = "Put all the parts linked to " + actionGroups[i].ToString() + " in the selection.";
-                else
-                    tooltip = "Link all parts selected to " + actionGroups[i].ToString();
-
-                if (selectMode && list.Count == 0)
-                    GUI.enabled = false;
-
-                GUIStyle style;
-                if (classicView || textActionGroups)
-                {
-                    guiContent = SetupGuiContent(buttonTitle, tooltip);
-                    style = Style.ButtonToggleStyle;
-                }
-                else
-                {
-                    guiContent = SetupGuiContent(buttonTitle, GameDatabase.Instance.GetTexture(ButtonIcons.GetIcon(actionGroups[i]), false), tooltip);
-                    style = Style.ButtonIconStyle;
-                }
-
-                //Push the button will replace the actual action group list with all the selected action
-                if (GUILayout.Button(guiContent, style))
-                {
-
-                    if (!selectMode)
-                    {
-                        //TODO: Remvoe foreach
-                        foreach (BaseAction ba in list)
-                            ba.RemoveActionToAnActionGroup(actionGroups[i]);
-
-                        foreach (BaseAction ba in currentSelectedBaseAction)
-                            ba.AddActionToAnActionGroup(actionGroups[i]);
-
-                        currentSelectedBaseAction.Clear();
-
+                    if (final)
+                        currentSelectedPart = list[i];
+                    else
                         currentSelectedPart = null;
-                        confirmDelete = false;
+                }
+
+                if (currentAG.Count > 0)
+                {
+                    for (int j = 0; j < currentAG.Count; j++)
+                    {
+                        if (currentAG[j] == KSPActionGroup.None)
+                            continue;
+
+                        if (list[i] != currentSelectedPart)
+                        {
+                            if (GUILayout.Button(SetupGuiContent(currentAG[j].ToShortString(), "Part has an action linked to action group " + currentAG[j].ToString()), Style.ButtonToggleStyle, GUILayout.Width(20)))
+                            {
+                                currentSelectedBaseAction = partFilter.GetBaseActionAttachedToActionGroup(currentAG[j]);
+                                currentSelectedActionGroup = currentAG[j];
+                                allActionGroupSelected = true;
+                            }
+                        }
+                    }
+
+                }
+
+                GUILayout.EndHorizontal();
+
+                if (currentSelectedPart == list[i])
+                    InternaDrawActions();
+            }
+        }
+
+        //Draw the selected part available actions in Part View
+        private void InternaDrawActions()
+        {
+            if (currentSelectedPart)
+            {
+                List<BaseAction> baseActions = BaseActionFilter.FromParts(currentSelectedPart);
+                List<KSPActionGroup> actionGroups;
+                GUILayout.BeginVertical();
+
+                for (int i = 0; i < baseActions.Count; i++)
+                {
+                    GUILayout.BeginHorizontal();
+                    GUILayout.Space(20);
+                    GUILayout.Label(baseActions[i].guiName, Style.LabelExpandStyle);
+                    GUILayout.FlexibleSpace();
+
+                    if (BaseActionFilter.GetActionGroupList(baseActions[i]).Count > 0)
+                    {
+                        actionGroups = BaseActionFilter.GetActionGroupList(baseActions[i]);
+                        for (int j = 0; j < actionGroups.Count; j++)
+                        {
+                            if (GUILayout.Button(SetupGuiContent(actionGroups[j].ToShortString(), actionGroups[j].ToString()), Style.ButtonToggleStyle, GUILayout.Width(20)))
+                            {
+                                currentSelectedBaseAction = partFilter.GetBaseActionAttachedToActionGroup(actionGroups[j]);
+                                currentSelectedActionGroup = actionGroups[j];
+                                allActionGroupSelected = true;
+                            }
+                        }
+                    }
+
+
+                    if (currentSelectedBaseAction.Contains(baseActions[i]))
+                    {
+                        if (GUILayout.Button(SetupGuiContent("<", "Remove from selection."), Style.ButtonToggleStyle, GUILayout.Width(20)))
+                        {
+                            if (allActionGroupSelected)
+                                allActionGroupSelected = false;
+                            currentSelectedBaseAction.Remove(baseActions[i]);
+                            listIsDirty = true;
+                        }
+
+                        //Remove all symetry parts.
+                        if (currentSelectedPart.symmetryCounterparts.Count > 0)
+                        {
+                            if (GUILayout.Button(SetupGuiContent("<<", "Remove part and all symmetry linked parts from selection."), Style.ButtonToggleStyle, GUILayout.Width(20)))
+                            {
+                                if (allActionGroupSelected)
+                                    allActionGroupSelected = false;
+
+                                currentSelectedBaseAction.Remove(baseActions[i]);
+
+                                //TODO: Remove foreach
+                                foreach (BaseAction removeAll in BaseActionFilter.FromParts(currentSelectedPart.symmetryCounterparts))
+                                {
+                                    if (removeAll.name == baseActions[i].name && currentSelectedBaseAction.Contains(removeAll))
+                                        currentSelectedBaseAction.Remove(removeAll);
+                                }
+                                listIsDirty = true;
+                            }
+                        }
+
                     }
                     else
                     {
-                        if (list.Count > 0)
+                        if (GUILayout.Button(SetupGuiContent(">", "Add to selection."), Style.ButtonToggleStyle, GUILayout.Width(20)))
                         {
-                            currentSelectedBaseAction = list;
-                            allActionGroupSelected = true;
-                            currentSelectedActionGroup = actionGroups[i];
+                            if (allActionGroupSelected)
+                                allActionGroupSelected = false;
+                            currentSelectedBaseAction.Add(baseActions[i]);
+                            listIsDirty = true;
                         }
+
+                        //Add all symetry parts.
+                        if (currentSelectedPart.symmetryCounterparts.Count > 0)
+                        {
+                            if (GUILayout.Button(SetupGuiContent(">>", "Add part and all symmetry linked parts to selection."), Style.ButtonToggleStyle, GUILayout.Width(20)))
+                            {
+                                if (allActionGroupSelected)
+                                    allActionGroupSelected = false;
+                                if (!currentSelectedBaseAction.Contains(baseActions[i]))
+                                    currentSelectedBaseAction.Add(baseActions[i]);
+
+                                //TODO: Remove foreach
+                                foreach (BaseAction addAll in BaseActionFilter.FromParts(currentSelectedPart.symmetryCounterparts))
+                                {
+                                    if (addAll.name == baseActions[i].name && !currentSelectedBaseAction.Contains(addAll))
+                                        currentSelectedBaseAction.Add(addAll);
+                                }
+                                listIsDirty = true;
+                            }
+                        }
+
                     }
+
+                    GUILayout.EndHorizontal();
+
                 }
 
-                GUI.enabled = true;
-
-                if (classicView && actionGroups[i] == KSPActionGroup.Custom02)
-                {
-                    GUILayout.EndHorizontal();  // End Button Row (Classic View)
-                    GUILayout.BeginHorizontal(); // Begin button Row (Classic View)
-                }
-                else if (!classicView && !textActionGroups)
-                {
-                    if (iconCount % 2 == 0) GUILayout.EndHorizontal(); // End 2 Button Row (New View with Icons)
-                }
-
+                GUILayout.EndVertical();
             }
-            if (classicView)
-            {
-                GUILayout.EndHorizontal();  // End Button Row (Classic View)
-            }
-            else if (!textActionGroups)
-            {
-                if (iconCount % 2 == 1) GUILayout.EndHorizontal(); // End 2 Button Row if number of Buttons is Odd (New View with Icons)
-            }
-            GUILayout.EndVertical(); // End Button Collection Area
-            GUI.enabled = true;
         }
 
         private void DrawSearch()
