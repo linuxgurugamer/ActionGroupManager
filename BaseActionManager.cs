@@ -11,7 +11,7 @@ namespace ActionGroupManager
 {
     static class BaseActionFilter
     {
-        public static IEnumerable<BaseAction> FromParts(Part part)
+        public static List<BaseAction> FromParts(Part part)
         {
             List<BaseAction> ret = new List<BaseAction>();
 
@@ -58,7 +58,7 @@ namespace ActionGroupManager
                 });
         }
 
-        public static IEnumerable<KSPActionGroup> GetActionGroupList(BaseAction bA)
+        public static List<KSPActionGroup> GetActionGroupList(BaseAction bA)
         {
             List<KSPActionGroup> ret = new List<KSPActionGroup>();
 

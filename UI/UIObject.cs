@@ -10,13 +10,9 @@ namespace ActionGroupManager.UI
     {
         bool visible;
 
-        //public abstract void Initialize(params object[] list);
-
         public abstract void Terminate();
 
         public abstract void DoUILogic();
-
-        public abstract void Reset();
 
         public bool IsVisible()
         {
@@ -25,22 +21,10 @@ namespace ActionGroupManager.UI
 
         public virtual void SetVisible(bool vis)
         {
-            if (vis)
-            {
-                if (!visible)
-                {
+            if (vis && !visible)
                     ActionGroupManager.AddToPostDrawQueue(DoUILogic);
-                    //RenderingManager.AddToPostDrawQueue(3, new Callback(DoUILogic));
-                }
-            }
-            else
-            {
-                if (visible)
-                {
+            else if(!vis & visible)
                     ActionGroupManager.AddToPostDrawQueue(DoUILogic);
-                    //RenderingManager.RemoveFromPostDrawQueue(3, new Callback(DoUILogic));
-                }
-            }
 
             visible = vis;
         }

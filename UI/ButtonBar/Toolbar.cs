@@ -53,11 +53,6 @@ namespace ActionGroupManager.UI.ButtonBar
             throw new NotImplementedException();
         }
 
-        public override void Reset()
-        {
-            throw new NotImplementedException();
-        }
-
         public override void SetVisible(bool vis)
         {
             mainButton.Visible = vis;

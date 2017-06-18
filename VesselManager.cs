@@ -192,7 +192,7 @@ namespace ActionGroupManager
         #endregion
 
         #region Request Methods for Parts listing
-        public IEnumerable<Part> GetParts()
+        public List<Part> GetParts()
         {
             return ActiveVesselPartsList;
         }

@@ -87,8 +87,5 @@ namespace ActionGroupManager.UI
             SettingsManager.Settings.save();
         }
 
-        public override void Reset()
-        {
-        }
     }
 }

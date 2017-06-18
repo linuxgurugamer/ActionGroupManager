@@ -86,7 +86,7 @@ namespace ActionGroupManager
             Dirty = true;
         }
 
-        public IEnumerable<Part> GetCurrentParts()
+        public List<Part> GetCurrentParts()
         {
             if (Dirty)
             {
@@ -202,7 +202,7 @@ namespace ActionGroupManager
             return (p.inverseStage == CurrentStage);
         }
 
-        public IEnumerable<KSPActionGroup> GetActionGroupAttachedToPart(Part p)
+        public List<KSPActionGroup> GetActionGroupAttachedToPart(Part p)
         {
             List<KSPActionGroup> ret = new List<KSPActionGroup>();
             foreach (KSPActionGroup ag in Enum.GetValues(typeof(KSPActionGroup)))
@@ -224,7 +224,7 @@ namespace ActionGroupManager
             return ret;
         }
      
-        public IEnumerable<BaseAction> GetBaseActionAttachedToActionGroup(KSPActionGroup ag)
+        public List<BaseAction> GetBaseActionAttachedToActionGroup(KSPActionGroup ag)
         {
             IEnumerable<Part> parts = manager.GetParts();
 

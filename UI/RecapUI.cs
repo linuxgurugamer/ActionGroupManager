@@ -92,9 +92,5 @@ namespace ActionGroupManager.UI
 
             GUI.DragWindow();
         }
-
-        public override void Reset()
-        {
-        }
     }
 }
