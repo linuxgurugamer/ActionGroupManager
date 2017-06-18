@@ -1,0 +1,36 @@
+﻿{
+    "NAME":"Action Group Manager",
+    "URL":"https://github.com/Alshain01/ActionGroupManager/master/ActionGroupManager.version",
+    "DOWNLOAD":"https://www.spacedock.info/mod/1412/ActionGroupManager%20Continued",
+    "GITHUB":
+    {
+        "USERNAME":"Alshian01",
+        "REPOSITORY":"ActionGroupManager",
+        "ALLOW_PRE_RELEASE":false,
+    },
+    "VERSION":
+    {
+        "MAJOR":1,
+        "MINOR":5,
+        "PATCH":0,
+        "BUILD":0
+    },
+    "KSP_VERSION":
+    {
+        "MAJOR":1,
+        "MINOR":3,
+        "PATCH":0
+    },
+    "KSP_VERSION_MIN":
+    {
+        "MAJOR":1,
+        "MINOR":3,
+        "PATCH":0
+    },
+    "KSP_VERSION_MAX":
+    {
+        "MAJOR":1,
+        "MINOR":3,
+        "PATCH":99
+    }
+} 
