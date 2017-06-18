@@ -98,19 +98,29 @@ namespace ActionGroupManager.UI
             if (GUI.Button(new Rect(mainWindowSize.width - 24, 4, 20, 20), SetupGuiContent("X", "Close the window."), Style.CloseButtonStyle))
                 SetVisible(!IsVisible());
 
-            DrawCategoryButtons();
-            DrawScrollLists();
-            
             if (!classicView)
-            {
-                GUILayout.BeginVertical();
-                DrawActionGroupButtons();
-                GUILayout.EndVertical();
+                GUILayout.BeginHorizontal(); // Begin Collection area to include Category Buttons, Scroll Lists, and Action Group Buttons (New View)
 
-                GUILayout.EndHorizontal();
-                GUILayout.Space(10);
-            }
+            DrawCategoryButtons();
 
+            if (classicView)
+                GUILayout.BeginHorizontal(); // Begin Collection Area for Scroll Lists (Classic View)
+
+            DrawPartsScrollList();
+
+            GUILayout.Space(10);
+
+            DrawActionsScrollList();
+
+            if (classicView)
+                GUILayout.EndHorizontal(); // End Collection Area for Scroll Lists (Classic View)
+
+            DrawActionGroupButtons();
+
+            if (!classicView)
+                GUILayout.EndHorizontal(); // End Collection Area for Category buttons, Scroll Lists, and Action Group Buttons (New View)
+
+            GUILayout.Space(10);
             DrawSearch();
 
             // Tooltip Label
@@ -126,10 +136,11 @@ namespace ActionGroupManager.UI
             string buttonText = string.Empty;
             SortedList<PartCategories, int> partCounts = partFilter.GetNumberOfPartByCategory();
 
-            GUILayout.BeginHorizontal();
-            if (!classicView)
+            if(classicView)
+                GUILayout.BeginHorizontal(); // Begin First Row of Buttons
+            else
             {
-                GUILayout.BeginVertical();
+                GUILayout.BeginVertical(); // Begin Vertical Button Group
                 GUILayout.Label("Category Filter");
             }
 
@@ -143,8 +154,8 @@ namespace ActionGroupManager.UI
                 iconCount++;
                 if(classicView && iconCount % 9 == 0)
                 {
-                    GUILayout.EndHorizontal();
-                    GUILayout.BeginHorizontal();
+                    GUILayout.EndHorizontal();  // End Button Row (Classic View)
+                    GUILayout.BeginHorizontal(); // Begin New Button Row (Classic View)
                 }
 
                 if (classicView || textCategories)
@@ -155,8 +166,8 @@ namespace ActionGroupManager.UI
                 }
                 else
                 {
-                    if (iconCount % 2 == 1)  // Set up for 2 columns
-                        GUILayout.BeginHorizontal();
+                    if (iconCount % 2 == 1)
+                        GUILayout.BeginHorizontal(); // Begin 2 Button Row (New View with Icons)
 
                     if (partCounts[partCounts.Keys[i]] > 0)
                         buttonText = partCounts[partCounts.Keys[i]].ToString();
@@ -184,45 +195,40 @@ namespace ActionGroupManager.UI
 
                 if (!classicView && !textCategories)
                 {
-                    if (iconCount % 2 == 0)  // Set up for 2 columns
-                        GUILayout.EndHorizontal();
+                    if (iconCount % 2 == 0)
+                        GUILayout.EndHorizontal();  // End 2 Button Row (New View with Icons)
                 }
             }
 
             // Finish the drawing area
             if (classicView)
             {
-                GUILayout.EndHorizontal();
+                GUILayout.EndHorizontal(); // End Button Row (Classic View)
             }
             else if (!textCategories)
             {
                 if (iconCount % 2 == 1)
-                    GUILayout.EndHorizontal();
+                    GUILayout.EndHorizontal(); // End Button Row if odd number of Buttons (New View with Icons)
 
-                GUILayout.EndVertical();
+                GUILayout.EndVertical(); // End Button Columns (New View with Icons)
             }
             else
             {
-                GUILayout.EndVertical();
+                GUILayout.EndVertical(); // End Button Column (New View with Text)
             }
         }
 
         #region Parts view
 
         //Entry of action group view draw
-        private void DrawScrollLists()
+        private void DrawPartsScrollList()
         {
             List<Part> list;
 
             highlighter.Update();
 
-            if(classicView)
-                GUILayout.BeginVertical();
-
-            GUILayout.BeginHorizontal();
-
-            partsList = GUILayout.BeginScrollView(partsList, Style.ScrollViewStyle, GUILayout.Width(275));
-            GUILayout.BeginVertical();
+            partsList = GUILayout.BeginScrollView(partsList, Style.ScrollViewStyle, GUILayout.Width(275)); // Begin Parts List
+            GUILayout.BeginVertical(); // Begin Parts List
 
             // Draw All Parts Into List
             if (!SettingsManager.Settings.GetValue<bool>(SettingsManager.OrderByStage))
@@ -251,32 +257,8 @@ namespace ActionGroupManager.UI
                 OnUpdate(FilterModification.Stage, int.MinValue);
             }
 
-            GUILayout.EndVertical();
-            GUILayout.EndScrollView();
-            
-            GUILayout.Space(10);
-            if(classicView)
-                actionList = GUILayout.BeginScrollView(actionList, Style.ScrollViewStyle);
-            else
-                actionList = GUILayout.BeginScrollView(actionList, Style.ScrollViewStyle, GUILayout.Width(275));
-
-            GUILayout.BeginVertical();
-
-            DrawSelectedAction();
-
-            GUILayout.EndVertical();
-
-            GUILayout.EndScrollView();
-
-            GUILayout.EndHorizontal();
-
-            if (classicView)
-            {
-                GUILayout.Space(10);
-                DrawActionGroupButtons();
-
-                GUILayout.EndVertical();
-            }
+            GUILayout.EndVertical(); // End Parts List
+            GUILayout.EndScrollView(); // End Parts List
         }
 
         //Internal draw routine for DrawAllParts()
@@ -442,11 +424,18 @@ namespace ActionGroupManager.UI
         }
 
         //Draw all the current selected action
-        private void DrawSelectedAction()
+        private void DrawActionsScrollList()
         {
             Part currentDrawn = null;
             string str;
             bool initial, final;
+
+            if (classicView)
+                actionList = GUILayout.BeginScrollView(actionList, Style.ScrollViewStyle);  // Begin Actions List (Classic View)
+            else
+                actionList = GUILayout.BeginScrollView(actionList, Style.ScrollViewStyle, GUILayout.Width(275)); // Begin Actions List (New View)
+
+            GUILayout.BeginVertical(); // Begin Actions List
 
             if (currentSelectedBaseAction.Count > 0)
             {
@@ -548,6 +537,8 @@ namespace ActionGroupManager.UI
 
                 GUILayout.EndHorizontal();
             }
+            GUILayout.EndVertical(); // End Actions List
+            GUILayout.EndScrollView(); // End Actions List
         }
 
         //Draw the Action groups grid in Part View
@@ -556,10 +547,11 @@ namespace ActionGroupManager.UI
             List<BaseAction> list;
             string tooltip, buttonTitle;
             bool selectMode = currentSelectedBaseAction.Count == 0;
+
+            GUILayout.BeginVertical();  // Begin Action Group Collection (All Views)
             if (classicView)
             {
-                GUILayout.BeginVertical();
-                GUILayout.BeginHorizontal();
+                GUILayout.BeginHorizontal();  // Begin First Row of Action Group Buttons (Classic View)
             }
 
             int iconCount = 0;
@@ -583,7 +575,7 @@ namespace ActionGroupManager.UI
                 else
                 {
                     if (iconCount % 2 == 1)
-                        GUILayout.BeginHorizontal();
+                        GUILayout.BeginHorizontal();  // Begin 2 Button Row (New View with Icons)
 
                     if (list.Count > 0)
                         buttonTitle = list.Count.ToString();
@@ -643,24 +635,24 @@ namespace ActionGroupManager.UI
 
                 if (classicView && actionGroups[i] == KSPActionGroup.Custom02)
                 {
-                    GUILayout.EndHorizontal();
-                    GUILayout.BeginHorizontal();
+                    GUILayout.EndHorizontal();  // End Button Row (Classic View)
+                    GUILayout.BeginHorizontal(); // Begin button Row (Classic View)
                 }
                 else if (!classicView && !textActionGroups)
                 {
-                    if (iconCount % 2 == 0) GUILayout.EndHorizontal();
+                    if (iconCount % 2 == 0) GUILayout.EndHorizontal(); // End 2 Button Row (New View with Icons)
                 }
 
             }
             if (classicView)
             {
-                GUILayout.EndHorizontal();
-                GUILayout.EndVertical();
+                GUILayout.EndHorizontal();  // End Button Row (Classic View)
             }
             else if (!textActionGroups)
             {
-                if (iconCount % 2 == 1) GUILayout.EndHorizontal();
+                if (iconCount % 2 == 1) GUILayout.EndHorizontal(); // End 2 Button Row if number of Buttons is Odd (New View with Icons)
             }
+            GUILayout.EndVertical(); // End Button Collection Area
             GUI.enabled = true;
         }
 
