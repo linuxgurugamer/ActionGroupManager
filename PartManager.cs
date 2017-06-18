@@ -21,7 +21,7 @@ namespace ActionGroupManager
         bool Dirty { get; set; }
 
         List<Part> returnPart;
-        Dictionary<PartCategories, int> dic;
+        SortedList<PartCategories, int> dic;
 
         public PartFilter()
         {
@@ -242,11 +242,11 @@ namespace ActionGroupManager
             return ret;
         }
 
-        public Dictionary<PartCategories, int> GetNumberOfPartByCategory()
+        public SortedList<PartCategories, int> GetNumberOfPartByCategory()
         {
             if (Dirty)
             {
-                dic = new Dictionary<PartCategories, int>();
+                dic = new SortedList<PartCategories, int>();
 
                 foreach (PartCategories item in Enum.GetValues(typeof(PartCategories)))
                 {

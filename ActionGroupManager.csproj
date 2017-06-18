@@ -106,15 +106,11 @@
     <Content Include="Resources\number0.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\ToolbarOffLarge.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
+    <Content Include="Resources\ToolbarOffLarge.png" />
     <Content Include="Resources\ToolbarOff.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\ToolbarOnLarge.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
+    <Content Include="Resources\ToolbarOnLarge.png" />
     <Content Include="Resources\ToolbarOn.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

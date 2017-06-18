@@ -13,10 +13,14 @@ namespace ActionGroupManager
     public class ActionGroupManager : MonoBehaviour
     {
         //List of current UI handle
-        Dictionary<string, UiObject> UiList;
+        SortedList<string, UiObject> UiList;
         static private List<Callback> postDrawQueue = new List<Callback>();
-
         static ActionGroupManager _manager;
+
+        public bool ShowSettings { get; set; }
+        public bool ShowMainWindow { get; set; }
+        public bool ShowRecapWindow { get; set; }
+
 
         public static ActionGroupManager Manager
         {
@@ -25,10 +29,6 @@ namespace ActionGroupManager
                 return _manager;
             }
         }
-
-        public bool ShowSettings { get; set; }
-        public bool ShowMainWindow { get; set; }
-        public bool ShowRecapWindow { get; set; }
 
         void Awake()
         {
@@ -42,7 +42,7 @@ namespace ActionGroupManager
         {
             _manager = this;
 
-            UiList = new Dictionary<string, UiObject>();
+            UiList = new SortedList<string, UiObject>();
             MainUi main = new MainUi();
             UiList.Add("Main", main);
             UiList.Add("Light", new TweakableUi());
@@ -110,8 +110,8 @@ namespace ActionGroupManager
 
         public void OnGUI()
         {
-            for(int x = 0; x < postDrawQueue.Count; x++)
-                postDrawQueue[x]();
+            for(int i = 0; i < postDrawQueue.Count; i++)
+                postDrawQueue[i]();
         }
 
         static internal void AddToPostDrawQueue(Callback c)
@@ -122,8 +122,9 @@ namespace ActionGroupManager
         void OnDestroy()
         {
             //Terminate all UI
-            foreach (KeyValuePair<string, UiObject> ui in UiList)
-                ui.Value.Terminate();
+            for (int i = 0; i < UiList.Count; i++)
+                UiList[UiList.Keys[i]].Terminate();
+
             //Save settings to disk
             SettingsManager.Settings.save();
 

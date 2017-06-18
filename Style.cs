@@ -11,7 +11,8 @@ namespace ActionGroupManager
         public static GUIStyle ButtonToggleYellowStyle;
         public static GUIStyle ButtonToggleGreenStyle;
         public static GUIStyle ButtonToggleRedStyle;
-        public static GUIStyle ButtonCategoryStyle;
+        public static GUIStyle ButtonIconStyle;
+        public static GUIStyle ButtonPartStyle;
 
         public static GUIStyle LabelExpandStyle;
 
@@ -31,10 +32,15 @@ namespace ActionGroupManager
             ButtonToggleStyle.margin = new RectOffset(baseSkin.button.margin.left, baseSkin.button.margin.right, 5, 5);
             ButtonToggleStyle.fixedHeight = 25f;
 
-            ButtonCategoryStyle = new GUIStyle(baseSkin.button);
-            ButtonCategoryStyle.margin = new RectOffset(baseSkin.button.margin.left, baseSkin.button.margin.right, 5, 5);
-            ButtonCategoryStyle.fixedHeight = 50f;
-            ButtonCategoryStyle.fixedWidth = 50f;
+            ButtonIconStyle = new GUIStyle(baseSkin.button);
+            ButtonIconStyle.margin = new RectOffset(baseSkin.button.margin.left, baseSkin.button.margin.right, 5, 5);
+            ButtonIconStyle.fixedHeight = 40f;
+            ButtonIconStyle.fixedWidth = 40f;
+
+            ButtonPartStyle = new GUIStyle(baseSkin.button);
+            ButtonPartStyle.margin = new RectOffset(baseSkin.button.margin.left, baseSkin.button.margin.right, 5, 5);
+            ButtonPartStyle.fixedHeight = 25f;
+            ButtonPartStyle.fontSize = 12;
 
             ButtonToggleYellowStyle = new GUIStyle(ButtonToggleStyle);
             ButtonToggleYellowStyle.normal.textColor = Color.yellow;

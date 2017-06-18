@@ -33,6 +33,10 @@ namespace ActionGroupManager.UI
         bool listIsDirty = false;
         bool allActionGroupSelected = false;
         bool confirmDelete = false;
+
+        // Objects for reusability to reduce garbage collection
+        FilterEventArgs filterArgs = new FilterEventArgs();
+        static GUIContent guiContent = new GUIContent();
         #endregion
 
         public MainUi()
@@ -51,8 +55,9 @@ namespace ActionGroupManager.UI
 
         private void OnUpdate(FilterModification mod, object o)
         {
-            FilterEventArgs ev = new FilterEventArgs() { Modified = mod, Object = o };
-            FilterChanged(this, ev);
+            filterArgs.Modified = mod;
+            filterArgs.Object = o;
+            FilterChanged(this, filterArgs);
         }
 
         #region override Base class
@@ -86,11 +91,11 @@ namespace ActionGroupManager.UI
                 SortCurrentSelectedBaseAction();
 
             // Window Buttons
-            if (GUI.Button(new Rect(mainWindowSize.width - 66, 4, 20, 20), new GUIContent("R", "Show recap."), Style.CloseButtonStyle))
+            if (GUI.Button(new Rect(mainWindowSize.width - 66, 4, 20, 20), SetupGuiContent("R", "Show recap."), Style.CloseButtonStyle))
                 ActionGroupManager.Manager.ShowRecapWindow = !ActionGroupManager.Manager.ShowRecapWindow;
-            if (GUI.Button(new Rect(mainWindowSize.width - 45, 4, 20, 20), new GUIContent("S", "Show settings."), Style.CloseButtonStyle))
+            if (GUI.Button(new Rect(mainWindowSize.width - 45, 4, 20, 20), SetupGuiContent("S", "Show settings."), Style.CloseButtonStyle))
                 ActionGroupManager.Manager.ShowSettings = !ActionGroupManager.Manager.ShowSettings;
-            if (GUI.Button(new Rect(mainWindowSize.width - 24, 4, 20, 20), new GUIContent("X", "Close the window."), Style.CloseButtonStyle))
+            if (GUI.Button(new Rect(mainWindowSize.width - 24, 4, 20, 20), SetupGuiContent("X", "Close the window."), Style.CloseButtonStyle))
                 SetVisible(!IsVisible());
 
             DrawCategoryButtons();
@@ -116,9 +121,10 @@ namespace ActionGroupManager.UI
 
         private void DrawCategoryButtons()
         {
-            #if DEBUG_VERBOSE
-                Debug.Log("AGM : Categories Draw.");
-            #endif
+            bool result, initial;
+            int iconCount = 0;
+            string buttonText = string.Empty;
+            SortedList<PartCategories, int> partCounts = partFilter.GetNumberOfPartByCategory();
 
             GUILayout.BeginHorizontal();
             if (!classicView)
@@ -127,46 +133,45 @@ namespace ActionGroupManager.UI
                 GUILayout.Label("Category Filter");
             }
 
-            Dictionary<PartCategories, int> dic = partFilter.GetNumberOfPartByCategory();
-
-            int iconCount = 0;
-            foreach (PartCategories category in dic.Keys)
+            for (int i = 0; i < partCounts.Count; i++)
             {
-                if (category == PartCategories.none)
-                    continue;
+                if (partCounts.Keys[i] == PartCategories.none) continue;
 
-                bool initial = category == partFilter.CurrentPartCategory;
-                string buttonText;
+                initial = partCounts.Keys[i] == partFilter.CurrentPartCategory;
+                buttonText = string.Empty;
 
                 iconCount++;
-                if (!classicView && !textCategories)
+                if(classicView && iconCount % 9 == 0)
                 {
-                    if (iconCount % 2 == 1)
+                    GUILayout.EndHorizontal();
+                    GUILayout.BeginHorizontal();
+                }
+
+                if (classicView || textCategories)
+                {
+                    buttonText = partCounts.Keys[i].ToString();
+                    if (partCounts[partCounts.Keys[i]] > 0)
+                        buttonText += " (" + partCounts[partCounts.Keys[i]] + ")";
+                }
+                else
+                {
+                    if (iconCount % 2 == 1)  // Set up for 2 columns
                         GUILayout.BeginHorizontal();
+
+                    if (partCounts[partCounts.Keys[i]] > 0)
+                        buttonText = partCounts[partCounts.Keys[i]].ToString();
                 }
 
+                GUI.enabled = (partCounts[partCounts.Keys[i]] > 0);
 
                 if (classicView || textCategories)
-                {
-                    buttonText = category.ToString();
-                    if (dic[category] > 0)
-                        buttonText += " (" + dic[category] + ")";
-                }
+                    result = GUILayout.Toggle(initial, SetupGuiContent(buttonText, "Show only " + partCounts.Keys[i].ToString() + " parts."), Style.ButtonToggleStyle);
                 else
-                {
-                    buttonText = "";
-                    if (dic[category] > 0)
-                        buttonText = dic[category].ToString();
-                }
+                    result = GUILayout.Toggle(initial, 
+                        SetupGuiContent(buttonText, GameDatabase.Instance.GetTexture(ButtonIcons.GetIcon(partCounts.Keys[i]), false),"Show only " + partCounts.Keys[i].ToString() + " parts."),
+                        Style.ButtonIconStyle);
 
-                GUI.enabled = (dic[category] > 0);
-                bool result;
-                if (classicView || textCategories)
-                    result = GUILayout.Toggle(initial, new GUIContent(buttonText, "Show only " + category.ToString() + " parts."), Style.ButtonToggleStyle);
-                else
-                {
-                    result = GUILayout.Toggle(initial, new GUIContent(buttonText, GameDatabase.Instance.GetTexture(ButtonIcons.GetIcon(category), false), "Show only " + category.ToString() + " parts."), Style.ButtonCategoryStyle);
-                }
+
                 GUI.enabled = true;
 
                 if (initial != result)
@@ -174,25 +179,32 @@ namespace ActionGroupManager.UI
                     if (!result)
                         OnUpdate(FilterModification.Category, PartCategories.none);
                     else
-                        OnUpdate(FilterModification.Category, category);
+                        OnUpdate(FilterModification.Category, partCounts.Keys[i]);
                 }
 
                 if (!classicView && !textCategories)
                 {
-                    if (iconCount % 2 == 0) GUILayout.EndHorizontal();
+                    if (iconCount % 2 == 0)  // Set up for 2 columns
+                        GUILayout.EndHorizontal();
                 }
-
             }
 
+            // Finish the drawing area
             if (classicView)
-                GUILayout.EndHorizontal();
-            else if(!textCategories)
             {
-                if (iconCount % 2 == 1) GUILayout.EndHorizontal();
+                GUILayout.EndHorizontal();
+            }
+            else if (!textCategories)
+            {
+                if (iconCount % 2 == 1)
+                    GUILayout.EndHorizontal();
+
                 GUILayout.EndVertical();
             }
             else
+            {
                 GUILayout.EndVertical();
+            }
         }
 
         #region Parts view
@@ -200,9 +212,7 @@ namespace ActionGroupManager.UI
         //Entry of action group view draw
         private void DrawScrollLists()
         {
-#if DEBUG_VERBOSE
-            Debug.Log("AGM : DoPartView.");
-#endif
+            List<Part> list;
 
             highlighter.Update();
 
@@ -211,7 +221,7 @@ namespace ActionGroupManager.UI
 
             GUILayout.BeginHorizontal();
 
-            partsList = GUILayout.BeginScrollView(partsList, Style.ScrollViewStyle, GUILayout.Width(300));
+            partsList = GUILayout.BeginScrollView(partsList, Style.ScrollViewStyle, GUILayout.Width(275));
             GUILayout.BeginVertical();
 
             // Draw All Parts Into List
@@ -221,12 +231,10 @@ namespace ActionGroupManager.UI
             }
             else
             {
-                int currentStage = StageManager.LastStage;
-
-                for (int i = -1; i <= currentStage; i++)
+                for (int i = -1; i <= StageManager.LastStage; i++)
                 {
                     OnUpdate(FilterModification.Stage, i);
-                    List<Part> list = partFilter.GetCurrentParts();
+                    list = partFilter.GetCurrentParts();
 
                     if (list.Count > 0)
                     {
@@ -250,7 +258,7 @@ namespace ActionGroupManager.UI
             if(classicView)
                 actionList = GUILayout.BeginScrollView(actionList, Style.ScrollViewStyle);
             else
-                actionList = GUILayout.BeginScrollView(actionList, Style.ScrollViewStyle, GUILayout.Width(300));
+                actionList = GUILayout.BeginScrollView(actionList, Style.ScrollViewStyle, GUILayout.Width(275));
 
             GUILayout.BeginVertical();
 
@@ -269,53 +277,52 @@ namespace ActionGroupManager.UI
 
                 GUILayout.EndVertical();
             }
-#if DEBUG_VERBOSE
-            Debug.Log("AGM : End DoPartView.");
-#endif
         }
 
         //Internal draw routine for DrawAllParts()
-        private void InternalDrawParts(IEnumerable<Part> list)
+        private void InternalDrawParts(List<Part> list)
         {
-#if DEBUG_VERBOSE
-            Debug.Log("AGM : Internal Draw All parts");
-#endif
-            foreach (Part p in list)
+            bool initial, final;
+            string str = string.Empty;
+            List<KSPActionGroup> currentAG;
+
+            for (int i = 0; i < list.Count; i++)
             {
-                List<KSPActionGroup> currentAG = partFilter.GetActionGroupAttachedToPart(p);
+                currentAG = partFilter.GetActionGroupAttachedToPart(list[i]);
                 GUILayout.BeginHorizontal();
 
-                bool initial = highlighter.Contains(p);
-                bool final = GUILayout.Toggle(initial, new GUIContent("!", "Highlight the part."), Style.ButtonToggleStyle, GUILayout.Width(20));
+                initial = highlighter.Contains(list[i]);
+                
+                final = GUILayout.Toggle(initial, SetupGuiContent("!", "Highlight the part."), Style.ButtonToggleStyle, GUILayout.Width(20));
+
                 if (final != initial)
-                    highlighter.Switch(p);
+                    highlighter.Switch(list[i]);
 
-                initial = p == currentSelectedPart;
-                string str = p.partInfo.title;
+                initial = list[i] == currentSelectedPart;
+                str = list[i].partInfo.title;
 
-                final = GUILayout.Toggle(initial, str, Style.ButtonToggleStyle);
+                final = GUILayout.Toggle(initial, str, Style.ButtonPartStyle);
                 if (initial != final)
                 {
                     if (final)
-                        currentSelectedPart = p;
+                        currentSelectedPart = list[i];
                     else
                         currentSelectedPart = null;
                 }
 
                 if (currentAG.Count > 0)
                 {
-                    foreach (KSPActionGroup ag in currentAG)
+                    for(int j = 0; j < currentAG.Count; j++)
                     {
-                        if (ag == KSPActionGroup.None)
+                        if (currentAG[j] == KSPActionGroup.None)
                             continue;
-                        GUIContent content = new GUIContent(ag.ToShortString(), "Part has an action linked to action group " + ag.ToString());
 
-                        if (p != currentSelectedPart)
+                         if (list[i] != currentSelectedPart)
                         {
-                            if (GUILayout.Button(content, Style.ButtonToggleStyle, GUILayout.Width(20)))
+                            if (GUILayout.Button(SetupGuiContent(currentAG[j].ToShortString(), "Part has an action linked to action group " + currentAG[j].ToString()), Style.ButtonToggleStyle, GUILayout.Width(20)))
                             {
-                                currentSelectedBaseAction = partFilter.GetBaseActionAttachedToActionGroup(ag);
-                                currentSelectedActionGroup = ag;
+                                currentSelectedBaseAction = partFilter.GetBaseActionAttachedToActionGroup(currentAG[j]);
+                                currentSelectedActionGroup = currentAG[j];
                                 allActionGroupSelected = true;
                             }
                         }
@@ -325,14 +332,9 @@ namespace ActionGroupManager.UI
 
                 GUILayout.EndHorizontal();
 
-                if (currentSelectedPart == p)
+                if (currentSelectedPart == list[i])
                     DrawActionGroupList();
             }
-
-#if DEBUG_VERBOSE
-            Debug.Log("AGM : End Internal Draw All parts");
-#endif
-
         }
 
         #endregion
@@ -340,63 +342,58 @@ namespace ActionGroupManager.UI
         //Draw the selected part available actions in Part View
         private void DrawActionGroupList()
         {
-#if DEBUG_VERBOSE
-            Debug.Log("AGM : DoMyPartView.");
-#endif
             if (currentSelectedPart)
             {
+                List<BaseAction> baseActions = BaseActionFilter.FromParts(currentSelectedPart);
+                List<KSPActionGroup> actionGroups;
                 GUILayout.BeginVertical();
 
-                List<BaseAction> current = BaseActionFilter.FromParts(currentSelectedPart);
-                foreach (BaseAction ba in current)
+                for(int i = 0; i < baseActions.Count; i++)
                 {
                     GUILayout.BeginHorizontal();
-
                     GUILayout.Space(20);
-
-                    GUILayout.Label(ba.guiName, Style.LabelExpandStyle);
-
+                    GUILayout.Label(baseActions[i].guiName, Style.LabelExpandStyle);
                     GUILayout.FlexibleSpace();
 
-                    if (BaseActionFilter.GetActionGroupList(ba).Count > 0)
+                    if (BaseActionFilter.GetActionGroupList(baseActions[i]).Count > 0)
                     {
-                        foreach (KSPActionGroup ag in BaseActionFilter.GetActionGroupList(ba))
+                        actionGroups = BaseActionFilter.GetActionGroupList(baseActions[i]);
+                        for(int j = 0; j < actionGroups.Count; j++)
                         {
-                            GUIContent content = new GUIContent(ag.ToShortString(), ag.ToString());
-
-                            if (GUILayout.Button(content, Style.ButtonToggleStyle, GUILayout.Width(20)))
+                            if (GUILayout.Button(SetupGuiContent(actionGroups[j].ToShortString(), actionGroups[j].ToString()), Style.ButtonToggleStyle, GUILayout.Width(20)))
                             {
-                                currentSelectedBaseAction = partFilter.GetBaseActionAttachedToActionGroup(ag);
-                                currentSelectedActionGroup = ag;
+                                currentSelectedBaseAction = partFilter.GetBaseActionAttachedToActionGroup(actionGroups[j]);
+                                currentSelectedActionGroup = actionGroups[j];
                                 allActionGroupSelected = true;
                             }
                         }
                     }
 
 
-                    if (currentSelectedBaseAction.Contains(ba))
+                    if (currentSelectedBaseAction.Contains(baseActions[i]))
                     {
-                        if (GUILayout.Button(new GUIContent("<", "Remove from selection."), Style.ButtonToggleStyle, GUILayout.Width(20)))
+                        if (GUILayout.Button(SetupGuiContent("<", "Remove from selection."), Style.ButtonToggleStyle, GUILayout.Width(20)))
                         {
                             if (allActionGroupSelected)
                                 allActionGroupSelected = false;
-                            currentSelectedBaseAction.Remove(ba);
+                            currentSelectedBaseAction.Remove(baseActions[i]);
                             listIsDirty = true;
                         }
 
                         //Remove all symetry parts.
                         if (currentSelectedPart.symmetryCounterparts.Count > 0)
                         {
-                            if (GUILayout.Button(new GUIContent("<<", "Remove part and all symmetry linked parts from selection."), Style.ButtonToggleStyle, GUILayout.Width(20)))
+                            if (GUILayout.Button(SetupGuiContent("<<", "Remove part and all symmetry linked parts from selection."), Style.ButtonToggleStyle, GUILayout.Width(20)))
                             {
                                 if (allActionGroupSelected)
                                     allActionGroupSelected = false;
 
-                                currentSelectedBaseAction.Remove(ba);
+                                currentSelectedBaseAction.Remove(baseActions[i]);
 
+                                //TODO: Remove foreach
                                 foreach (BaseAction removeAll in BaseActionFilter.FromParts(currentSelectedPart.symmetryCounterparts))
                                 {
-                                    if (removeAll.name == ba.name && currentSelectedBaseAction.Contains(removeAll))
+                                    if (removeAll.name == baseActions[i].name && currentSelectedBaseAction.Contains(removeAll))
                                         currentSelectedBaseAction.Remove(removeAll);
                                 }
                                 listIsDirty = true;
@@ -406,27 +403,28 @@ namespace ActionGroupManager.UI
                     }
                     else
                     {
-                        if (GUILayout.Button(new GUIContent(">", "Add to selection."), Style.ButtonToggleStyle, GUILayout.Width(20)))
+                        if (GUILayout.Button(SetupGuiContent(">", "Add to selection."), Style.ButtonToggleStyle, GUILayout.Width(20)))
                         {
                             if (allActionGroupSelected)
                                 allActionGroupSelected = false;
-                            currentSelectedBaseAction.Add(ba);
+                            currentSelectedBaseAction.Add(baseActions[i]);
                             listIsDirty = true;
                         }
 
                         //Add all symetry parts.
                         if (currentSelectedPart.symmetryCounterparts.Count > 0)
                         {
-                            if (GUILayout.Button(new GUIContent(">>", "Add part and all symmetry linked parts to selection."), Style.ButtonToggleStyle, GUILayout.Width(20)))
+                            if (GUILayout.Button(SetupGuiContent(">>", "Add part and all symmetry linked parts to selection."), Style.ButtonToggleStyle, GUILayout.Width(20)))
                             {
                                 if (allActionGroupSelected)
                                     allActionGroupSelected = false;
-                                if (!currentSelectedBaseAction.Contains(ba))
-                                    currentSelectedBaseAction.Add(ba);
+                                if (!currentSelectedBaseAction.Contains(baseActions[i]))
+                                    currentSelectedBaseAction.Add(baseActions[i]);
 
+                                //TODO: Remove foreach
                                 foreach (BaseAction addAll in BaseActionFilter.FromParts(currentSelectedPart.symmetryCounterparts))
                                 {
-                                    if (addAll.name == ba.name && !currentSelectedBaseAction.Contains(addAll))
+                                    if (addAll.name == baseActions[i].name && !currentSelectedBaseAction.Contains(addAll))
                                         currentSelectedBaseAction.Add(addAll);
                                 }
                                 listIsDirty = true;
@@ -447,6 +445,9 @@ namespace ActionGroupManager.UI
         private void DrawSelectedAction()
         {
             Part currentDrawn = null;
+            string str;
+            bool initial, final;
+
             if (currentSelectedBaseAction.Count > 0)
             {
                 GUILayout.Space(HighLogic.Skin.verticalScrollbar.margin.left);
@@ -454,7 +455,7 @@ namespace ActionGroupManager.UI
 
                 if (allActionGroupSelected)
                 {
-                    string str = confirmDelete ? "Delete all actions in " + currentSelectedActionGroup.ToString() + " OK ?" : "Remove all from group " + currentSelectedActionGroup.ToShortString();
+                    str = confirmDelete ? "Delete all actions in " + currentSelectedActionGroup.ToString() + " OK ?" : "Remove all from group " + currentSelectedActionGroup.ToShortString();
                     if (GUILayout.Button(str, Style.ButtonToggleStyle))
                     {
                         if (!confirmDelete)
@@ -463,6 +464,7 @@ namespace ActionGroupManager.UI
                         {
                             if (currentSelectedBaseAction.Count > 0)
                             {
+                                //TODO: Remove foreach
                                 foreach (BaseAction ba in currentSelectedBaseAction)
                                 {
                                     ba.RemoveActionToAnActionGroup(currentSelectedActionGroup);
@@ -484,30 +486,32 @@ namespace ActionGroupManager.UI
                 else
                     GUILayout.FlexibleSpace();
 
-                if (GUILayout.Button(new GUIContent ("X", "Clear the selection."), Style.ButtonToggleStyle, GUILayout.Width(Style.ButtonToggleStyle.fixedHeight)))
+                if (GUILayout.Button(SetupGuiContent("X", "Clear the selection."), Style.ButtonToggleStyle, GUILayout.Width(Style.ButtonToggleStyle.fixedHeight)))
                 {
                     currentSelectedBaseAction.Clear();
                 }
                 GUILayout.EndHorizontal();
             }
+
+            //TODO: Remove foreach
             foreach (BaseAction pa in currentSelectedBaseAction)
             {
                 
                 if (currentDrawn != pa.listParent.part)
                 {
                     GUILayout.BeginHorizontal();
-                    GUILayout.Label(pa.listParent.part.partInfo.title, Style.ButtonToggleStyle);
+                    GUILayout.Label(pa.listParent.part.partInfo.title, Style.ButtonPartStyle);
                     currentDrawn = pa.listParent.part;
 
-                    bool initial = highlighter.Contains(pa.listParent.part);
-                    bool final = GUILayout.Toggle(initial, new GUIContent("!", "Highlight the part."), Style.ButtonToggleStyle, GUILayout.Width(20));
+                    initial = highlighter.Contains(pa.listParent.part);
+                    final = GUILayout.Toggle(initial, SetupGuiContent("!", "Highlight the part."), Style.ButtonToggleStyle, GUILayout.Width(20));
                     if (final != initial)
                         highlighter.Switch(pa.listParent.part);
 
                     GUILayout.EndHorizontal();
                 }
                 GUILayout.BeginHorizontal();
-                if (GUILayout.Button(new GUIContent("<", "Remove from selection."), Style.ButtonToggleStyle, GUILayout.Width(20)))
+                if (GUILayout.Button(SetupGuiContent("<", "Remove from selection."), Style.ButtonToggleStyle, GUILayout.Width(20)))
                 {
                     currentSelectedBaseAction.Remove(pa);
                     if (allActionGroupSelected)
@@ -516,13 +520,14 @@ namespace ActionGroupManager.UI
 
                 if (pa.listParent.part.symmetryCounterparts.Count > 0)
                 {
-                    if (GUILayout.Button(new GUIContent("<<", "Remove part and all symmetry linked parts from selection."), Style.ButtonToggleStyle, GUILayout.Width(20)))
+                    if (GUILayout.Button(SetupGuiContent("<<", "Remove part and all symmetry linked parts from selection."), Style.ButtonToggleStyle, GUILayout.Width(20)))
                     {
                         if (allActionGroupSelected)
                             allActionGroupSelected = false;
 
                         currentSelectedBaseAction.Remove(pa);
 
+                        //TODO: Remove foreach
                         foreach (BaseAction removeAll in BaseActionFilter.FromParts(pa.listParent.part.symmetryCounterparts))
                         {
                             if (removeAll.name == pa.name && currentSelectedBaseAction.Contains(removeAll))
@@ -535,7 +540,7 @@ namespace ActionGroupManager.UI
 
                 GUILayout.Label(pa.guiName, Style.LabelExpandStyle);
 
-                if (GUILayout.Button(new GUIContent("F", "Find action in parts list."), Style.ButtonToggleStyle, GUILayout.Width(20)))
+                if (GUILayout.Button(SetupGuiContent("F", "Find action in parts list."), Style.ButtonToggleStyle, GUILayout.Width(20)))
                 {
                     currentSelectedPart = pa.listParent.part;
                 }
@@ -548,9 +553,8 @@ namespace ActionGroupManager.UI
         //Draw the Action groups grid in Part View
         private void DrawActionGroupButtons()
         {
-#if DEBUG_VERBOSE
-            Debug.Log("AGM : Draw Action Group list");
-#endif
+            List<BaseAction> list;
+            string tooltip, buttonTitle;
             bool selectMode = currentSelectedBaseAction.Count == 0;
             if (classicView)
             {
@@ -559,73 +563,65 @@ namespace ActionGroupManager.UI
             }
 
             int iconCount = 0;
-            foreach (KSPActionGroup ag in VesselManager.Instance.AllActionGroups)
+            List<KSPActionGroup> actionGroups = VesselManager.Instance.AllActionGroups;
+            for (int i = 0; i < actionGroups.Count; i++)
             {
-                if (ag == KSPActionGroup.None || ag == KSPActionGroup.REPLACEWITHDEFAULT)
+                if (actionGroups[i] == KSPActionGroup.None || actionGroups[i] == KSPActionGroup.REPLACEWITHDEFAULT)
                     continue;
 
+                list = partFilter.GetBaseActionAttachedToActionGroup(actionGroups[i]);
+                tooltip = string.Empty;
+                buttonTitle = string.Empty;
+
                 iconCount++;
-                if (!classicView && !textActionGroups)
+                if (classicView || textActionGroups)
+                {
+                    buttonTitle = actionGroups[i].ToString();
+                    if (list.Count > 0)
+                        buttonTitle += " (" + list.Count + ")";
+                }
+                else
                 {
                     if (iconCount % 2 == 1)
                         GUILayout.BeginHorizontal();
-                }
 
-                List<BaseAction> list = partFilter.GetBaseActionAttachedToActionGroup(ag);
-
-                string buttonTitle = "";
-                if (classicView || textActionGroups)
-                {
-                    buttonTitle = ag.ToString();
                     if (list.Count > 0)
-                    {
-                        buttonTitle += " (" + list.Count + ")";
-                    }
-                }
-                else
-                {
-                    if (list.Count > 0)
-                    {
                         buttonTitle = list.Count.ToString();
-                    }
                 }
 
-                string tooltip;
                 if (selectMode)
                     if (list.Count > 0)
-                        tooltip = "Put all the parts linked to " + ag.ToString() + " in the selection.";
-                    else
-                        tooltip = string.Empty;
+                        tooltip = "Put all the parts linked to " + actionGroups[i].ToString() + " in the selection.";
                 else
-                    tooltip = "Link all parts selected to " + ag.ToString();
+                    tooltip = "Link all parts selected to " + actionGroups[i].ToString();
 
                 if (selectMode && list.Count == 0)
                     GUI.enabled = false;
 
-                GUIContent content;
                 GUIStyle style;
                 if (classicView || textActionGroups)
                 {
-                    content = new GUIContent(buttonTitle, tooltip);
+                    guiContent = SetupGuiContent(buttonTitle, tooltip);
                     style = Style.ButtonToggleStyle;
                 }
                 else
                 {
-                    content = new GUIContent(buttonTitle, GameDatabase.Instance.GetTexture(ButtonIcons.GetIcon(ag), false), tooltip);
-                    style = Style.ButtonCategoryStyle;
+                    guiContent = SetupGuiContent(buttonTitle, GameDatabase.Instance.GetTexture(ButtonIcons.GetIcon(actionGroups[i]), false), tooltip);
+                    style = Style.ButtonIconStyle;
                 }
 
                 //Push the button will replace the actual action group list with all the selected action
-                if (GUILayout.Button(content, style))
+                if (GUILayout.Button(guiContent, style))
                 {
 
                     if (!selectMode)
                     {
+                        //TODO: Remvoe foreach
                         foreach (BaseAction ba in list)
-                            ba.RemoveActionToAnActionGroup(ag);
+                            ba.RemoveActionToAnActionGroup(actionGroups[i]);
 
                         foreach (BaseAction ba in currentSelectedBaseAction)
-                            ba.AddActionToAnActionGroup(ag);
+                            ba.AddActionToAnActionGroup(actionGroups[i]);
 
                         currentSelectedBaseAction.Clear();
 
@@ -638,14 +634,14 @@ namespace ActionGroupManager.UI
                         {
                             currentSelectedBaseAction = list;
                             allActionGroupSelected = true;
-                            currentSelectedActionGroup = ag;
+                            currentSelectedActionGroup = actionGroups[i];
                         }
                     }
                 }
 
                 GUI.enabled = true;
 
-                if (classicView && ag == KSPActionGroup.Custom02)
+                if (classicView && actionGroups[i] == KSPActionGroup.Custom02)
                 {
                     GUILayout.EndHorizontal();
                     GUILayout.BeginHorizontal();
@@ -659,7 +655,6 @@ namespace ActionGroupManager.UI
             if (classicView)
             {
                 GUILayout.EndHorizontal();
-
                 GUILayout.EndVertical();
             }
             else if (!textActionGroups)
@@ -673,23 +668,34 @@ namespace ActionGroupManager.UI
         {
             GUILayout.BeginHorizontal();
             GUILayout.Label("Part Search:");
-            string newString = GUILayout.TextField(partFilter.CurrentSearch);
-            if (partFilter.CurrentSearch != newString)
-                OnUpdate(FilterModification.Search, newString);
+            string searchString = GUILayout.TextField(partFilter.CurrentSearch);
+            if (partFilter.CurrentSearch != searchString)
+                OnUpdate(FilterModification.Search, searchString);
 
             GUILayout.Space(5);
-            if (GUILayout.Button(new GUIContent("X", "Remove all text from the input box."), Style.ButtonToggleStyle, GUILayout.Width(Style.ButtonToggleStyle.fixedHeight)))
+            if (GUILayout.Button(SetupGuiContent("X", "Remove all text from the input box."), Style.ButtonToggleStyle, GUILayout.Width(Style.ButtonToggleStyle.fixedHeight)))
                 OnUpdate(FilterModification.Search, string.Empty);
 
             GUILayout.EndHorizontal();
         }
 
-        //Entry of action group view draw
-
         private void SortCurrentSelectedBaseAction()
         {
             currentSelectedBaseAction.Sort((ba1, ba2) => ba1.listParent.part.GetInstanceID().CompareTo(ba2.listParent.part.GetInstanceID()));
             listIsDirty = false;
+        }
+
+        // Reconfigures an existing GUIContent to avoid Garbage collection
+        static GUIContent SetupGuiContent(string text, Texture tex, string tooltip)
+        {
+            guiContent.text = text;
+            guiContent.tooltip = tooltip;
+            guiContent.image = tex;
+            return guiContent;
+        }
+        static GUIContent SetupGuiContent(string text, string tooltip)
+        {
+            return SetupGuiContent(text, null, tooltip);
         }
     }
 }

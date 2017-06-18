@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using KSP.UI.Dialogs;
 
@@ -50,7 +49,7 @@ namespace ActionGroupManager.UI
                 if (ag == KSPActionGroup.None)
                     continue;
 
-                List<BaseAction> list = BaseActionFilter.FromParts(VesselManager.Instance.GetParts(), ag).ToList();
+                List<BaseAction> list = BaseActionFilter.FromParts(VesselManager.Instance.GetParts(), ag);
 
                 if (list.Count > 0)
                 {

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace ActionGroupManager
 {
@@ -24,7 +23,7 @@ namespace ActionGroupManager
             return ret;
         }
 
-        public static IEnumerable<BaseAction> FromParts(IEnumerable<Part> parts)
+        public static List<BaseAction> FromParts(IEnumerable<Part> parts)
         {
             List<BaseAction> ret = new List<BaseAction>();
             foreach (Part p in parts)
@@ -44,13 +43,18 @@ namespace ActionGroupManager
             return ret;
         }
 
-        public static IEnumerable<BaseAction> FromParts(IEnumerable<Part> parts, KSPActionGroup ag)
+        public static List<BaseAction> FromParts(List<Part> parts, KSPActionGroup ag)
         {
-            return FromParts(parts).Where(
-                (e) =>
+            List<BaseAction> list = FromParts(parts);
+            List<BaseAction> ret = new List<BaseAction>();
+            for (int i = 0; i < list.Count; i++)
+            {
+                if(list[i].IsInActionGroup(ag))
                 {
-                    return e.IsInActionGroup(ag);
-                });
+                    ret.Add(list[i]);
+                }
+            }
+            return ret;
         }
 
         public static List<KSPActionGroup> GetActionGroupList(BaseAction bA)
