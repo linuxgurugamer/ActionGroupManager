@@ -74,7 +74,7 @@ namespace ActionGroupManager.UI
                 return;
 
             GUI.skin = HighLogic.Skin;
-            mainWindowSize = GUILayout.Window(this.GetHashCode(), mainWindowSize, DrawMainView, "Action Group Manager", HighLogic.Skin.window);
+            mainWindowSize = GUILayout.Window(this.GetHashCode(), mainWindowSize, DrawMainView, "Action Group Manager - " + VesselManager.Instance.ActiveVessel.GetName(), HighLogic.Skin.window);
         }
 
         public override void SetVisible(bool vis)

@@ -35,7 +35,7 @@ namespace ActionGroupManager
 #if DEBUG
                 Debug.Log("AGM : Action Group Manager is awake.");
 #endif
-            //GameEvents.onHideUI.Add(HideUI);
+            GameEvents.onHideUI.Add(HideUI);
         }
 
         void Start()
