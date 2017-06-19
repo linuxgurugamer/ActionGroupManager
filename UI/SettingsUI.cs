@@ -58,7 +58,7 @@ namespace ActionGroupManager.UI
             }
 
             initial = SettingsManager.Settings.GetValue<bool>(SettingsManager.TextActionGroups);
-            final = GUILayout.Toggle(initial, "Use Action Group Icons", Style.ButtonToggleStyle);
+            final = GUILayout.Toggle(initial, "Use Text Action Group Buttons", Style.ButtonToggleStyle);
             if (final != initial)
             {
                 SettingsManager.Settings.SetValue(SettingsManager.TextActionGroups, final);
