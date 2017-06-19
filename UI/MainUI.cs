@@ -17,7 +17,7 @@ namespace ActionGroupManager.UI
         PartFilter partFilter;
         Part currentSelectedPart; //The current part selected
         List<BaseAction> currentSelectedBaseAction; //The current action selected
-        KSPActionGroup currentSelectedActionGroup; //the current action group selected
+        KSPActionGroup currentSelectedActionGroup = KSPActionGroup.Stage; //the current action group selected
         string currentSearch = string.Empty; //the current text in search box
 
         // Application Settings
@@ -31,7 +31,7 @@ namespace ActionGroupManager.UI
         Vector2 actionList;
 
         bool listIsDirty = false;
-        bool allActionGroupSelected = false;
+        bool allActionGroupSelected = true;
         bool confirmDelete = false;
 
         // Objects for reusability to reduce garbage collection
@@ -253,15 +253,17 @@ namespace ActionGroupManager.UI
                     if (list.Count > 0)
                         buttonTitle = list.Count.ToString();
                 }
-
+                /*
                 if (selectMode)
                     if (list.Count > 0)
                         tooltip = "Put all the parts linked to " + actionGroups[i].ToString() + " in the selection.";
                     else
                         tooltip = "Link all parts selected to " + actionGroups[i].ToString();
+                        */
+                tooltip = "Select the " + actionGroups[i].ToString() + " group for editing.";
 
-                if (selectMode && list.Count == 0)
-                    GUI.enabled = false;
+                //if (selectMode && list.Count == 0)
+                    //GUI.enabled = false;
 
                 GUIStyle style;
                 if (classicView || textActionGroups)
@@ -276,9 +278,10 @@ namespace ActionGroupManager.UI
                 }
 
                 //Push the button will replace the actual action group list with all the selected action
-                if (GUILayout.Button(guiContent, style))
+                //if (GUILayout.Button(guiContent, style))
+                if(GUILayout.Toggle(actionGroups[i] == currentSelectedActionGroup, guiContent, style))
                 {
-
+                    /*
                     if (!selectMode)
                     {
                         //TODO: Remvoe foreach
@@ -294,14 +297,19 @@ namespace ActionGroupManager.UI
                         confirmDelete = false;
                     }
                     else
-                    {
-                        if (list.Count > 0)
+                    {*/
+                    currentSelectedActionGroup = actionGroups[i];
+                    if (list.Count > 0)
                         {
                             currentSelectedBaseAction = list;
                             allActionGroupSelected = true;
-                            currentSelectedActionGroup = actionGroups[i];
+                            
                         }
+                    else
+                    {
+                        currentSelectedBaseAction.Clear();
                     }
+                    //}
                 }
 
                 GUI.enabled = true;
@@ -413,7 +421,7 @@ namespace ActionGroupManager.UI
                                             highlighter.Remove(ba.listParent.part);
                                         return true;
                                     });
-                                allActionGroupSelected = false;
+                                //allActionGroupSelected = false;
                                 confirmDelete = false;
                             }
                         }
@@ -423,10 +431,12 @@ namespace ActionGroupManager.UI
                 else
                     GUILayout.FlexibleSpace();
 
+                /*
                 if (GUILayout.Button(SetupGuiContent("X", "Clear the selection."), Style.ButtonToggleStyle, GUILayout.Width(Style.ButtonToggleStyle.fixedHeight)))
                 {
                     currentSelectedBaseAction.Clear();
                 }
+                */
                 GUILayout.EndHorizontal();
             }
 
@@ -465,24 +475,29 @@ namespace ActionGroupManager.UI
                 if (GUILayout.Button(SetupGuiContent("<", "Remove from selection."), Style.ButtonToggleStyle, GUILayout.Width(20)))
                 {
                     currentSelectedBaseAction.Remove(pa);
-                    if (allActionGroupSelected)
-                        allActionGroupSelected = false;
+                    pa.RemoveActionToAnActionGroup(currentSelectedActionGroup);
+                    //if (allActionGroupSelected)
+                        //allActionGroupSelected = false;
                 }
 
                 if (pa.listParent.part.symmetryCounterparts.Count > 0)
                 {
                     if (GUILayout.Button(SetupGuiContent("<<", "Remove part and all symmetry linked parts from selection."), Style.ButtonToggleStyle, GUILayout.Width(20)))
                     {
-                        if (allActionGroupSelected)
-                            allActionGroupSelected = false;
+                        //if (allActionGroupSelected)
+                            //allActionGroupSelected = false;
 
                         currentSelectedBaseAction.Remove(pa);
+                        pa.RemoveActionToAnActionGroup(currentSelectedActionGroup);
 
                         //TODO: Remove foreach
                         foreach (BaseAction removeAll in BaseActionFilter.FromParts(pa.listParent.part.symmetryCounterparts))
                         {
                             if (removeAll.name == pa.name && currentSelectedBaseAction.Contains(removeAll))
+                            {
+                                removeAll.RemoveActionToAnActionGroup(currentSelectedActionGroup);
                                 currentSelectedBaseAction.Remove(removeAll);
+                            }
                         }
                         listIsDirty = true;
                     }
@@ -614,9 +629,10 @@ namespace ActionGroupManager.UI
                     {
                         if (GUILayout.Button(SetupGuiContent("<", "Remove from selection."), Style.ButtonToggleStyle, GUILayout.Width(20)))
                         {
-                            if (allActionGroupSelected)
-                                allActionGroupSelected = false;
+                            //if (allActionGroupSelected)
+                                //allActionGroupSelected = false;
                             currentSelectedBaseAction.Remove(baseActions[i]);
+                            baseActions[i].RemoveActionToAnActionGroup(currentSelectedActionGroup);
                             listIsDirty = true;
                         }
 
@@ -625,16 +641,18 @@ namespace ActionGroupManager.UI
                         {
                             if (GUILayout.Button(SetupGuiContent("<<", "Remove part and all symmetry linked parts from selection."), Style.ButtonToggleStyle, GUILayout.Width(20)))
                             {
-                                if (allActionGroupSelected)
-                                    allActionGroupSelected = false;
+                                //if (allActionGroupSelected)
+                                    //allActionGroupSelected = false;
 
                                 currentSelectedBaseAction.Remove(baseActions[i]);
+                                baseActions[i].RemoveActionToAnActionGroup(currentSelectedActionGroup);
 
                                 //TODO: Remove foreach
                                 foreach (BaseAction removeAll in BaseActionFilter.FromParts(currentSelectedPart.symmetryCounterparts))
                                 {
                                     if (removeAll.name == baseActions[i].name && currentSelectedBaseAction.Contains(removeAll))
                                         currentSelectedBaseAction.Remove(removeAll);
+                                        removeAll.RemoveActionToAnActionGroup(currentSelectedActionGroup);
                                 }
                                 listIsDirty = true;
                             }
@@ -645,9 +663,10 @@ namespace ActionGroupManager.UI
                     {
                         if (GUILayout.Button(SetupGuiContent(">", "Add to selection."), Style.ButtonToggleStyle, GUILayout.Width(20)))
                         {
-                            if (allActionGroupSelected)
-                                allActionGroupSelected = false;
+                            //if (allActionGroupSelected)
+                                //allActionGroupSelected = false;
                             currentSelectedBaseAction.Add(baseActions[i]);
+                            baseActions[i].AddActionToAnActionGroup(currentSelectedActionGroup);
                             listIsDirty = true;
                         }
 
@@ -656,16 +675,20 @@ namespace ActionGroupManager.UI
                         {
                             if (GUILayout.Button(SetupGuiContent(">>", "Add part and all symmetry linked parts to selection."), Style.ButtonToggleStyle, GUILayout.Width(20)))
                             {
-                                if (allActionGroupSelected)
-                                    allActionGroupSelected = false;
+                                //if (allActionGroupSelected)
+                                    //allActionGroupSelected = false;
                                 if (!currentSelectedBaseAction.Contains(baseActions[i]))
                                     currentSelectedBaseAction.Add(baseActions[i]);
 
+                                baseActions[i].AddActionToAnActionGroup(currentSelectedActionGroup);
                                 //TODO: Remove foreach
                                 foreach (BaseAction addAll in BaseActionFilter.FromParts(currentSelectedPart.symmetryCounterparts))
                                 {
                                     if (addAll.name == baseActions[i].name && !currentSelectedBaseAction.Contains(addAll))
+                                    {
                                         currentSelectedBaseAction.Add(addAll);
+                                        addAll.AddActionToAnActionGroup(currentSelectedActionGroup);
+                                    }
                                 }
                                 listIsDirty = true;
                             }
