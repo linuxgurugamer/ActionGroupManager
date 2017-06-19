@@ -89,14 +89,26 @@
     <Compile Include="UI\RecapUi.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="License.txt">
+    <None Include="Licenses\AGMC-License.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="MiniAVC.dll">
+    <None Include="Licenses\MiniAVC-License.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
+    </None>
+    <None Include="MiniAVC.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Licenses\MiniAVC-Info.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Licenses\Toolbar-Info.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Licenses\Toolbar-License.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <Content Include="Resources\Abort.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

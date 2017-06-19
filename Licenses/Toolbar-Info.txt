@@ -1,0 +1,4 @@
+﻿Toolbar Continued (Wrapper)
+Authors: Maik Schreiber (Blizzy78), linuxgurugamer
+Version: 1.7.14
+Website: http://forum.kerbalspaceprogram.com/index.php?/topic/161857-13
