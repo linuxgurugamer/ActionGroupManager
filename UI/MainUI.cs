@@ -31,7 +31,7 @@ namespace ActionGroupManager.UI
         Vector2 actionList;
 
         bool listIsDirty = false;
-        bool allActionGroupSelected = true;
+        //bool allActionGroupSelected = true;
         bool confirmDelete = false;
 
         // Objects for reusability to reduce garbage collection
@@ -41,7 +41,7 @@ namespace ActionGroupManager.UI
 
         public MainUi()
         {
-            mainWindowSize = SettingsManager.Settings.GetValue<Rect>(SettingsManager.MainWindowRect, new Rect(200, 200, 500, 400));
+            mainWindowSize = SettingsManager.Settings.GetValue(SettingsManager.MainWindowRect, new Rect(200, 200, 500, 400));
             mainWindowSize.width = mainWindowSize.width > 500 ? 500 : mainWindowSize.width;
             mainWindowSize.height = mainWindowSize.height > 400 ? 400 : mainWindowSize.height;
 
@@ -74,7 +74,7 @@ namespace ActionGroupManager.UI
                 return;
 
             GUI.skin = HighLogic.Skin;
-            mainWindowSize = GUILayout.Window(this.GetHashCode(), mainWindowSize, DrawMainView, "Action Group Manager - " + VesselManager.Instance.ActiveVessel.GetName(), HighLogic.Skin.window);
+            mainWindowSize = GUILayout.Window(GetHashCode(), mainWindowSize, DrawMainView, "Action Group Manager - " + VesselManager.Instance.ActiveVessel.GetName(), HighLogic.Skin.window);
         }
 
         public override void SetVisible(bool vis)
@@ -91,17 +91,17 @@ namespace ActionGroupManager.UI
                 SortCurrentSelectedBaseAction();
 
             // Window Buttons
-            if (GUI.Button(new Rect(mainWindowSize.width - 66, 4, 20, 20), SetupGuiContent("R", "Show recap."), Style.CloseButtonStyle))
+            if (GUI.Button(new Rect(mainWindowSize.width - 66, 4, 20, 20), NewGuiContent("R", "Show recap."), Style.CloseButtonStyle))
                 ActionGroupManager.Manager.ShowRecapWindow = !ActionGroupManager.Manager.ShowRecapWindow;
-            if (GUI.Button(new Rect(mainWindowSize.width - 45, 4, 20, 20), SetupGuiContent("S", "Show settings."), Style.CloseButtonStyle))
+            if (GUI.Button(new Rect(mainWindowSize.width - 45, 4, 20, 20), NewGuiContent("S", "Show settings."), Style.CloseButtonStyle))
                 ActionGroupManager.Manager.ShowSettings = !ActionGroupManager.Manager.ShowSettings;
-            if (GUI.Button(new Rect(mainWindowSize.width - 24, 4, 20, 20), SetupGuiContent("X", "Close the window."), Style.CloseButtonStyle))
+            if (GUI.Button(new Rect(mainWindowSize.width - 24, 4, 20, 20), NewGuiContent("X", "Close the window."), Style.CloseButtonStyle))
                 SetVisible(!IsVisible());
 
             if (!classicView)
                 GUILayout.BeginHorizontal(); // Begin Collection area to include Category Buttons, Scroll Lists, and Action Group Buttons (New View)
 
-            DrawCategoryButtons();
+            DrawCategoryButtons(classicView, classicView || textCategories);
             if (classicView)
                 GUILayout.BeginHorizontal(); // Begin Collection Area for Scroll Lists (Classic View)
 
@@ -112,7 +112,7 @@ namespace ActionGroupManager.UI
             if (classicView)
                 GUILayout.EndHorizontal(); // End Collection Area for Scroll Lists (Classic View)
 
-            DrawActionGroupButtons();
+            DrawActionGroupButtons(classicView, classicView || textActionGroups);
             if (!classicView)
                 GUILayout.EndHorizontal(); // End Collection Area for Category buttons, Scroll Lists, and Action Group Buttons (New View)
 
@@ -125,40 +125,44 @@ namespace ActionGroupManager.UI
             GUI.DragWindow();
         }
 
-        private void DrawCategoryButtons()
+        private void DrawCategoryButtons(bool rowView, bool textButtons)
         {
             bool result, initial;
             int iconCount = 0;
-            string buttonText = string.Empty;
+            string buttonText;
+            string tooltip = "Show only {0} parts.";
+            GUIStyle buttonStyle = textButtons ? Style.ButtonToggleStyle : Style.ButtonIconStyle;
             SortedList<PartCategories, int> partCounts = partFilter.GetNumberOfPartByCategory();
 
-            if(classicView)
-                GUILayout.BeginHorizontal(); // Begin First Row of Buttons
+            GUILayout.BeginVertical();  // Begin Category Button Collection (All Views)
+            if (rowView)
+                GUILayout.BeginHorizontal();  // Begin First Row of Category Buttons (Classic View)
             else
-            {
-                GUILayout.BeginVertical(); // Begin Vertical Button Group
                 GUILayout.Label("Category Filter");
-            }
 
+            // Begin constructing buttons
             for (int i = 0; i < partCounts.Count; i++)
             {
                 if (partCounts.Keys[i] == PartCategories.none) continue;
 
                 initial = partCounts.Keys[i] == partFilter.CurrentPartCategory;
-                buttonText = string.Empty;
 
+                buttonText = string.Empty;
                 iconCount++;
-                if(classicView && iconCount % 9 == 0)
+
+                if(rowView && iconCount % 9 == 0)
                 {
                     GUILayout.EndHorizontal();  // End Button Row (Classic View)
                     GUILayout.BeginHorizontal(); // Begin New Button Row (Classic View)
                 }
 
-                if (classicView || textCategories)
+                if (textButtons)
                 {
                     buttonText = partCounts.Keys[i].ToString();
                     if (partCounts[partCounts.Keys[i]] > 0)
                         buttonText += " (" + partCounts[partCounts.Keys[i]] + ")";
+
+                    guiContent = NewGuiContent(buttonText, string.Format(tooltip, partCounts.Keys[i].ToString()));
                 }
                 else
                 {
@@ -167,19 +171,12 @@ namespace ActionGroupManager.UI
 
                     if (partCounts[partCounts.Keys[i]] > 0)
                         buttonText = partCounts[partCounts.Keys[i]].ToString();
+
+                    guiContent = NewGuiContent(buttonText, GameDatabase.Instance.GetTexture(ButtonIcons.GetIcon(partCounts.Keys[i]), false), string.Format(tooltip, partCounts.Keys[i].ToString()));
                 }
-
                 GUI.enabled = (partCounts[partCounts.Keys[i]] > 0);
+                result = GUILayout.Toggle(initial, guiContent, buttonStyle);
 
-                if (classicView || textCategories)
-                    result = GUILayout.Toggle(initial, SetupGuiContent(buttonText, "Show only " + partCounts.Keys[i].ToString() + " parts."), Style.ButtonToggleStyle);
-                else
-                    result = GUILayout.Toggle(initial, 
-                        SetupGuiContent(buttonText, GameDatabase.Instance.GetTexture(ButtonIcons.GetIcon(partCounts.Keys[i]), false),"Show only " + partCounts.Keys[i].ToString() + " parts."),
-                        Style.ButtonIconStyle);
-
-
-                GUI.enabled = true;
 
                 if (initial != result)
                 {
@@ -189,152 +186,86 @@ namespace ActionGroupManager.UI
                         OnUpdate(FilterModification.Category, partCounts.Keys[i]);
                 }
 
-                if (!classicView && !textCategories)
-                {
-                    if (iconCount % 2 == 0)
-                        GUILayout.EndHorizontal();  // End 2 Button Row (New View with Icons)
-                }
+                if (!textButtons && iconCount % 2 == 0)
+                    GUILayout.EndHorizontal();  // End 2 Button Row (New View with Icons)
             }
 
-            // Finish the drawing area
-            if (classicView)
-            {
-                GUILayout.EndHorizontal(); // End Button Row (Classic View)
-            }
-            else if (!textCategories)
-            {
-                if (iconCount % 2 == 1)
-                    GUILayout.EndHorizontal(); // End Button Row if odd number of Buttons (New View with Icons)
+            // Finish the layout
+            if (rowView || (!textButtons && iconCount % 2 == 1))
+                GUILayout.EndHorizontal(); // End Button Row (Classic View) or 2 Button row if number of Buttons is Odd (New View with Icons)
 
-                GUILayout.EndVertical(); // End Button Columns (New View with Icons)
-            }
-            else
-            {
-                GUILayout.EndVertical(); // End Button Column (New View with Text)
-            }
+            GUILayout.EndVertical(); // End Category Button Columns (New View)
         }
 
         //Draw the Action groups grid in Part View
-        private void DrawActionGroupButtons()
+        private void DrawActionGroupButtons(bool rowView, bool textButtons)
         {
-            List<BaseAction> list;
-            string tooltip, buttonTitle;
-            bool selectMode = currentSelectedBaseAction.Count == 0;
+            int iconCount = 0;
+            string buttonText;
+            string tooltip = "Select the {0} group for editing.";
+            GUIStyle buttonStyle = textButtons ? Style.ButtonToggleStyle : Style.ButtonIconStyle;
+            List<KSPActionGroup> actionGroups = VesselManager.Instance.AllActionGroups;
+            List<BaseAction> baList;
 
             GUILayout.BeginVertical();  // Begin Action Group Collection (All Views)
-            if (classicView)
-            {
+            if (rowView)
                 GUILayout.BeginHorizontal();  // Begin First Row of Action Group Buttons (Classic View)
-            }
 
-            int iconCount = 0;
-            List<KSPActionGroup> actionGroups = VesselManager.Instance.AllActionGroups;
+            // Begin constructing buttons
             for (int i = 0; i < actionGroups.Count; i++)
             {
                 if (actionGroups[i] == KSPActionGroup.None || actionGroups[i] == KSPActionGroup.REPLACEWITHDEFAULT)
                     continue;
 
-                list = partFilter.GetBaseActionAttachedToActionGroup(actionGroups[i]);
-                tooltip = string.Empty;
-                buttonTitle = string.Empty;
+                baList = partFilter.GetBaseActionAttachedToActionGroup(actionGroups[i]);
 
+                buttonText = string.Empty;
                 iconCount++;
-                if (classicView || textActionGroups)
+
+                if (rowView && iconCount % 9 == 0)
                 {
-                    buttonTitle = actionGroups[i].ToString();
-                    if (list.Count > 0)
-                        buttonTitle += " (" + list.Count + ")";
+                    GUILayout.EndHorizontal();  // End Button Row (Classic View)
+                    GUILayout.BeginHorizontal(); // Begin New Button Row (Classic View)
+                }
+
+                // Configure the button
+                if (textButtons)
+                {
+                    buttonText = actionGroups[i].ToString();
+                    buttonText += baList.Count > 0 ? " (" + baList.Count + ")" : null;
+                    guiContent = NewGuiContent(buttonText, string.Format(tooltip, actionGroups[i]));
                 }
                 else
                 {
                     if (iconCount % 2 == 1)
                         GUILayout.BeginHorizontal();  // Begin 2 Button Row (New View with Icons)
 
-                    if (list.Count > 0)
-                        buttonTitle = list.Count.ToString();
-                }
-                /*
-                if (selectMode)
-                    if (list.Count > 0)
-                        tooltip = "Put all the parts linked to " + actionGroups[i].ToString() + " in the selection.";
-                    else
-                        tooltip = "Link all parts selected to " + actionGroups[i].ToString();
-                        */
-                tooltip = "Select the " + actionGroups[i].ToString() + " group for editing.";
+                    if (baList.Count > 0)
+                        buttonText = baList.Count.ToString();
 
-                //if (selectMode && list.Count == 0)
-                    //GUI.enabled = false;
-
-                GUIStyle style;
-                if (classicView || textActionGroups)
-                {
-                    guiContent = SetupGuiContent(buttonTitle, tooltip);
-                    style = Style.ButtonToggleStyle;
-                }
-                else
-                {
-                    guiContent = SetupGuiContent(buttonTitle, GameDatabase.Instance.GetTexture(ButtonIcons.GetIcon(actionGroups[i]), false), tooltip);
-                    style = Style.ButtonIconStyle;
+                    guiContent = NewGuiContent(buttonText, GameDatabase.Instance.GetTexture(ButtonIcons.GetIcon(actionGroups[i]), false), string.Format(tooltip, actionGroups[i]));
                 }
 
-                //Push the button will replace the actual action group list with all the selected action
-                //if (GUILayout.Button(guiContent, style))
-                if(GUILayout.Toggle(actionGroups[i] == currentSelectedActionGroup, guiContent, style))
+                // Create the button
+                if(GUILayout.Toggle(actionGroups[i] == currentSelectedActionGroup, guiContent, buttonStyle))
                 {
-                    /*
-                    if (!selectMode)
-                    {
-                        //TODO: Remvoe foreach
-                        foreach (BaseAction ba in list)
-                            ba.RemoveActionToAnActionGroup(actionGroups[i]);
-
-                        foreach (BaseAction ba in currentSelectedBaseAction)
-                            ba.AddActionToAnActionGroup(actionGroups[i]);
-
-                        currentSelectedBaseAction.Clear();
-
-                        currentSelectedPart = null;
-                        confirmDelete = false;
-                    }
-                    else
-                    {*/
                     currentSelectedActionGroup = actionGroups[i];
-                    if (list.Count > 0)
-                        {
-                            currentSelectedBaseAction = list;
-                            allActionGroupSelected = true;
-                            
-                        }
+                    if (baList.Count > 0)
+                        currentSelectedBaseAction = baList;
                     else
-                    {
                         currentSelectedBaseAction.Clear();
-                    }
-                    //}
                 }
 
-                GUI.enabled = true;
+                // Finish the layout for this button
+                 if (!textButtons && iconCount % 2 == 0)
+                    GUILayout.EndHorizontal(); // End 2 Button Row (New View with Icons)
+            }
 
-                if (classicView && actionGroups[i] == KSPActionGroup.Custom02)
-                {
-                    GUILayout.EndHorizontal();  // End Button Row (Classic View)
-                    GUILayout.BeginHorizontal(); // Begin button Row (Classic View)
-                }
-                else if (!classicView && !textActionGroups)
-                {
-                    if (iconCount % 2 == 0) GUILayout.EndHorizontal(); // End 2 Button Row (New View with Icons)
-                }
+            // Finish the whole layout
+            if (rowView || (!textButtons && iconCount % 2 == 1))
+                GUILayout.EndHorizontal();  // End Button Row (Classic View) or 2 Button row if number of Buttons is Odd (New View with Icons)
 
-            }
-            if (classicView)
-            {
-                GUILayout.EndHorizontal();  // End Button Row (Classic View)
-            }
-            else if (!textActionGroups)
-            {
-                if (iconCount % 2 == 1) GUILayout.EndHorizontal(); // End 2 Button Row if number of Buttons is Odd (New View with Icons)
-            }
             GUILayout.EndVertical(); // End Button Collection Area
-            GUI.enabled = true;
         }
 
         //Entry of action group view draw
@@ -395,49 +326,33 @@ namespace ActionGroupManager.UI
             if (currentSelectedBaseAction.Count > 0)
             {
                 GUILayout.Space(HighLogic.Skin.verticalScrollbar.margin.left);
-                GUILayout.BeginHorizontal();
 
-                if (allActionGroupSelected)
+                str = confirmDelete ? "Delete all actions in " + currentSelectedActionGroup.ToString() + " OK ?" : "Remove all from group " + currentSelectedActionGroup.ToShortString();
+                if (GUILayout.Button(str, Style.ButtonToggleStyle))
                 {
-                    str = confirmDelete ? "Delete all actions in " + currentSelectedActionGroup.ToString() + " OK ?" : "Remove all from group " + currentSelectedActionGroup.ToShortString();
-                    if (GUILayout.Button(str, Style.ButtonToggleStyle))
+                    if (!confirmDelete)
+                        confirmDelete = !confirmDelete;
+                    else
                     {
-                        if (!confirmDelete)
-                            confirmDelete = !confirmDelete;
-                        else
+                        if (currentSelectedBaseAction.Count > 0)
                         {
-                            if (currentSelectedBaseAction.Count > 0)
+                            //TODO: Remove foreach
+                            foreach (BaseAction ba in currentSelectedBaseAction)
                             {
-                                //TODO: Remove foreach
-                                foreach (BaseAction ba in currentSelectedBaseAction)
-                                {
-                                    ba.RemoveActionToAnActionGroup(currentSelectedActionGroup);
-                                }
-
-                                currentSelectedBaseAction.RemoveAll(
-                                    (ba) =>
-                                    {
-                                        if(classicView)
-                                            highlighter.Remove(ba.listParent.part);
-                                        return true;
-                                    });
-                                //allActionGroupSelected = false;
-                                confirmDelete = false;
+                                ba.RemoveActionToAnActionGroup(currentSelectedActionGroup);
                             }
+
+                            currentSelectedBaseAction.RemoveAll(
+                                (ba) =>
+                                {
+                                    if(classicView)
+                                        highlighter.Remove(ba.listParent.part);
+                                    return true;
+                                });
+                            confirmDelete = false;
                         }
                     }
-
                 }
-                else
-                    GUILayout.FlexibleSpace();
-
-                /*
-                if (GUILayout.Button(SetupGuiContent("X", "Clear the selection."), Style.ButtonToggleStyle, GUILayout.Width(Style.ButtonToggleStyle.fixedHeight)))
-                {
-                    currentSelectedBaseAction.Clear();
-                }
-                */
-                GUILayout.EndHorizontal();
             }
 
             //TODO: Remove foreach
@@ -451,7 +366,7 @@ namespace ActionGroupManager.UI
                         GUILayout.Label(pa.listParent.part.partInfo.title, Style.ButtonPartStyle);
                     else {
 
-                        if (GUILayout.Button(SetupGuiContent(pa.listParent.part.partInfo.title, "Find action in parts list."), Style.ButtonPartStyle))
+                        if (GUILayout.Button(NewGuiContent(pa.listParent.part.partInfo.title, "Find action in parts list."), Style.ButtonPartStyle))
                         {
                             highlighter.Remove(currentSelectedPart);
                             highlighter.Add(pa.listParent.part);
@@ -464,7 +379,7 @@ namespace ActionGroupManager.UI
                     if (classicView)
                     {
                         initial = highlighter.Contains(pa.listParent.part);
-                        final = GUILayout.Toggle(initial, SetupGuiContent("!", "Highlight the part."), Style.ButtonToggleStyle, GUILayout.Width(20));
+                        final = GUILayout.Toggle(initial, NewGuiContent("!", "Highlight the part."), Style.ButtonToggleStyle, GUILayout.Width(20));
                         if (final != initial)
                             highlighter.Switch(pa.listParent.part);
                     }
@@ -472,7 +387,7 @@ namespace ActionGroupManager.UI
                     GUILayout.EndHorizontal();
                 }
                 GUILayout.BeginHorizontal();
-                if (GUILayout.Button(SetupGuiContent("<", "Remove from selection."), Style.ButtonToggleStyle, GUILayout.Width(20)))
+                if (GUILayout.Button(NewGuiContent("<", "Remove from selection."), Style.ButtonToggleStyle, GUILayout.Width(20)))
                 {
                     currentSelectedBaseAction.Remove(pa);
                     pa.RemoveActionToAnActionGroup(currentSelectedActionGroup);
@@ -482,7 +397,7 @@ namespace ActionGroupManager.UI
 
                 if (pa.listParent.part.symmetryCounterparts.Count > 0)
                 {
-                    if (GUILayout.Button(SetupGuiContent("<<", "Remove part and all symmetry linked parts from selection."), Style.ButtonToggleStyle, GUILayout.Width(20)))
+                    if (GUILayout.Button(NewGuiContent("<<", "Remove part and all symmetry linked parts from selection."), Style.ButtonToggleStyle, GUILayout.Width(20)))
                     {
                         //if (allActionGroupSelected)
                             //allActionGroupSelected = false;
@@ -507,7 +422,7 @@ namespace ActionGroupManager.UI
                 GUILayout.Label(pa.guiName, Style.LabelExpandStyle);
 
                 if (classicView) {
-                    if (GUILayout.Button(SetupGuiContent("F", "Find action in parts list."), Style.ButtonToggleStyle, GUILayout.Width(20)))
+                    if (GUILayout.Button(NewGuiContent("F", "Find action in parts list."), Style.ButtonToggleStyle, GUILayout.Width(20)))
                     {
                         currentSelectedPart = pa.listParent.part;
                     }
@@ -536,7 +451,7 @@ namespace ActionGroupManager.UI
                 {
                     initial = highlighter.Contains(list[i]);
 
-                    final = GUILayout.Toggle(initial, SetupGuiContent("!", "Highlight the part."), Style.ButtonToggleStyle, GUILayout.Width(20));
+                    final = GUILayout.Toggle(initial, NewGuiContent("!", "Highlight the part."), Style.ButtonToggleStyle, GUILayout.Width(20));
 
                     if (final != initial)
                         highlighter.Switch(list[i]);
@@ -576,11 +491,10 @@ namespace ActionGroupManager.UI
 
                         if (list[i] != currentSelectedPart)
                         {
-                            if (GUILayout.Button(SetupGuiContent(currentAG[j].ToShortString(), "Part has an action linked to action group " + currentAG[j].ToString()), Style.ButtonToggleStyle, GUILayout.Width(20)))
+                            if (GUILayout.Button(NewGuiContent(currentAG[j].ToShortString(), "Part has an action linked to action group " + currentAG[j].ToString()), Style.ButtonToggleStyle, GUILayout.Width(20)))
                             {
                                 currentSelectedBaseAction = partFilter.GetBaseActionAttachedToActionGroup(currentAG[j]);
                                 currentSelectedActionGroup = currentAG[j];
-                                allActionGroupSelected = true;
                             }
                         }
                     }
@@ -615,11 +529,10 @@ namespace ActionGroupManager.UI
                         actionGroups = BaseActionFilter.GetActionGroupList(baseActions[i]);
                         for (int j = 0; j < actionGroups.Count; j++)
                         {
-                            if (GUILayout.Button(SetupGuiContent(actionGroups[j].ToShortString(), actionGroups[j].ToString()), Style.ButtonToggleStyle, GUILayout.Width(20)))
+                            if (GUILayout.Button(NewGuiContent(actionGroups[j].ToShortString(), actionGroups[j].ToString()), Style.ButtonToggleStyle, GUILayout.Width(20)))
                             {
                                 currentSelectedBaseAction = partFilter.GetBaseActionAttachedToActionGroup(actionGroups[j]);
                                 currentSelectedActionGroup = actionGroups[j];
-                                allActionGroupSelected = true;
                             }
                         }
                     }
@@ -627,7 +540,7 @@ namespace ActionGroupManager.UI
 
                     if (currentSelectedBaseAction.Contains(baseActions[i]))
                     {
-                        if (GUILayout.Button(SetupGuiContent("<", "Remove from selection."), Style.ButtonToggleStyle, GUILayout.Width(20)))
+                        if (GUILayout.Button(NewGuiContent("<", "Remove from selection."), Style.ButtonToggleStyle, GUILayout.Width(20)))
                         {
                             //if (allActionGroupSelected)
                                 //allActionGroupSelected = false;
@@ -639,7 +552,7 @@ namespace ActionGroupManager.UI
                         //Remove all symetry parts.
                         if (currentSelectedPart.symmetryCounterparts.Count > 0)
                         {
-                            if (GUILayout.Button(SetupGuiContent("<<", "Remove part and all symmetry linked parts from selection."), Style.ButtonToggleStyle, GUILayout.Width(20)))
+                            if (GUILayout.Button(NewGuiContent("<<", "Remove part and all symmetry linked parts from selection."), Style.ButtonToggleStyle, GUILayout.Width(20)))
                             {
                                 //if (allActionGroupSelected)
                                     //allActionGroupSelected = false;
@@ -661,7 +574,7 @@ namespace ActionGroupManager.UI
                     }
                     else
                     {
-                        if (GUILayout.Button(SetupGuiContent(">", "Add to selection."), Style.ButtonToggleStyle, GUILayout.Width(20)))
+                        if (GUILayout.Button(NewGuiContent(">", "Add to selection."), Style.ButtonToggleStyle, GUILayout.Width(20)))
                         {
                             //if (allActionGroupSelected)
                                 //allActionGroupSelected = false;
@@ -673,7 +586,7 @@ namespace ActionGroupManager.UI
                         //Add all symetry parts.
                         if (currentSelectedPart.symmetryCounterparts.Count > 0)
                         {
-                            if (GUILayout.Button(SetupGuiContent(">>", "Add part and all symmetry linked parts to selection."), Style.ButtonToggleStyle, GUILayout.Width(20)))
+                            if (GUILayout.Button(NewGuiContent(">>", "Add part and all symmetry linked parts to selection."), Style.ButtonToggleStyle, GUILayout.Width(20)))
                             {
                                 //if (allActionGroupSelected)
                                     //allActionGroupSelected = false;
@@ -713,7 +626,7 @@ namespace ActionGroupManager.UI
                 OnUpdate(FilterModification.Search, searchString);
 
             GUILayout.Space(5);
-            if (GUILayout.Button(SetupGuiContent("X", "Remove all text from the input box."), Style.ButtonToggleStyle, GUILayout.Width(Style.ButtonToggleStyle.fixedHeight)))
+            if (GUILayout.Button(NewGuiContent("X", "Remove all text from the input box."), Style.ButtonToggleStyle, GUILayout.Width(Style.ButtonToggleStyle.fixedHeight)))
                 OnUpdate(FilterModification.Search, string.Empty);
 
             GUILayout.EndHorizontal();
@@ -726,16 +639,20 @@ namespace ActionGroupManager.UI
         }
 
         // Reconfigures an existing GUIContent to avoid Garbage collection
-        static GUIContent SetupGuiContent(string text, Texture tex, string tooltip)
+        static GUIContent NewGuiContent(string text, Texture tex, string tooltip)
         {
             guiContent.text = text;
             guiContent.tooltip = tooltip;
             guiContent.image = tex;
             return guiContent;
         }
-        static GUIContent SetupGuiContent(string text, string tooltip)
+        static GUIContent NewGuiContent(string text, string tooltip)
         {
-            return SetupGuiContent(text, null, tooltip);
+            return NewGuiContent(text, null, tooltip);
+        }
+        static GUIContent NewGuiContent(string text)
+        {
+            return NewGuiContent(text, null, null);
         }
     }
 }
