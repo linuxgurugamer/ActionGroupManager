@@ -143,7 +143,8 @@ namespace ActionGroupManager.UI
             // Begin constructing buttons
             for (int i = 0; i < partCounts.Count; i++)
             {
-                if (partCounts.Keys[i] == PartCategories.none) continue;
+                if (partCounts.Keys[i] == PartCategories.none || partCounts.Keys[i] == PartCategories.Propulsion/* Unused Category */)
+                    continue;
 
                 initial = partCounts.Keys[i] == partFilter.CurrentPartCategory;
 
