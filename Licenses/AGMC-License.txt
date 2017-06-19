@@ -1,5 +1,6 @@
 Action Group Manager Continued
 This license applies to all new code and resources from AGMC.
+Action Group Manager original code and resources are license under the WTFPL
 
 Copyright (c) 2017 Kevin Seiden
 
