@@ -409,7 +409,8 @@ namespace ActionGroupManager.UI
                                 currentSelectedBaseAction.RemoveAll(
                                     (ba) =>
                                     {
-                                        highlighter.Remove(ba.listParent.part);
+                                        if(classicView)
+                                            highlighter.Remove(ba.listParent.part);
                                         return true;
                                     });
                                 allActionGroupSelected = false;
@@ -436,13 +437,27 @@ namespace ActionGroupManager.UI
                 if (currentDrawn != pa.listParent.part)
                 {
                     GUILayout.BeginHorizontal();
-                    GUILayout.Label(pa.listParent.part.partInfo.title, Style.ButtonPartStyle);
+                    if (classicView)
+                        GUILayout.Label(pa.listParent.part.partInfo.title, Style.ButtonPartStyle);
+                    else {
+
+                        if (GUILayout.Button(SetupGuiContent(pa.listParent.part.partInfo.title, "Find action in parts list."), Style.ButtonPartStyle))
+                        {
+                            highlighter.Remove(currentSelectedPart);
+                            highlighter.Add(pa.listParent.part);
+                            currentSelectedPart = pa.listParent.part;
+                        }
+                    }
+
                     currentDrawn = pa.listParent.part;
 
-                    initial = highlighter.Contains(pa.listParent.part);
-                    final = GUILayout.Toggle(initial, SetupGuiContent("!", "Highlight the part."), Style.ButtonToggleStyle, GUILayout.Width(20));
-                    if (final != initial)
-                        highlighter.Switch(pa.listParent.part);
+                    if (classicView)
+                    {
+                        initial = highlighter.Contains(pa.listParent.part);
+                        final = GUILayout.Toggle(initial, SetupGuiContent("!", "Highlight the part."), Style.ButtonToggleStyle, GUILayout.Width(20));
+                        if (final != initial)
+                            highlighter.Switch(pa.listParent.part);
+                    }
 
                     GUILayout.EndHorizontal();
                 }
@@ -476,9 +491,11 @@ namespace ActionGroupManager.UI
 
                 GUILayout.Label(pa.guiName, Style.LabelExpandStyle);
 
-                if (GUILayout.Button(SetupGuiContent("F", "Find action in parts list."), Style.ButtonToggleStyle, GUILayout.Width(20)))
-                {
-                    currentSelectedPart = pa.listParent.part;
+                if (classicView) {
+                    if (GUILayout.Button(SetupGuiContent("F", "Find action in parts list."), Style.ButtonToggleStyle, GUILayout.Width(20)))
+                    {
+                        currentSelectedPart = pa.listParent.part;
+                    }
                 }
 
 
@@ -500,12 +517,15 @@ namespace ActionGroupManager.UI
                 currentAG = partFilter.GetActionGroupAttachedToPart(list[i]);
                 GUILayout.BeginHorizontal();
 
-                initial = highlighter.Contains(list[i]);
+                if (classicView)
+                {
+                    initial = highlighter.Contains(list[i]);
 
-                final = GUILayout.Toggle(initial, SetupGuiContent("!", "Highlight the part."), Style.ButtonToggleStyle, GUILayout.Width(20));
+                    final = GUILayout.Toggle(initial, SetupGuiContent("!", "Highlight the part."), Style.ButtonToggleStyle, GUILayout.Width(20));
 
-                if (final != initial)
-                    highlighter.Switch(list[i]);
+                    if (final != initial)
+                        highlighter.Switch(list[i]);
+                }
 
                 initial = list[i] == currentSelectedPart;
                 str = list[i].partInfo.title;
@@ -514,9 +534,22 @@ namespace ActionGroupManager.UI
                 if (initial != final)
                 {
                     if (final)
+                    {
+                        if (!classicView)
+                        {
+                            highlighter.Add(list[i]);
+                            highlighter.Remove(currentSelectedPart);
+                        }
+
                         currentSelectedPart = list[i];
+
+                    }
                     else
+                    {
+                        if (!classicView)
+                            highlighter.Remove(currentSelectedPart);
                         currentSelectedPart = null;
+                    }
                 }
 
                 if (currentAG.Count > 0)

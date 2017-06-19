@@ -1,12 +1,12 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
-
 namespace ActionGroupManager
 {
     class Highlighter
     {
+        private readonly Color highlightColor = new Color(1, 0.64f, 0);
         List<Part> internalHighlight;
-
+        
         public Highlighter()
         {
             internalHighlight = new List<Part>();
@@ -16,7 +16,7 @@ namespace ActionGroupManager
         {
             for(int i = 0; i < internalHighlight.Count; i++)
             {
-                internalHighlight[i].SetHighlightColor(Color.blue);
+                internalHighlight[i].SetHighlightColor(highlightColor);
                 internalHighlight[i].SetHighlight(true, false);
             }
         }
@@ -27,7 +27,7 @@ namespace ActionGroupManager
                 return;
 
             internalHighlight.Add(p);
-            p.highlightColor = Color.blue;
+            p.highlightColor = highlightColor;
             p.SetHighlight(true, false);
         }
 
