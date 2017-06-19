@@ -16,7 +16,7 @@ namespace ActionGroupManager
 
         public static GUIStyle LabelExpandStyle;
 
-        static bool UseKSPSkin = false;
+        static bool UseKSPSkin = true;
 
         static Style()
         {
