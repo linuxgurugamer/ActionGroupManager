@@ -109,12 +109,19 @@
     <None Include="Licenses\Toolbar-License.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <Content Include="Changelog.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Resources\Abort.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\AppLauncher.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="Resources\ArrowLeft.png" />
+    <Content Include="Resources\ArrowRight.png" />
+    <Content Include="Resources\ChevronLeft.png" />
+    <Content Include="Resources\ChevronRight.png" />
     <Content Include="Resources\number0.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

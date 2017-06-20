@@ -118,12 +118,5 @@ namespace ActionGroupManager
                 ButtonToggleGreenStyle.onHover.textColor = Color.green;
             */
         }
-
-        public static void Reload()
-        {
-
-
-
-        }
     }
 }

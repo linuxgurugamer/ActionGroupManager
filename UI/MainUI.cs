@@ -24,6 +24,8 @@ namespace ActionGroupManager.UI
         bool classicView = SettingsManager.Settings.GetValue<bool>(SettingsManager.ClassicView);
         bool textCategories = SettingsManager.Settings.GetValue<bool>(SettingsManager.TextCategories);
         bool textActionGroups = SettingsManager.Settings.GetValue<bool>(SettingsManager.TextActionGroups);
+        bool useCareer = !SettingsManager.Settings.GetValue<bool>(SettingsManager.DisableCareer);
+        float CareerLevel = Math.Max(ScenarioUpgradeableFacilities.GetFacilityLevel(SpaceCenterFacility.SpaceplaneHangar), ScenarioUpgradeableFacilities.GetFacilityLevel(SpaceCenterFacility.VehicleAssemblyBuilding));
 
         //Inital window rect
         Rect mainWindowSize;
@@ -51,6 +53,14 @@ namespace ActionGroupManager.UI
 
             partFilter = new PartFilter();
             FilterChanged += partFilter.ViewFilterChanged;
+            GameEvents.OnUpgradeableObjLevelChange.Add(UpgradeBuilding);
+        }
+
+        private void UpgradeBuilding(Upgradeables.UpgradeableObject o, int level)
+        {
+            if(o.GetType() == typeof(Upgradeables.UpgradeableFacility))
+                CareerLevel = Math.Max(ScenarioUpgradeableFacilities.GetFacilityLevel(SpaceCenterFacility.SpaceplaneHangar), ScenarioUpgradeableFacilities.GetFacilityLevel(SpaceCenterFacility.VehicleAssemblyBuilding));
+            SetVisible(false);
         }
 
         private void OnUpdate(FilterModification mod, object o)
@@ -102,6 +112,7 @@ namespace ActionGroupManager.UI
                 GUILayout.BeginHorizontal(); // Begin Collection area to include Category Buttons, Scroll Lists, and Action Group Buttons (New View)
 
             DrawCategoryButtons(classicView, classicView || textCategories);
+
             if (classicView)
                 GUILayout.BeginHorizontal(); // Begin Collection Area for Scroll Lists (Classic View)
 
@@ -202,6 +213,7 @@ namespace ActionGroupManager.UI
                 GUILayout.EndHorizontal(); // End Button Row (Classic View) or 2 Button row if number of Buttons is Odd (New View with Icons)
 
             GUILayout.EndVertical(); // End Category Button Columns (New View)
+            GUI.enabled = true;
         }
 
         private void DrawActionGroupButtons(bool rowView, bool textButtons)
@@ -425,65 +437,69 @@ namespace ActionGroupManager.UI
                         }
                     }
 
-                    // Action Remove Buttons
-                    if (currentSelectedBaseAction.Contains(baseActions[i]))
+                    if ((useCareer && (CareerLevel > 0.5f || (!currentSelectedActionGroup.ToString().Contains("Custom") && CareerLevel > 0f))))
                     {
-                        if (GUILayout.Button(NewGuiContent("<", "Remove from selection."), Style.ButtonToggleStyle, GUILayout.Width(20)))
-                        {
-                            baseActions[i].RemoveActionToAnActionGroup(currentSelectedActionGroup);
-                            currentSelectedBaseAction.Remove(baseActions[i]);
-                            listIsDirty = true;
-                        }
 
-                        //Remove all symetry parts.
-                        if (currentSelectedPart.symmetryCounterparts.Count > 0)
+                        // Action Remove Buttons
+                        if (currentSelectedBaseAction.Contains(baseActions[i]))
                         {
-                            if (GUILayout.Button(NewGuiContent((currentSelectedPart.symmetryCounterparts.Count + 1).ToString() + "<",
-                                "Remove part and all symmetry linked parts from selection."), Style.ButtonToggleStyle, GUILayout.Width(25)))
+                            if (GUILayout.Button(NewGuiContent("<", "Remove from selection."), Style.ButtonToggleStyle, GUILayout.Width(20)))
                             {
-                                symmetryActions = BaseActionFilter.FromParts(currentSelectedPart.symmetryCounterparts);
-                                for (int j = 0; j < symmetryActions.Count; j++)
-                                {
-                                    symmetryActions[j].RemoveActionToAnActionGroup(currentSelectedActionGroup);
-                                    if (symmetryActions[j].name == baseActions[i].name && currentSelectedBaseAction.Contains(symmetryActions[j]))
-                                        currentSelectedBaseAction.Remove(symmetryActions[j]);
-                                }
                                 baseActions[i].RemoveActionToAnActionGroup(currentSelectedActionGroup);
                                 currentSelectedBaseAction.Remove(baseActions[i]);
                                 listIsDirty = true;
                             }
-                        }
-                    }
-                    else
-                    {
-                        // Action Add Buttons
-                        if (GUILayout.Button(NewGuiContent(">", "Add to selection."), Style.ButtonToggleStyle, GUILayout.Width(20)))
-                        {
-                            currentSelectedBaseAction.Add(baseActions[i]);
-                            baseActions[i].AddActionToAnActionGroup(currentSelectedActionGroup);
-                            listIsDirty = true;
-                        }
 
-                        //Add all symetry parts.
-                        if (currentSelectedPart.symmetryCounterparts.Count > 0)
-                        {
-                            if (GUILayout.Button(NewGuiContent(">" + (currentSelectedPart.symmetryCounterparts.Count + 1).ToString(),
-                                "Add part and all symmetry linked parts to selection."), Style.ButtonToggleStyle, GUILayout.Width(25)))
+                            //Remove all symetry parts.
+                            if (currentSelectedPart.symmetryCounterparts.Count > 0)
                             {
-                                baseActions[i].AddActionToAnActionGroup(currentSelectedActionGroup);
-                                if (!currentSelectedBaseAction.Contains(baseActions[i]))
-                                    currentSelectedBaseAction.Add(baseActions[i]);
-                                
-                                symmetryActions = BaseActionFilter.FromParts(currentSelectedPart.symmetryCounterparts);
-                                for (int j = 0; j < symmetryActions.Count; j++)
+                                if (GUILayout.Button(NewGuiContent((currentSelectedPart.symmetryCounterparts.Count + 1).ToString() + "<",
+                                    "Remove part and all symmetry linked parts from selection."), Style.ButtonToggleStyle, GUILayout.Width(25)))
                                 {
-                                    if (symmetryActions[j].name == baseActions[i].name && !currentSelectedBaseAction.Contains(symmetryActions[j]))
+                                    symmetryActions = BaseActionFilter.FromParts(currentSelectedPart.symmetryCounterparts);
+                                    for (int j = 0; j < symmetryActions.Count; j++)
                                     {
-                                        currentSelectedBaseAction.Add(symmetryActions[j]);
-                                        symmetryActions[j].AddActionToAnActionGroup(currentSelectedActionGroup);
+                                        symmetryActions[j].RemoveActionToAnActionGroup(currentSelectedActionGroup);
+                                        if (symmetryActions[j].name == baseActions[i].name && currentSelectedBaseAction.Contains(symmetryActions[j]))
+                                            currentSelectedBaseAction.Remove(symmetryActions[j]);
                                     }
+                                    baseActions[i].RemoveActionToAnActionGroup(currentSelectedActionGroup);
+                                    currentSelectedBaseAction.Remove(baseActions[i]);
+                                    listIsDirty = true;
                                 }
+                            }
+                        }
+                        else
+                        {
+                            // Action Add Buttons
+                            if (GUILayout.Button(NewGuiContent(">", "Add to selection."), Style.ButtonToggleStyle, GUILayout.Width(20)))
+                            {
+                                currentSelectedBaseAction.Add(baseActions[i]);
+                                baseActions[i].AddActionToAnActionGroup(currentSelectedActionGroup);
                                 listIsDirty = true;
+                            }
+
+                            //Add all symetry parts.
+                            if (currentSelectedPart.symmetryCounterparts.Count > 0)
+                            {
+                                if (GUILayout.Button(NewGuiContent(">" + (currentSelectedPart.symmetryCounterparts.Count + 1).ToString(),
+                                    "Add part and all symmetry linked parts to selection."), Style.ButtonToggleStyle, GUILayout.Width(25)))
+                                {
+                                    baseActions[i].AddActionToAnActionGroup(currentSelectedActionGroup);
+                                    if (!currentSelectedBaseAction.Contains(baseActions[i]))
+                                        currentSelectedBaseAction.Add(baseActions[i]);
+
+                                    symmetryActions = BaseActionFilter.FromParts(currentSelectedPart.symmetryCounterparts);
+                                    for (int j = 0; j < symmetryActions.Count; j++)
+                                    {
+                                        if (symmetryActions[j].name == baseActions[i].name && !currentSelectedBaseAction.Contains(symmetryActions[j]))
+                                        {
+                                            currentSelectedBaseAction.Add(symmetryActions[j]);
+                                            symmetryActions[j].AddActionToAnActionGroup(currentSelectedActionGroup);
+                                        }
+                                    }
+                                    listIsDirty = true;
+                                }
                             }
                         }
                     }
@@ -510,26 +526,31 @@ namespace ActionGroupManager.UI
             // Add the Remove All Button
             if (currentSelectedBaseAction.Count > 0)
             {
-                GUILayout.Space(Style.BaseSkin.verticalScrollbar.margin.left);
+                
+                
+                    GUILayout.Space(Style.BaseSkin.verticalScrollbar.margin.left);
                 str = confirmDelete ? 
                     string.Format("OK to delete all actions in {0}?", currentSelectedActionGroup.ToString()) : 
                     string.Format("Remove all from {0}", currentSelectedActionGroup.ToString());
 
-                if (GUILayout.Button(str, confirmDelete ? Style.ButtonStrongEmphasisToggleStyle : Style.ButtonEmphasisToggle))
+                if ((useCareer && (CareerLevel > 0.5f || (!currentSelectedActionGroup.ToString().Contains("Custom") && CareerLevel > 0f))))
                 {
-                    if (!confirmDelete)
-                        confirmDelete = !confirmDelete;
-                    else if (currentSelectedBaseAction.Count > 0)
+                    if (GUILayout.Button(str, confirmDelete ? Style.ButtonStrongEmphasisToggleStyle : Style.ButtonEmphasisToggle))
                     {
-                        for (int i = 0; i < currentSelectedBaseAction.Count; i++)
+                        if (!confirmDelete)
+                            confirmDelete = !confirmDelete;
+                        else if (currentSelectedBaseAction.Count > 0)
                         {
-                            if (classicView)
-                                highlighter.Remove(currentSelectedBaseAction[i].listParent.part);
+                            for (int i = 0; i < currentSelectedBaseAction.Count; i++)
+                            {
+                                if (classicView)
+                                    highlighter.Remove(currentSelectedBaseAction[i].listParent.part);
 
-                            currentSelectedBaseAction[i].RemoveActionToAnActionGroup(currentSelectedActionGroup);
+                                currentSelectedBaseAction[i].RemoveActionToAnActionGroup(currentSelectedActionGroup);
+                            }
+                            currentSelectedBaseAction.Clear();
+                            confirmDelete = false;
                         }
-                        currentSelectedBaseAction.Clear();
-                        confirmDelete = false;
                     }
                 }
             }
@@ -573,29 +594,36 @@ namespace ActionGroupManager.UI
 
                 // Draw the action controls
                 GUILayout.BeginHorizontal();  // Begin Action Line
-                if (GUILayout.Button(NewGuiContent("<", "Remove from selection."), Style.ButtonToggleStyle, GUILayout.Width(20)))
-                {
-                    currentSelectedBaseAction[i].RemoveActionToAnActionGroup(currentSelectedActionGroup);
-                    currentSelectedBaseAction.Remove(currentSelectedBaseAction[i]);
-                }
+#if DEBUG
+                Debug.Log("AGM: Found Career Level:" + CareerLevel);
+                    #endif
 
-                if (currentSelectedBaseAction[i].listParent.part.symmetryCounterparts.Count > 0)
+                if ((useCareer && (CareerLevel > 0.5f || (!currentSelectedActionGroup.ToString().Contains("Custom") && CareerLevel > 0f))))
                 {
-                    if (GUILayout.Button(NewGuiContent((currentSelectedBaseAction[i].listParent.part.symmetryCounterparts.Count + 1).ToString() + "<",
-                        "Remove part and all symmetry linked parts from selection."), Style.ButtonToggleStyle, GUILayout.Width(25)))
+                    if (GUILayout.Button(NewGuiContent("<", "Remove from selection."), Style.ButtonToggleStyle, GUILayout.Width(20)))
                     {
-                        actions = BaseActionFilter.FromParts(currentSelectedBaseAction[i].listParent.part.symmetryCounterparts);
-                        for(int j = 0; j < actions.Count; j++)
-                        {
-                            if (actions[j].name == currentSelectedBaseAction[i].name && currentSelectedBaseAction.Contains(actions[j]))
-                            {
-                                actions[j].RemoveActionToAnActionGroup(currentSelectedActionGroup);
-                                currentSelectedBaseAction.Remove(actions[j]);
-                            }
-                        }
                         currentSelectedBaseAction[i].RemoveActionToAnActionGroup(currentSelectedActionGroup);
                         currentSelectedBaseAction.Remove(currentSelectedBaseAction[i]);
-                        listIsDirty = true;
+                    }
+
+                    if (currentSelectedBaseAction[i].listParent.part.symmetryCounterparts.Count > 0)
+                    {
+                        if (GUILayout.Button(NewGuiContent((currentSelectedBaseAction[i].listParent.part.symmetryCounterparts.Count + 1).ToString() + "<",
+                            "Remove part and all symmetry linked parts from selection."), Style.ButtonToggleStyle, GUILayout.Width(25)))
+                        {
+                            actions = BaseActionFilter.FromParts(currentSelectedBaseAction[i].listParent.part.symmetryCounterparts);
+                            for (int j = 0; j < actions.Count; j++)
+                            {
+                                if (actions[j].name == currentSelectedBaseAction[i].name && currentSelectedBaseAction.Contains(actions[j]))
+                                {
+                                    actions[j].RemoveActionToAnActionGroup(currentSelectedActionGroup);
+                                    currentSelectedBaseAction.Remove(actions[j]);
+                                }
+                            }
+                            currentSelectedBaseAction[i].RemoveActionToAnActionGroup(currentSelectedActionGroup);
+                            currentSelectedBaseAction.Remove(currentSelectedBaseAction[i]);
+                            listIsDirty = true;
+                        }
                     }
                 }
 

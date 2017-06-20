@@ -1,7 +1,8 @@
 ﻿{
     "NAME":"Action Group Manager",
-    "URL":"https://github.com/Alshain01/ActionGroupManager/master/ActionGroupManager.version",
-    "DOWNLOAD":"https://www.spacedock.info/mod/1412/ActionGroupManager%20Continued",
+    "URL":"http://ksp-avc.cybutek.net/version.php?id=488",
+    "DOWNLOAD": "https://www.spacedock.info/mod/1412/ActionGroupManager%20Continued",
+    "CHANGELOG": "https://raw.githubusercontent.com/Alshain01/ActionGroupManager/master/ActionGroupManager.changelog",
     "GITHUB":
     {
         "USERNAME":"Alshian01",
