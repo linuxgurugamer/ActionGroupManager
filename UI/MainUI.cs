@@ -73,8 +73,8 @@ namespace ActionGroupManager.UI
             if (!IsVisible() || PauseMenu.isOpen || FlightResultsDialog.isDisplaying)
                 return;
 
-            GUI.skin = HighLogic.Skin;
-            mainWindowSize = GUILayout.Window(GetHashCode(), mainWindowSize, DrawMainView, "Action Group Manager - " + VesselManager.Instance.ActiveVessel.GetName(), HighLogic.Skin.window);
+            GUI.skin = Style.BaseSkin;
+            mainWindowSize = GUILayout.Window(GetHashCode(), mainWindowSize, DrawMainView, "Action Group Manager - " + VesselManager.Instance.ActiveVessel.GetName(), Style.BaseSkin.window);
         }
 
         public override void SetVisible(bool vis)
@@ -89,12 +89,13 @@ namespace ActionGroupManager.UI
             if (listIsDirty)
                 SortCurrentSelectedBaseAction();
 
+            int size = Style.UseUnitySkin ? 10 : 20;
             // Window Buttons
-            if (GUI.Button(new Rect(mainWindowSize.width - 66, 4, 20, 20), NewGuiContent("R", "Show recap."), Style.CloseButtonStyle))
+            if (GUI.Button(new Rect(mainWindowSize.width - 66, 4, size, size), NewGuiContent("R", "Show recap."), Style.CloseButtonStyle))
                 ActionGroupManager.Manager.ShowRecapWindow = !ActionGroupManager.Manager.ShowRecapWindow;
-            if (GUI.Button(new Rect(mainWindowSize.width - 45, 4, 20, 20), NewGuiContent("S", "Show settings."), Style.CloseButtonStyle))
+            if (GUI.Button(new Rect(mainWindowSize.width - 45, 4, size, size), NewGuiContent("S", "Show settings."), Style.CloseButtonStyle))
                 ActionGroupManager.Manager.ShowSettings = !ActionGroupManager.Manager.ShowSettings;
-            if (GUI.Button(new Rect(mainWindowSize.width - 24, 4, 20, 20), NewGuiContent("X", "Close the window."), Style.CloseButtonStyle))
+            if (GUI.Button(new Rect(mainWindowSize.width - 24, 4, size, size), NewGuiContent("X", "Close the window."), Style.CloseButtonStyle))
                 SetVisible(!IsVisible());
 
             if (!classicView)
@@ -114,13 +115,19 @@ namespace ActionGroupManager.UI
             DrawActionGroupButtons(classicView, classicView || textActionGroups);
             if (!classicView)
                 GUILayout.EndHorizontal(); // End Collection Area for Category buttons, Scroll Lists, and Action Group Buttons (New View)
+            
+            if(Style.UseUnitySkin)
+                GUILayout.Space(5);
+            else
+                GUILayout.Space(10);
 
-            GUILayout.Space(10);
             DrawSearch();
 
             // Tooltip Label
-            GUILayout.Label(GUI.tooltip, GUILayout.Height(15));
-
+            if(Style.UseUnitySkin)
+                GUILayout.Label(GUI.tooltip);
+            else
+                GUILayout.Label(GUI.tooltip, GUILayout.Height(15));
             GUI.DragWindow();
         }
 
@@ -275,7 +282,7 @@ namespace ActionGroupManager.UI
             partsList = GUILayout.BeginScrollView(partsList, Style.ScrollViewStyle, GUILayout.Width(275)); // Begin Parts List
             GUILayout.BeginVertical(); // Begin Parts List
 
-            bool final = GUILayout.Toggle(orderByStage, "Sort Parts by Stage", Style.ButtonToggleGreenStyle);
+            bool final = GUILayout.Toggle(orderByStage, "Sort Parts by Stage", Style.ButtonEmphasisToggle);
             if (final != orderByStage)
             {
                 SettingsManager.Settings.SetValue(SettingsManager.OrderByStage, final);
@@ -298,9 +305,9 @@ namespace ActionGroupManager.UI
                     if (list.Count > 0)
                     {
                         if (i == -1)
-                            GUILayout.Label("Not in active stage.", HighLogic.Skin.label);
+                            GUILayout.Label("Not in active stage.", Style.BaseSkin.label);
                         else
-                            GUILayout.Label("Stage " + i.ToString(), HighLogic.Skin.label);
+                            GUILayout.Label("Stage " + i.ToString(), Style.BaseSkin.label);
 
                         InternalDrawParts(list);
                     }
@@ -370,7 +377,7 @@ namespace ActionGroupManager.UI
 
                         if (list[i] != currentSelectedPart)
                         {
-                            if (GUILayout.Button(NewGuiContent(currentAG[j].ToShortString(), "Part has an action linked to action group " + currentAG[j].ToString()), Style.ButtonToggleStyle, GUILayout.Width(20)))
+                            if (GUILayout.Button(NewGuiContent(currentAG[j].ToShortString(), "Part has an action linked to action group " + currentAG[j].ToString()), Style.ButtonToggleStyle, GUILayout.Width(Style.UseUnitySkin ? 30 : 20)))
                             {
                                 currentSelectedBaseAction = partFilter.GetBaseActionAttachedToActionGroup(currentAG[j]);
                                 currentSelectedActionGroup = currentAG[j];
@@ -410,7 +417,7 @@ namespace ActionGroupManager.UI
                         actionGroups = BaseActionFilter.GetActionGroupList(baseActions[i]);
                         for (int j = 0; j < actionGroups.Count; j++)
                         {
-                            if (GUILayout.Button(NewGuiContent(actionGroups[j].ToShortString(), actionGroups[j].ToString()), Style.ButtonToggleStyle, GUILayout.Width(20)))
+                            if (GUILayout.Button(NewGuiContent(actionGroups[j].ToShortString(), actionGroups[j].ToString()), Style.ButtonToggleStyle, GUILayout.Width(Style.UseUnitySkin ? 30 : 20)))
                             {
                                 currentSelectedBaseAction = partFilter.GetBaseActionAttachedToActionGroup(actionGroups[j]);
                                 currentSelectedActionGroup = actionGroups[j];
@@ -431,7 +438,8 @@ namespace ActionGroupManager.UI
                         //Remove all symetry parts.
                         if (currentSelectedPart.symmetryCounterparts.Count > 0)
                         {
-                            if (GUILayout.Button(NewGuiContent("<<", "Remove part and all symmetry linked parts from selection."), Style.ButtonToggleStyle, GUILayout.Width(20)))
+                            if (GUILayout.Button(NewGuiContent((currentSelectedPart.symmetryCounterparts.Count + 1).ToString() + "<",
+                                "Remove part and all symmetry linked parts from selection."), Style.ButtonToggleStyle, GUILayout.Width(25)))
                             {
                                 symmetryActions = BaseActionFilter.FromParts(currentSelectedPart.symmetryCounterparts);
                                 for (int j = 0; j < symmetryActions.Count; j++)
@@ -459,7 +467,8 @@ namespace ActionGroupManager.UI
                         //Add all symetry parts.
                         if (currentSelectedPart.symmetryCounterparts.Count > 0)
                         {
-                            if (GUILayout.Button(NewGuiContent(">>", "Add part and all symmetry linked parts to selection."), Style.ButtonToggleStyle, GUILayout.Width(20)))
+                            if (GUILayout.Button(NewGuiContent(">" + (currentSelectedPart.symmetryCounterparts.Count + 1).ToString(),
+                                "Add part and all symmetry linked parts to selection."), Style.ButtonToggleStyle, GUILayout.Width(25)))
                             {
                                 baseActions[i].AddActionToAnActionGroup(currentSelectedActionGroup);
                                 if (!currentSelectedBaseAction.Contains(baseActions[i]))
@@ -501,12 +510,12 @@ namespace ActionGroupManager.UI
             // Add the Remove All Button
             if (currentSelectedBaseAction.Count > 0)
             {
-                GUILayout.Space(HighLogic.Skin.verticalScrollbar.margin.left);
+                GUILayout.Space(Style.BaseSkin.verticalScrollbar.margin.left);
                 str = confirmDelete ? 
                     string.Format("OK to delete all actions in {0}?", currentSelectedActionGroup.ToString()) : 
                     string.Format("Remove all from {0}", currentSelectedActionGroup.ToString());
 
-                if (GUILayout.Button(str, confirmDelete ? Style.ButtonToggleRedStyle : Style.ButtonToggleYellowStyle))
+                if (GUILayout.Button(str, confirmDelete ? Style.ButtonStrongEmphasisToggleStyle : Style.ButtonEmphasisToggle))
                 {
                     if (!confirmDelete)
                         confirmDelete = !confirmDelete;
@@ -572,7 +581,8 @@ namespace ActionGroupManager.UI
 
                 if (currentSelectedBaseAction[i].listParent.part.symmetryCounterparts.Count > 0)
                 {
-                    if (GUILayout.Button(NewGuiContent("<<", "Remove part and all symmetry linked parts from selection."), Style.ButtonToggleStyle, GUILayout.Width(20)))
+                    if (GUILayout.Button(NewGuiContent((currentSelectedBaseAction[i].listParent.part.symmetryCounterparts.Count + 1).ToString() + "<",
+                        "Remove part and all symmetry linked parts from selection."), Style.ButtonToggleStyle, GUILayout.Width(25)))
                     {
                         actions = BaseActionFilter.FromParts(currentSelectedBaseAction[i].listParent.part.symmetryCounterparts);
                         for(int j = 0; j < actions.Count; j++)
@@ -610,6 +620,7 @@ namespace ActionGroupManager.UI
         {
             GUILayout.BeginHorizontal();
             GUILayout.Label("Part Search:");
+            GUILayout.Space(5);
             string searchString = GUILayout.TextField(partFilter.CurrentSearch);
             if (partFilter.CurrentSearch != searchString)
                 OnUpdate(FilterModification.Search, searchString);
@@ -643,6 +654,13 @@ namespace ActionGroupManager.UI
         static GUIContent NewGuiContent(string text, string tooltip)
         {
             return NewGuiContent(text, null, tooltip);
+        }
+        /// <summary>
+        /// Creates a new GUIContent from a previously existing one to avoid Garbage Collection
+        /// </summary>
+        static GUIContent NewGuiContent(Texture tex, string tooltip)
+        {
+            return NewGuiContent(null, tex, tooltip);
         }
         /// <summary>
         /// Creates a new GUIContent from a previously existing one to avoid Garbage Collection

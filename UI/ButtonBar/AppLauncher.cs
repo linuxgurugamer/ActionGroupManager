@@ -9,7 +9,7 @@ namespace ActionGroupManager.UI.ButtonBar
         ApplicationLauncherButton mainButton;
         static readonly string appPath = "ActionGroupManager/Resources/";
         static readonly Texture2D appLauncherButton = GameDatabase.Instance.GetTexture(appPath + "AppLauncher", false);
-        UiObject controled;
+        UiObject controlled;
 
         public AppLauncher(params object[] list)
         {
@@ -21,13 +21,13 @@ namespace ActionGroupManager.UI.ButtonBar
 
             if (list != null && list[0] != null)
             {
-                controled = list[0] as UiObject;
+                controlled = list[0] as UiObject;
             }
         }
 
         private void OnClick()
         {
-            controled.SetVisible(!controled.IsVisible());
+            controlled.SetVisible(!controlled.IsVisible());
         }
 
         public override void Terminate()

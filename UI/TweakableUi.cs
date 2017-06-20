@@ -118,6 +118,8 @@ namespace ActionGroupManager.UI
 
         public UIPartManager(Part p)
         {
+            int i; // Loop iterator
+
             this.Part = p;
             IsActive = false;
             IsFolderVisible = false;
@@ -132,26 +134,28 @@ namespace ActionGroupManager.UI
                 //if the part already contains actionManager class, we clean them.
 
                 List<PartModule> toRemove = new List<PartModule>();
-                foreach (PartModule item in Part.Modules)
+
+                for(i = 0; i < Part.Modules.Count; i++)
                 {
-                    if (item is UIBaseActionManager || item is UIActionGroupManager)
-                        toRemove.Add(item);
+                    if (Part.Modules[i] is UIBaseActionManager || Part.Modules[i] is UIActionGroupManager)
+                        toRemove.Add(Part.Modules[i]);
                 }
 
-                foreach (PartModule mod in toRemove)
-                    Part.Modules.Remove(mod);
+                for(i = 0; i < toRemove.Count; i++)
+                    Part.Modules.Remove(toRemove[i]);
             }
 
 
             //We create our base action list
-            foreach (BaseAction ba in BaseActionFilter.FromParts(p))
+            List <BaseAction> partBaseActions = BaseActionFilter.FromParts(p);
+            for (i = 0; i < partBaseActions.Count; i++)
             {
                 //We create the module through AddModule to get the initialization done
                 UIBaseActionManager man = Part.AddModule("UIBaseActionManager") as UIBaseActionManager;
                 // and we remove it to avoid bloating an eventual save.
                 Part.Modules.Remove(man);
 
-                man.Action = ba;
+                man.Action = partBaseActions[i];
                 man.Origin = this;
                 man.Clicked += BaseAction_Clicked;
 
@@ -185,16 +189,17 @@ namespace ActionGroupManager.UI
             actionGroupList.Add(agm);
 
             //and the rest of action groups
-            foreach (KSPActionGroup ag in Enum.GetValues(typeof(KSPActionGroup)))
+            KSPActionGroup[] actionGroups = Enum.GetValues(typeof(KSPActionGroup)) as KSPActionGroup[];
+            for (i = 0; i < actionGroups.Length; i++)
             {
-                if (ag == KSPActionGroup.None)
+                if (actionGroups[i] == KSPActionGroup.None)
                     continue;
 
                 agm = Part.AddModule("UIActionGroupManager") as UIActionGroupManager;
                 Part.Modules.Remove(agm);
 
                 agm.Origin = this;
-                agm.ActionGroup = ag;
+                agm.ActionGroup = actionGroups[i];
                 agm.Clicked += ActionGroup_Clicked;
                 agm.Initialize();
 

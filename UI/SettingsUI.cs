@@ -16,13 +16,14 @@ namespace ActionGroupManager.UI
                 return;
             }
 
-            GUI.skin = HighLogic.Skin;
+            GUI.skin = Style.BaseSkin;
             settingsWindowPositon = GUILayout.Window(this.GetHashCode(), settingsWindowPositon, DoMySettingsView, "Settings");
         }
 
         void DoMySettingsView(int id)
         {
-            if (GUI.Button(new Rect(settingsWindowPositon.width - 24, 4, 20, 20), "X", Style.CloseButtonStyle))
+            int size = Style.UseUnitySkin ? 10 : 20;
+            if (GUI.Button(new Rect(settingsWindowPositon.width - 24, 4, size, size), "X", Style.CloseButtonStyle))
             {
                 ActionGroupManager.Manager.ShowSettings = false;
                 return;
@@ -60,6 +61,14 @@ namespace ActionGroupManager.UI
                 SettingsManager.Settings.SetValue(SettingsManager.TextActionGroups, final);
                 // Icon categories are exclusive to the new UI
                 if (final) SettingsManager.Settings.SetValue(SettingsManager.ClassicView, false);
+            }
+
+            GUILayout.Label("Requires Restart:");
+            initial = SettingsManager.Settings.GetValue<bool>(SettingsManager.UseUnitySkin);
+            final = GUILayout.Toggle(initial, "Use Unity Skin", Style.ButtonToggleStyle);
+            if (final != initial)
+            {
+                SettingsManager.Settings.SetValue(SettingsManager.UseUnitySkin, final);
             }
 
             GUILayout.EndVertical();

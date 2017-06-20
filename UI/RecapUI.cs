@@ -26,16 +26,16 @@ namespace ActionGroupManager.UI
             if (!IsVisible() || PauseMenu.isOpen || FlightResultsDialog.isDisplaying)
                 return;
 
-            GUI.skin = HighLogic.Skin;
-            recapWindowSize = GUILayout.Window(this.GetHashCode(), recapWindowSize, new GUI.WindowFunction(DoMyRecapView), "AGM : Recap", HighLogic.Skin.window, GUILayout.Width(200));
+            GUI.skin = Style.BaseSkin;
+            recapWindowSize = GUILayout.Window(this.GetHashCode(), recapWindowSize, new GUI.WindowFunction(DoMyRecapView), "AGM : Recap", Style.BaseSkin.window, GUILayout.Width(200));
         }
 
         private void DoMyRecapView(int id)
         {
             List<KSPActionGroup> actionGroups;
             List<BaseAction> baseActions;
-
-            if (GUI.Button(new Rect(recapWindowSize.width - 24, 4, 20, 20), new GUIContent("X", "Close the window."), Style.CloseButtonStyle))
+            int size = Style.UseUnitySkin ? 10 : 20;
+            if (GUI.Button(new Rect(recapWindowSize.width - 24, 4, size, size), new GUIContent("X", "Close the window."), Style.CloseButtonStyle))
             {
                 ActionGroupManager.Manager.ShowRecapWindow = false;
                 return;
@@ -53,7 +53,7 @@ namespace ActionGroupManager.UI
                 baseActions = BaseActionFilter.FromParts(VesselManager.Instance.GetParts(), actionGroups[i]);
                 if (baseActions.Count > 0)
                 {
-                    GUILayout.Label(actionGroups[i].ToString() + " :", HighLogic.Skin.label);
+                    GUILayout.Label(actionGroups[i].ToString() + " :", Style.BaseSkin.label);
 
 
                     SortedList<string, int> dic = new SortedList<string, int>();
@@ -74,7 +74,7 @@ namespace ActionGroupManager.UI
                         string str = dic.Keys[j];
                         if (dic[str] > 1)
                             str += " * " + dic[str];
-                        GUILayout.Label(str, HighLogic.Skin.label);
+                        GUILayout.Label(str, Style.BaseSkin.label);
                         GUILayout.EndHorizontal();
                     }
                 }

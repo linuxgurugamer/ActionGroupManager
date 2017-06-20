@@ -8,13 +8,13 @@ namespace ActionGroupManager.UI.ButtonBar
         readonly string mainPath = "ActionGroupManager/Resources/";
         readonly string onButton = "ToolbarOn";
         readonly string offButton = "ToolbarOff";
-        UiObject controled;
+        UiObject controlled;
 
         public Toolbar(params object[] list)
         {
             if (list != null && list[0] != null)
             {
-                controled = list[0] as UiObject;
+                controlled = list[0] as UiObject;
             }
             mainButton = ToolbarManager.Instance.add("AGM", "AGMMainSwitch");
             string str = SettingsManager.Settings.GetValue<bool>( SettingsManager.IsMainWindowVisible, true) ? 
@@ -31,8 +31,8 @@ namespace ActionGroupManager.UI.ButtonBar
                 {
                     if (e.MouseButton == 0)
                     {
-                        controled.SetVisible(!controled.IsVisible());
-                        mainButton.TexturePath = controled.IsVisible() ? mainPath + onButton : mainPath + offButton;
+                        controlled.SetVisible(!controlled.IsVisible());
+                        mainButton.TexturePath = controlled.IsVisible() ? mainPath + onButton : mainPath + offButton;
                     }
                 };
 

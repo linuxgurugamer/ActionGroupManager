@@ -8,6 +8,8 @@ namespace ActionGroupManager
      * Listen to an event and change the filter according to the new one.
      * GetCurrentParts return always the current filtered data. 
      */
+
+    //TODO: Optimize this class for Unity (remove Linq/foreach)
     class PartFilter
     {
         VesselManager manager;
