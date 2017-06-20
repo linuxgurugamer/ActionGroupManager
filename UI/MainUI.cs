@@ -275,7 +275,7 @@ namespace ActionGroupManager.UI
             partsList = GUILayout.BeginScrollView(partsList, Style.ScrollViewStyle, GUILayout.Width(275)); // Begin Parts List
             GUILayout.BeginVertical(); // Begin Parts List
 
-            bool final = GUILayout.Toggle(orderByStage, "Sort Parts by Stage", Style.ButtonToggleStyle);
+            bool final = GUILayout.Toggle(orderByStage, "Sort Parts by Stage", Style.ButtonToggleGreenStyle);
             if (final != orderByStage)
             {
                 SettingsManager.Settings.SetValue(SettingsManager.OrderByStage, final);
@@ -313,122 +313,7 @@ namespace ActionGroupManager.UI
             GUILayout.EndScrollView(); // End Parts List
         }
 
-        private void DrawActionsScrollList()
-        {
-            Part currentDrawn = null;
-            string str;
-            bool initial, final;
-
-            if (classicView)
-                actionList = GUILayout.BeginScrollView(actionList, Style.ScrollViewStyle);  // Begin Actions List (Classic View)
-            else
-                actionList = GUILayout.BeginScrollView(actionList, Style.ScrollViewStyle, GUILayout.Width(275)); // Begin Actions List (New View)
-
-            GUILayout.BeginVertical(); // Begin Actions List
-
-            // Add the Remove All Button
-            if (currentSelectedBaseAction.Count > 0)
-            {
-                GUILayout.Space(HighLogic.Skin.verticalScrollbar.margin.left);
-                str = confirmDelete ? 
-                    string.Format("Delete all actions in {0} OK ?", currentSelectedActionGroup.ToString()) : 
-                    string.Format("Remove all from group {0}", currentSelectedActionGroup.ToShortString());
-
-                if (GUILayout.Button(str, Style.ButtonToggleStyle))
-                {
-                    if (!confirmDelete)
-                        confirmDelete = !confirmDelete;
-                    else if (currentSelectedBaseAction.Count > 0)
-                    {
-                        for (int i = 0; i < currentSelectedBaseAction.Count; i++)
-                        {
-                            if (classicView)
-                                highlighter.Remove(currentSelectedBaseAction[i].listParent.part);
-
-                            currentSelectedBaseAction[i].RemoveActionToAnActionGroup(currentSelectedActionGroup);
-                        }
-                        currentSelectedBaseAction.Clear();
-                        confirmDelete = false;
-                    }
-                }
-            }
-
-            //TODO: Remove foreach
-            foreach (BaseAction pa in currentSelectedBaseAction)
-            {
-                
-                if (currentDrawn != pa.listParent.part)
-                {
-                    GUILayout.BeginHorizontal();
-                    if (classicView)
-                        GUILayout.Label(pa.listParent.part.partInfo.title, Style.ButtonPartStyle);
-                    else {
-
-                        if (GUILayout.Button(NewGuiContent(pa.listParent.part.partInfo.title, "Find action in parts list."), Style.ButtonPartStyle))
-                        {
-                            highlighter.Remove(currentSelectedPart);
-                            highlighter.Add(pa.listParent.part);
-                            currentSelectedPart = pa.listParent.part;
-                        }
-                    }
-
-                    currentDrawn = pa.listParent.part;
-
-                    if (classicView)
-                    {
-                        initial = highlighter.Contains(pa.listParent.part);
-                        final = GUILayout.Toggle(initial, NewGuiContent("!", "Highlight the part."), Style.ButtonToggleStyle, GUILayout.Width(20));
-                        if (final != initial)
-                            highlighter.Switch(pa.listParent.part);
-                    }
-
-                    GUILayout.EndHorizontal();
-                }
-                GUILayout.BeginHorizontal();
-                if (GUILayout.Button(NewGuiContent("<", "Remove from selection."), Style.ButtonToggleStyle, GUILayout.Width(20)))
-                {
-                    currentSelectedBaseAction.Remove(pa);
-                    pa.RemoveActionToAnActionGroup(currentSelectedActionGroup);
-                }
-
-                if (pa.listParent.part.symmetryCounterparts.Count > 0)
-                {
-                    if (GUILayout.Button(NewGuiContent("<<", "Remove part and all symmetry linked parts from selection."), Style.ButtonToggleStyle, GUILayout.Width(20)))
-                    {
-                        currentSelectedBaseAction.Remove(pa);
-                        pa.RemoveActionToAnActionGroup(currentSelectedActionGroup);
-
-                        //TODO: Remove foreach
-                        foreach (BaseAction removeAll in BaseActionFilter.FromParts(pa.listParent.part.symmetryCounterparts))
-                        {
-                            if (removeAll.name == pa.name && currentSelectedBaseAction.Contains(removeAll))
-                            {
-                                removeAll.RemoveActionToAnActionGroup(currentSelectedActionGroup);
-                                currentSelectedBaseAction.Remove(removeAll);
-                            }
-                        }
-                        listIsDirty = true;
-                    }
-                }
-
-
-                GUILayout.Label(pa.guiName, Style.LabelExpandStyle);
-
-                if (classicView) {
-                    if (GUILayout.Button(NewGuiContent("F", "Find action in parts list."), Style.ButtonToggleStyle, GUILayout.Width(20)))
-                    {
-                        currentSelectedPart = pa.listParent.part;
-                    }
-                }
-
-
-                GUILayout.EndHorizontal();
-            }
-            GUILayout.EndVertical(); // End Actions List
-            GUILayout.EndScrollView(); // End Actions List
-        }
-
-        //Internal draw routine for DrawAllParts()
+        //Internal draw routine for DrawPartsScrollList
         private void InternalDrawParts(List<Part> list)
         {
             bool initial, final;
@@ -473,6 +358,7 @@ namespace ActionGroupManager.UI
                             highlighter.Remove(currentSelectedPart);
                         currentSelectedPart = null;
                     }
+                    confirmDelete = false; // Reset the deletion confirmation
                 }
 
                 if (currentAG.Count > 0)
@@ -497,26 +383,28 @@ namespace ActionGroupManager.UI
                 GUILayout.EndHorizontal();
 
                 if (currentSelectedPart == list[i])
-                    InternaDrawActions();
+                    InternaDrawPartActions();
             }
         }
 
-        //Draw the selected part available actions in Part View
-        private void InternaDrawActions()
+        //Internal draw routine for InternalDrawPartActions
+        private void InternaDrawPartActions()
         {
             if (currentSelectedPart)
             {
                 List<BaseAction> baseActions = BaseActionFilter.FromParts(currentSelectedPart);
+                List<BaseAction> symmetryActions;
                 List<KSPActionGroup> actionGroups;
-                GUILayout.BeginVertical();
+                GUILayout.BeginVertical(); // Begin Action List
 
                 for (int i = 0; i < baseActions.Count; i++)
                 {
-                    GUILayout.BeginHorizontal();
+                    GUILayout.BeginHorizontal(); // Begin Action Controls
                     GUILayout.Space(20);
-                    GUILayout.Label(baseActions[i].guiName, Style.LabelExpandStyle);
+                    GUILayout.Label(baseActions[i].guiName, Style.LabelExpandStyle);  // Action Name
                     GUILayout.FlexibleSpace();
 
+                    // Add Action Group Find button
                     if (BaseActionFilter.GetActionGroupList(baseActions[i]).Count > 0)
                     {
                         actionGroups = BaseActionFilter.GetActionGroupList(baseActions[i]);
@@ -530,15 +418,13 @@ namespace ActionGroupManager.UI
                         }
                     }
 
-
+                    // Action Remove Buttons
                     if (currentSelectedBaseAction.Contains(baseActions[i]))
                     {
                         if (GUILayout.Button(NewGuiContent("<", "Remove from selection."), Style.ButtonToggleStyle, GUILayout.Width(20)))
                         {
-                            //if (allActionGroupSelected)
-                                //allActionGroupSelected = false;
-                            currentSelectedBaseAction.Remove(baseActions[i]);
                             baseActions[i].RemoveActionToAnActionGroup(currentSelectedActionGroup);
+                            currentSelectedBaseAction.Remove(baseActions[i]);
                             listIsDirty = true;
                         }
 
@@ -547,30 +433,24 @@ namespace ActionGroupManager.UI
                         {
                             if (GUILayout.Button(NewGuiContent("<<", "Remove part and all symmetry linked parts from selection."), Style.ButtonToggleStyle, GUILayout.Width(20)))
                             {
-                                //if (allActionGroupSelected)
-                                    //allActionGroupSelected = false;
-
-                                currentSelectedBaseAction.Remove(baseActions[i]);
-                                baseActions[i].RemoveActionToAnActionGroup(currentSelectedActionGroup);
-
-                                //TODO: Remove foreach
-                                foreach (BaseAction removeAll in BaseActionFilter.FromParts(currentSelectedPart.symmetryCounterparts))
+                                symmetryActions = BaseActionFilter.FromParts(currentSelectedPart.symmetryCounterparts);
+                                for (int j = 0; j < symmetryActions.Count; j++)
                                 {
-                                    if (removeAll.name == baseActions[i].name && currentSelectedBaseAction.Contains(removeAll))
-                                        currentSelectedBaseAction.Remove(removeAll);
-                                        removeAll.RemoveActionToAnActionGroup(currentSelectedActionGroup);
+                                    symmetryActions[j].RemoveActionToAnActionGroup(currentSelectedActionGroup);
+                                    if (symmetryActions[j].name == baseActions[i].name && currentSelectedBaseAction.Contains(symmetryActions[j]))
+                                        currentSelectedBaseAction.Remove(symmetryActions[j]);
                                 }
+                                baseActions[i].RemoveActionToAnActionGroup(currentSelectedActionGroup);
+                                currentSelectedBaseAction.Remove(baseActions[i]);
                                 listIsDirty = true;
                             }
                         }
-
                     }
                     else
                     {
+                        // Action Add Buttons
                         if (GUILayout.Button(NewGuiContent(">", "Add to selection."), Style.ButtonToggleStyle, GUILayout.Width(20)))
                         {
-                            //if (allActionGroupSelected)
-                                //allActionGroupSelected = false;
                             currentSelectedBaseAction.Add(baseActions[i]);
                             baseActions[i].AddActionToAnActionGroup(currentSelectedActionGroup);
                             listIsDirty = true;
@@ -581,33 +461,149 @@ namespace ActionGroupManager.UI
                         {
                             if (GUILayout.Button(NewGuiContent(">>", "Add part and all symmetry linked parts to selection."), Style.ButtonToggleStyle, GUILayout.Width(20)))
                             {
-                                //if (allActionGroupSelected)
-                                    //allActionGroupSelected = false;
+                                baseActions[i].AddActionToAnActionGroup(currentSelectedActionGroup);
                                 if (!currentSelectedBaseAction.Contains(baseActions[i]))
                                     currentSelectedBaseAction.Add(baseActions[i]);
-
-                                baseActions[i].AddActionToAnActionGroup(currentSelectedActionGroup);
-                                //TODO: Remove foreach
-                                foreach (BaseAction addAll in BaseActionFilter.FromParts(currentSelectedPart.symmetryCounterparts))
+                                
+                                symmetryActions = BaseActionFilter.FromParts(currentSelectedPart.symmetryCounterparts);
+                                for (int j = 0; j < symmetryActions.Count; j++)
                                 {
-                                    if (addAll.name == baseActions[i].name && !currentSelectedBaseAction.Contains(addAll))
+                                    if (symmetryActions[j].name == baseActions[i].name && !currentSelectedBaseAction.Contains(symmetryActions[j]))
                                     {
-                                        currentSelectedBaseAction.Add(addAll);
-                                        addAll.AddActionToAnActionGroup(currentSelectedActionGroup);
+                                        currentSelectedBaseAction.Add(symmetryActions[j]);
+                                        symmetryActions[j].AddActionToAnActionGroup(currentSelectedActionGroup);
                                     }
                                 }
                                 listIsDirty = true;
                             }
                         }
-
                     }
+                    GUILayout.EndHorizontal(); // End Action Row
+                }
+                GUILayout.EndVertical(); // End Actions List
+            }
+        }
 
-                    GUILayout.EndHorizontal();
+        private void DrawActionsScrollList()
+        {
+            Part currentDrawn = null;
+            List<BaseAction> actions;
+            string str;
+            bool initial, final;
 
+            if (classicView)
+                actionList = GUILayout.BeginScrollView(actionList, Style.ScrollViewStyle);  // Begin Actions List (Classic View)
+            else
+                actionList = GUILayout.BeginScrollView(actionList, Style.ScrollViewStyle, GUILayout.Width(275)); // Begin Actions List (New View)
+
+            GUILayout.BeginVertical(); // Begin Actions List
+
+            // Add the Remove All Button
+            if (currentSelectedBaseAction.Count > 0)
+            {
+                GUILayout.Space(HighLogic.Skin.verticalScrollbar.margin.left);
+                str = confirmDelete ? 
+                    string.Format("OK to delete all actions in {0}?", currentSelectedActionGroup.ToString()) : 
+                    string.Format("Remove all from {0}", currentSelectedActionGroup.ToString());
+
+                if (GUILayout.Button(str, confirmDelete ? Style.ButtonToggleRedStyle : Style.ButtonToggleYellowStyle))
+                {
+                    if (!confirmDelete)
+                        confirmDelete = !confirmDelete;
+                    else if (currentSelectedBaseAction.Count > 0)
+                    {
+                        for (int i = 0; i < currentSelectedBaseAction.Count; i++)
+                        {
+                            if (classicView)
+                                highlighter.Remove(currentSelectedBaseAction[i].listParent.part);
+
+                            currentSelectedBaseAction[i].RemoveActionToAnActionGroup(currentSelectedActionGroup);
+                        }
+                        currentSelectedBaseAction.Clear();
+                        confirmDelete = false;
+                    }
+                }
+            }
+
+            // Draw the actions buttons
+            for(int i = 0; i < currentSelectedBaseAction.Count; i++)
+            {
+                if (currentDrawn != currentSelectedBaseAction[i].listParent.part)
+                {
+                    // Draw Part Label/Button
+
+                    if (classicView)
+                    {
+                        GUILayout.BeginHorizontal();
+                        GUILayout.Label(currentSelectedBaseAction[i].listParent.part.partInfo.title, Style.ButtonPartStyle);
+                    }
+                    else
+                    {
+                        // "Find" function (New View)
+                        if (GUILayout.Button(NewGuiContent(currentSelectedBaseAction[i].listParent.part.partInfo.title, "Find action in parts list."), Style.ButtonPartStyle))
+                        {
+                            confirmDelete = false; // Reset the deletion confirmation
+                            highlighter.Remove(currentSelectedPart);
+                            highlighter.Add(currentSelectedBaseAction[i].listParent.part);
+                            currentSelectedPart = currentSelectedBaseAction[i].listParent.part;
+                        }
+                    }
+                    currentDrawn = currentSelectedBaseAction[i].listParent.part;
+
+                    // Highlighter Button for Classic View
+                    if (classicView)
+                    {
+                        initial = highlighter.Contains(currentSelectedBaseAction[i].listParent.part);
+                        final = GUILayout.Toggle(initial, NewGuiContent("!", "Highlight the part."), Style.ButtonToggleStyle, GUILayout.Width(20));
+                        if (final != initial)
+                            highlighter.Switch(currentSelectedBaseAction[i].listParent.part);
+
+                        GUILayout.EndHorizontal();
+                    }
                 }
 
-                GUILayout.EndVertical();
+                // Draw the action controls
+                GUILayout.BeginHorizontal();  // Begin Action Line
+                if (GUILayout.Button(NewGuiContent("<", "Remove from selection."), Style.ButtonToggleStyle, GUILayout.Width(20)))
+                {
+                    currentSelectedBaseAction[i].RemoveActionToAnActionGroup(currentSelectedActionGroup);
+                    currentSelectedBaseAction.Remove(currentSelectedBaseAction[i]);
+                }
+
+                if (currentSelectedBaseAction[i].listParent.part.symmetryCounterparts.Count > 0)
+                {
+                    if (GUILayout.Button(NewGuiContent("<<", "Remove part and all symmetry linked parts from selection."), Style.ButtonToggleStyle, GUILayout.Width(20)))
+                    {
+                        actions = BaseActionFilter.FromParts(currentSelectedBaseAction[i].listParent.part.symmetryCounterparts);
+                        for(int j = 0; j < actions.Count; j++)
+                        {
+                            if (actions[j].name == currentSelectedBaseAction[i].name && currentSelectedBaseAction.Contains(actions[j]))
+                            {
+                                actions[j].RemoveActionToAnActionGroup(currentSelectedActionGroup);
+                                currentSelectedBaseAction.Remove(actions[j]);
+                            }
+                        }
+                        currentSelectedBaseAction[i].RemoveActionToAnActionGroup(currentSelectedActionGroup);
+                        currentSelectedBaseAction.Remove(currentSelectedBaseAction[i]);
+                        listIsDirty = true;
+                    }
+                }
+
+                // Draw the action name
+                GUILayout.Label(currentSelectedBaseAction[i].guiName, Style.LabelExpandStyle);
+
+                // Draw the find button (Classic View)
+                if (classicView) {
+                    if (GUILayout.Button(NewGuiContent("F", "Find action in parts list."), Style.ButtonToggleStyle, GUILayout.Width(20)))
+                    {
+                        confirmDelete = false; // Reset the deletion confirmation
+                        currentSelectedPart = currentSelectedBaseAction[i].listParent.part;
+                    }
+                }
+                GUILayout.EndHorizontal(); // End Action Line
             }
+            GUILayout.EndVertical(); // End Actions List
+            GUILayout.EndScrollView(); // End Actions List
         }
 
         private void DrawSearch()
@@ -631,7 +627,9 @@ namespace ActionGroupManager.UI
             listIsDirty = false;
         }
 
-        // Reconfigures an existing GUIContent to avoid Garbage collection
+        /// <summary>
+        /// Creates a new GUIContent from a previously existing one to avoid Garbage Collection
+        /// </summary>
         static GUIContent NewGuiContent(string text, Texture tex, string tooltip)
         {
             guiContent.text = text;
@@ -639,10 +637,16 @@ namespace ActionGroupManager.UI
             guiContent.image = tex;
             return guiContent;
         }
+        /// <summary>
+        /// Creates a new GUIContent from a previously existing one to avoid Garbage Collection
+        /// </summary>
         static GUIContent NewGuiContent(string text, string tooltip)
         {
             return NewGuiContent(text, null, tooltip);
         }
+        /// <summary>
+        /// Creates a new GUIContent from a previously existing one to avoid Garbage Collection
+        /// </summary>
         static GUIContent NewGuiContent(string text)
         {
             return NewGuiContent(text, null, null);
