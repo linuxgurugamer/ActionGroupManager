@@ -24,9 +24,7 @@ namespace ActionGroupManager.UI
         public override void DoUILogic()
         {
             if (!IsVisible() || PauseMenu.isOpen || FlightResultsDialog.isDisplaying)
-            {
                 return;
-            }
 
             GUI.skin = HighLogic.Skin;
             recapWindowSize = GUILayout.Window(this.GetHashCode(), recapWindowSize, new GUI.WindowFunction(DoMyRecapView), "AGM : Recap", HighLogic.Skin.window, GUILayout.Width(200));
@@ -34,47 +32,48 @@ namespace ActionGroupManager.UI
 
         private void DoMyRecapView(int id)
         {
+            List<KSPActionGroup> actionGroups;
+            List<BaseAction> baseActions;
+
             if (GUI.Button(new Rect(recapWindowSize.width - 24, 4, 20, 20), new GUIContent("X", "Close the window."), Style.CloseButtonStyle))
             {
                 ActionGroupManager.Manager.ShowRecapWindow = false;
                 return;
             }
 
-
             recapWindowScrollposition = GUILayout.BeginScrollView(recapWindowScrollposition, Style.ScrollViewStyle);
             GUILayout.BeginVertical();
 
-            foreach (KSPActionGroup ag in VesselManager.Instance.AllActionGroups)
+            actionGroups = VesselManager.Instance.AllActionGroups;
+            for (int i = 0; i < actionGroups.Count; i++)
             {
-                if (ag == KSPActionGroup.None)
+                if (actionGroups[i] == KSPActionGroup.None || actionGroups[i] == KSPActionGroup.REPLACEWITHDEFAULT)
                     continue;
 
-                List<BaseAction> list = BaseActionFilter.FromParts(VesselManager.Instance.GetParts(), ag);
-
-                if (list.Count > 0)
+                baseActions = BaseActionFilter.FromParts(VesselManager.Instance.GetParts(), actionGroups[i]);
+                if (baseActions.Count > 0)
                 {
-                    GUILayout.Label(ag.ToString() + " :", HighLogic.Skin.label);
+                    GUILayout.Label(actionGroups[i].ToString() + " :", HighLogic.Skin.label);
 
 
-                    Dictionary<string, int> dic = new Dictionary<string, int>();
-                    list.ForEach(
-                        (e) =>
-                        {
-                            string str = e.listParent.part.partInfo.title + "\n(" + e.guiName + ")";
+                    SortedList<string, int> dic = new SortedList<string, int>();
+                    int j;
+                    for(j = 0; j < baseActions.Count; j++)
+                    {
+                            string str = baseActions[j].listParent.part.partInfo.title + "\n(" + baseActions[j].guiName + ")";
                             if (!dic.ContainsKey(str))
                                 dic.Add(str, 1);
-
                             else
                                 dic[str]++;
-                        });
+                    }
 
-                    foreach (KeyValuePair<string, int> pair in dic)
+                    for(j = 0; j < dic.Count; j++)
                     {
                         GUILayout.BeginHorizontal();
                         GUILayout.Space(20);
-                        string str = pair.Key;
-                        if (pair.Value > 1)
-                            str += " * " + pair.Value;
+                        string str = dic.Keys[j];
+                        if (dic[str] > 1)
+                            str += " * " + dic[str];
                         GUILayout.Label(str, HighLogic.Skin.label);
                         GUILayout.EndHorizontal();
                     }

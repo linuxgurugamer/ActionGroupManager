@@ -9,36 +9,30 @@ namespace ActionGroupManager
         {
             List<BaseAction> ret = new List<BaseAction>();
 
-            foreach (BaseAction ba in part.Actions)
-                ret.Add(ba);
+            int i;
+            for (i = 0; i < part.Actions.Count; i++)
+                ret.Add(part.Actions[i]);
 
-            foreach (PartModule pm in part.Modules)
-            {
-                foreach (BaseAction ba in pm.Actions)
-                {
-                    ret.Add(ba);
-                }
+            for (i = 0; i < part.Modules.Count; i++)
+                for (int j = 0; j < part.Modules[i].Actions.Count; j++)
+                    ret.Add(part.Modules[i].Actions[j]);
 
-            }
             return ret;
         }
 
-        public static List<BaseAction> FromParts(IEnumerable<Part> parts)
+        public static List<BaseAction> FromParts(List<Part> parts)
         {
             List<BaseAction> ret = new List<BaseAction>();
-            foreach (Part p in parts)
+
+            for (int i = 0; i < parts.Count; i++)
             {
-                foreach (BaseAction ba in p.Actions)
-                    ret.Add(ba);
+                int j;
+                for(j = 0; j < parts[i].Actions.Count; j++)
+                    ret.Add(parts[i].Actions[j]);
 
-                foreach (PartModule pm in p.Modules)
-                {
-                    foreach (BaseAction ba in pm.Actions)
-                    {
-                        ret.Add(ba);
-                    }
-
-                }
+                for(j = 0; j < parts[i].Modules.Count; j++)
+                    for(int k = 0; k < parts[i].Modules[j].Actions.Count; k++)
+                        ret.Add(parts[i].Modules[j].Actions[k]);
             }
             return ret;
         }
@@ -48,26 +42,24 @@ namespace ActionGroupManager
             List<BaseAction> list = FromParts(parts);
             List<BaseAction> ret = new List<BaseAction>();
             for (int i = 0; i < list.Count; i++)
-            {
                 if(list[i].IsInActionGroup(ag))
-                {
                     ret.Add(list[i]);
-                }
-            }
+
             return ret;
         }
 
         public static List<KSPActionGroup> GetActionGroupList(BaseAction bA)
         {
             List<KSPActionGroup> ret = new List<KSPActionGroup>();
+            KSPActionGroup[] groups = Enum.GetValues(typeof(KSPActionGroup)) as KSPActionGroup[];
 
-            foreach (KSPActionGroup ag in Enum.GetValues(typeof(KSPActionGroup)) as KSPActionGroup[])
+            for (int i = 0; i < groups.Length; i++)
             {
-                if (ag == KSPActionGroup.None)
+                if (groups[i] == KSPActionGroup.None || groups[i] == KSPActionGroup.REPLACEWITHDEFAULT)
                     continue;
 
-                if (bA.IsInActionGroup(ag))
-                    ret.Add(ag);
+                if (bA.IsInActionGroup(groups[i]))
+                    ret.Add(groups[i]);
             }
             return ret;
         }
