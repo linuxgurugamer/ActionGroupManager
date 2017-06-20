@@ -84,7 +84,6 @@ namespace ActionGroupManager.UI
         }
         #endregion
 
-        //Switch between by part view and by action group view
         private void DrawMainView(int windowID)
         {
             if (listIsDirty)
@@ -198,7 +197,6 @@ namespace ActionGroupManager.UI
             GUILayout.EndVertical(); // End Category Button Columns (New View)
         }
 
-        //Draw the Action groups grid in Part View
         private void DrawActionGroupButtons(bool rowView, bool textButtons)
         {
             int iconCount = 0;
@@ -269,15 +267,20 @@ namespace ActionGroupManager.UI
             GUILayout.EndVertical(); // End Button Collection Area
         }
 
-        //Entry of action group view draw
         private void DrawPartsScrollList()
         {
             List<Part> list;
-
             highlighter.Update();
-
+            bool orderByStage = SettingsManager.Settings.GetValue<bool>(SettingsManager.OrderByStage);
             partsList = GUILayout.BeginScrollView(partsList, Style.ScrollViewStyle, GUILayout.Width(275)); // Begin Parts List
             GUILayout.BeginVertical(); // Begin Parts List
+
+            bool final = GUILayout.Toggle(orderByStage, "Sort Parts by Stage", Style.ButtonToggleStyle);
+            if (final != orderByStage)
+            {
+                SettingsManager.Settings.SetValue(SettingsManager.OrderByStage, final);
+                orderByStage = final;
+            }
 
             // Draw All Parts Into List
             if (!SettingsManager.Settings.GetValue<bool>(SettingsManager.OrderByStage))
@@ -286,6 +289,7 @@ namespace ActionGroupManager.UI
             }
             else
             {
+                // Order parts by stage
                 for (int i = -1; i <= StageManager.LastStage; i++)
                 {
                     OnUpdate(FilterModification.Stage, i);
@@ -300,7 +304,6 @@ namespace ActionGroupManager.UI
 
                         InternalDrawParts(list);
                     }
-
                 }
 
                 OnUpdate(FilterModification.Stage, int.MinValue);
@@ -310,7 +313,6 @@ namespace ActionGroupManager.UI
             GUILayout.EndScrollView(); // End Parts List
         }
 
-        //Draw all the current selected action
         private void DrawActionsScrollList()
         {
             Part currentDrawn = null;
@@ -324,34 +326,29 @@ namespace ActionGroupManager.UI
 
             GUILayout.BeginVertical(); // Begin Actions List
 
+            // Add the Remove All Button
             if (currentSelectedBaseAction.Count > 0)
             {
                 GUILayout.Space(HighLogic.Skin.verticalScrollbar.margin.left);
+                str = confirmDelete ? 
+                    string.Format("Delete all actions in {0} OK ?", currentSelectedActionGroup.ToString()) : 
+                    string.Format("Remove all from group {0}", currentSelectedActionGroup.ToShortString());
 
-                str = confirmDelete ? "Delete all actions in " + currentSelectedActionGroup.ToString() + " OK ?" : "Remove all from group " + currentSelectedActionGroup.ToShortString();
                 if (GUILayout.Button(str, Style.ButtonToggleStyle))
                 {
                     if (!confirmDelete)
                         confirmDelete = !confirmDelete;
-                    else
+                    else if (currentSelectedBaseAction.Count > 0)
                     {
-                        if (currentSelectedBaseAction.Count > 0)
+                        for (int i = 0; i < currentSelectedBaseAction.Count; i++)
                         {
-                            //TODO: Remove foreach
-                            foreach (BaseAction ba in currentSelectedBaseAction)
-                            {
-                                ba.RemoveActionToAnActionGroup(currentSelectedActionGroup);
-                            }
+                            if (classicView)
+                                highlighter.Remove(currentSelectedBaseAction[i].listParent.part);
 
-                            currentSelectedBaseAction.RemoveAll(
-                                (ba) =>
-                                {
-                                    if(classicView)
-                                        highlighter.Remove(ba.listParent.part);
-                                    return true;
-                                });
-                            confirmDelete = false;
+                            currentSelectedBaseAction[i].RemoveActionToAnActionGroup(currentSelectedActionGroup);
                         }
+                        currentSelectedBaseAction.Clear();
+                        confirmDelete = false;
                     }
                 }
             }
@@ -392,17 +389,12 @@ namespace ActionGroupManager.UI
                 {
                     currentSelectedBaseAction.Remove(pa);
                     pa.RemoveActionToAnActionGroup(currentSelectedActionGroup);
-                    //if (allActionGroupSelected)
-                        //allActionGroupSelected = false;
                 }
 
                 if (pa.listParent.part.symmetryCounterparts.Count > 0)
                 {
                     if (GUILayout.Button(NewGuiContent("<<", "Remove part and all symmetry linked parts from selection."), Style.ButtonToggleStyle, GUILayout.Width(20)))
                     {
-                        //if (allActionGroupSelected)
-                            //allActionGroupSelected = false;
-
                         currentSelectedBaseAction.Remove(pa);
                         pa.RemoveActionToAnActionGroup(currentSelectedActionGroup);
 

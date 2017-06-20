@@ -29,14 +29,10 @@ namespace ActionGroupManager.UI
             }
             GUILayout.BeginVertical();
             GUILayout.Label("AGM version : " + Assembly.GetAssembly(typeof(ActionGroupManager)).GetName().Version.ToString(), Style.LabelExpandStyle);
-            bool initial = SettingsManager.Settings.GetValue<bool>(SettingsManager.OrderByStage);
-            bool final = GUILayout.Toggle(initial, "Order by stage", Style.ButtonToggleStyle);
-            if (final != initial)
-                SettingsManager.Settings.SetValue(SettingsManager.OrderByStage, final);
 
             GUILayout.Label("Requires Return to Space Center:");
-            initial = SettingsManager.Settings.GetValue<bool>(SettingsManager.ClassicView);
-            final = GUILayout.Toggle(initial, "Classic View", Style.ButtonToggleStyle);
+            bool initial = SettingsManager.Settings.GetValue<bool>(SettingsManager.ClassicView);
+            bool final = GUILayout.Toggle(initial, "Classic View", Style.ButtonToggleStyle);
             if (final != initial)
             {
                 SettingsManager.Settings.SetValue(SettingsManager.ClassicView, final);
