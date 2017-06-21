@@ -2,6 +2,7 @@
 * Add support for Career mode limitations
 * Add Unity Skin option
 * Add new flags and icons
+* Add auto-size to Recap window
 * Moved "Order by Parts" option to the main UI
 * Move Symmetry Linked parts button now indicated how many symmetry linked parts there are
 * Font Rework on KSP Visual Style to match modern KSP
