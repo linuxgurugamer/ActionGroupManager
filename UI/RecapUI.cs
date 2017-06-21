@@ -29,7 +29,7 @@ namespace ActionGroupManager.UI
                 return;
 
             GUI.skin = Style.BaseSkin;
-            recapWindowSize = GUILayout.Window(this.GetHashCode(), recapWindowSize, new GUI.WindowFunction(DoMyRecapView), Localizer.GetStringByTag("#autoLOC_AGM_002"), Style.BaseSkin.window, GUILayout.Width(250));
+            recapWindowSize = GUILayout.Window(this.GetHashCode(), recapWindowSize, new GUI.WindowFunction(DoMyRecapView), Localizer.GetStringByTag("#autoLOC_AGM_003"), Style.BaseSkin.window, GUILayout.Width(250));
 
         }
 
@@ -57,7 +57,7 @@ namespace ActionGroupManager.UI
                 if (baseActions.Count > 0)
                 {
                     listCount += 1;  // Size for title
-                    GUILayout.Label(actionGroups[i].ToString() + " :", Style.ScrollTextEmphasisStyle);
+                    GUILayout.Label(actionGroups[i].displayDescription() + " :", Style.ScrollTextEmphasisStyle);
 
 
                     SortedList<string, int> dic = new SortedList<string, int>();

@@ -71,7 +71,6 @@
     <Compile Include="UI\ButtonBar\AppLauncher.cs" />
     <Compile Include="UI\ButtonBar\IButtonBar.cs" />
     <Compile Include="UI\ButtonBar\ToolbarWrapper.cs" />
-    <Compile Include="UI\ButtonIcons.cs" />
     <Compile Include="UI\TweakableUi.cs" />
     <Compile Include="BaseActionManager.cs" />
     <Compile Include="Extensions.cs" />

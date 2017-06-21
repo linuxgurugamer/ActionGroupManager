@@ -176,12 +176,12 @@ namespace ActionGroupManager.UI
 
                 if (textButtons)
                 {
-                    buttonText = partCounts.Keys[i].ToString();
+                    buttonText = partCounts.Keys[i].displayDescription();
                     if (partCounts[partCounts.Keys[i]] > 0)
                         buttonText += " " + Localizer.Format(Localizer.GetStringByTag("#autoLOC_AGM_150"), partCounts[partCounts.Keys[i]].ToString());
 
                     guiContent = NewGuiContent(buttonText, 
-                        string.Format(Localizer.Format(Localizer.GetStringByTag("#autoLOC_AGM_103"), partCounts.Keys[i].ToString())));
+                        string.Format(Localizer.Format(Localizer.GetStringByTag("#autoLOC_AGM_103"), partCounts.Keys[i].displayDescription())));
                 }
                 else
                 {
@@ -191,8 +191,8 @@ namespace ActionGroupManager.UI
                     if (partCounts[partCounts.Keys[i]] > 0)
                         buttonText = partCounts[partCounts.Keys[i]].ToString();
 
-                    guiContent = NewGuiContent(buttonText, GameDatabase.Instance.GetTexture(ButtonIcons.GetIcon(partCounts.Keys[i]), false), 
-                        string.Format(Localizer.Format(Localizer.GetStringByTag("#autoLOC_AGM_103"), partCounts.Keys[i].ToString())));
+                    guiContent = NewGuiContent(buttonText, partCounts.Keys[i].GetIcon(), 
+                        string.Format(Localizer.Format(Localizer.GetStringByTag("#autoLOC_AGM_103"), partCounts.Keys[i].displayDescription())));
                 }
                 GUI.enabled = (partCounts[partCounts.Keys[i]] > 0);
                 result = GUILayout.Toggle(initial, guiContent, buttonStyle);
@@ -222,7 +222,6 @@ namespace ActionGroupManager.UI
         {
             int iconCount = 0;
             string buttonText;
-            string tooltip = "Select the {0} group for editing.";
             GUIStyle buttonStyle = textButtons ? Style.ButtonToggleStyle : Style.ButtonIconStyle;
             List<KSPActionGroup> actionGroups = VesselManager.Instance.AllActionGroups;
             List<BaseAction> baList;
@@ -251,9 +250,9 @@ namespace ActionGroupManager.UI
                 // Configure the button
                 if (textButtons)
                 {
-                    buttonText = actionGroups[i].ToString();
+                    buttonText = actionGroups[i].displayDescription();
                     buttonText += baList.Count > 0 ? " " + Localizer.Format(Localizer.GetStringByTag("#autoLOC_AGM_150"), baList.Count) : null;
-                    guiContent = NewGuiContent(buttonText, Localizer.Format(Localizer.GetStringByTag("#autoLOC_AGM_104"), actionGroups[i]));
+                    guiContent = NewGuiContent(buttonText, Localizer.Format(Localizer.GetStringByTag("#autoLOC_AGM_104"), actionGroups[i].displayDescription()));
                 }
                 else
                 {
@@ -263,8 +262,8 @@ namespace ActionGroupManager.UI
                     if (baList.Count > 0)
                         buttonText = baList.Count.ToString();
 
-                    guiContent = NewGuiContent(buttonText, GameDatabase.Instance.GetTexture(ButtonIcons.GetIcon(actionGroups[i]), false),
-                        string.Format(Localizer.Format(Localizer.GetStringByTag("#autoLOC_AGM_104"), actionGroups[i])));
+                    guiContent = NewGuiContent(buttonText, actionGroups[i].GetIcon(),
+                        string.Format(Localizer.Format(Localizer.GetStringByTag("#autoLOC_AGM_104"), actionGroups[i].displayDescription())));
                 }
 
                 // Create the button
@@ -351,7 +350,9 @@ namespace ActionGroupManager.UI
                 {
                     initial = highlighter.Contains(list[i]);
 
-                    final = GUILayout.Toggle(initial, NewGuiContent(Localizer.GetStringByTag("#autoLOC_AGM_154"), Localizer.GetStringByTag("#autoLOC_AGM_105")), Style.ButtonToggleStyle, GUILayout.Width(20));
+                    final = GUILayout.Toggle(initial, 
+                        NewGuiContent(Localizer.GetStringByTag("#autoLOC_AGM_154"), Localizer.GetStringByTag("#autoLOC_AGM_105")), 
+                        Style.ButtonToggleStyle, GUILayout.Width(20));
 
                     if (final != initial)
                         highlighter.Switch(list[i]);
@@ -392,7 +393,7 @@ namespace ActionGroupManager.UI
 
                         if (list[i] != currentSelectedPart)
                         {
-                            if (GUILayout.Button(NewGuiContent(currentAG[j].ToShortString(), Localizer.Format(Localizer.GetStringByTag("#autoLOC_AGM_106"), currentAG[j].ToString())), Style.ButtonToggleStyle, GUILayout.Width(Style.UseUnitySkin ? 30 : 20)))
+                            if (GUILayout.Button(NewGuiContent(currentAG[j].ToShortString(), Localizer.Format(Localizer.GetStringByTag("#autoLOC_AGM_106"), currentAG[j].displayDescription())), Style.ButtonToggleStyle, GUILayout.Width(Style.UseUnitySkin ? 30 : 20)))
                             {
                                 currentSelectedBaseAction = partFilter.GetBaseActionAttachedToActionGroup(currentAG[j]);
                                 currentSelectedActionGroup = currentAG[j];
@@ -535,8 +536,8 @@ namespace ActionGroupManager.UI
                 
                     GUILayout.Space(Style.BaseSkin.verticalScrollbar.margin.left);
                 str = confirmDelete ? 
-                    Localizer.Format(Localizer.GetStringByTag("#autoLOC_AGM_054"), currentSelectedActionGroup.ToString()) : 
-                    Localizer.Format(Localizer.GetStringByTag("#autoLOC_AGM_053"), currentSelectedActionGroup.ToString());
+                    Localizer.Format(Localizer.GetStringByTag("#autoLOC_AGM_054"), currentSelectedActionGroup.displayDescription()) : 
+                    Localizer.Format(Localizer.GetStringByTag("#autoLOC_AGM_053"), currentSelectedActionGroup.displayDescription());
 
                 if ((disableCareer || (!currentSelectedActionGroup.ToString().Contains("Custom") && CareerLevel > 0f) || (CareerLevel > 0.5f)))
                 {
