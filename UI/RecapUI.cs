@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using KSP.UI.Dialogs;
 
@@ -11,7 +12,7 @@ namespace ActionGroupManager.UI
 
         public RecapUi(bool visible)
         {
-            recapWindowSize = SettingsManager.Settings.GetValue<Rect>(SettingsManager.RecapWindocRect, new Rect(200, 200, 400, 500));
+            recapWindowSize = SettingsManager.Settings.GetValue<Rect>(SettingsManager.RecapWindocRect, new Rect(200, 200, 250, 100));
             SetVisible(visible);
         }
 
@@ -27,7 +28,8 @@ namespace ActionGroupManager.UI
                 return;
 
             GUI.skin = Style.BaseSkin;
-            recapWindowSize = GUILayout.Window(this.GetHashCode(), recapWindowSize, new GUI.WindowFunction(DoMyRecapView), "AGM : Recap", Style.BaseSkin.window, GUILayout.Width(200));
+            recapWindowSize = GUILayout.Window(this.GetHashCode(), recapWindowSize, new GUI.WindowFunction(DoMyRecapView), "AGM : Recap", Style.BaseSkin.window, GUILayout.Width(250));
+
         }
 
         private void DoMyRecapView(int id)
@@ -43,7 +45,7 @@ namespace ActionGroupManager.UI
 
             recapWindowScrollposition = GUILayout.BeginScrollView(recapWindowScrollposition, Style.ScrollViewStyle);
             GUILayout.BeginVertical();
-
+            int listCount = 0;
             actionGroups = VesselManager.Instance.AllActionGroups;
             for (int i = 0; i < actionGroups.Count; i++)
             {
@@ -53,6 +55,7 @@ namespace ActionGroupManager.UI
                 baseActions = BaseActionFilter.FromParts(VesselManager.Instance.GetParts(), actionGroups[i]);
                 if (baseActions.Count > 0)
                 {
+                    listCount += 1;  // Size for title
                     GUILayout.Label(actionGroups[i].ToString() + " :", Style.ScrollTextEmphasisStyle);
 
 
@@ -60,11 +63,15 @@ namespace ActionGroupManager.UI
                     int j;
                     for(j = 0; j < baseActions.Count; j++)
                     {
-                            string str = baseActions[j].listParent.part.partInfo.title + "\n(" + baseActions[j].guiName + ")";
-                            if (!dic.ContainsKey(str))
-                                dic.Add(str, 1);
-                            else
-                                dic[str]++;
+
+                        string str = baseActions[j].listParent.part.partInfo.title + "\n(" + baseActions[j].guiName + ")";
+                        if (!dic.ContainsKey(str))
+                        {
+                            listCount += 2; // Size for entry
+                            dic.Add(str, 1);
+                        }
+                        else
+                            dic[str]++;
                     }
 
                     for(j = 0; j < dic.Count; j++)
@@ -79,6 +86,9 @@ namespace ActionGroupManager.UI
                     }
                 }
             }
+
+            recapWindowSize.height = Math.Max(listCount * 27, 100); // Set the minimum size
+            recapWindowSize.height = Math.Min(recapWindowSize.height, 500); // Set the Maximum size
 
             GUILayout.EndVertical();
             GUILayout.EndScrollView();
