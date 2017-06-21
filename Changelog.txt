@@ -1,4 +1,17 @@
-﻿Version 2.0.0 - June 19, 2017
+﻿Version 2.x.x - Future Release
+* Add support for Career mode limitations
+* Add Unity Skin option
+* Add new flags and icons
+* Moved "Order by Parts" option to the main UI
+* Fixed bug where most of the UI would be disabled if a craft had nothing in the coupling category
+* Fixed incorrect text on the "Use Text Action Groups" button
+* Fixed version checking which had an incorrect check URL
+* Added Changelog to the version checking system
+* Removed unused "Propulsion" category (this exists in KSP's library for some reason)
+* Minor GUI enhancments
+* More Large Code Optimizations
+
+Version 2.0.0 - June 19, 2017
 * Removed Action Group Button Modality (All Views)
 * New Overhauled UI (optional)
 * Part Highlighting is Automatic When a Part is Selected (New View Only)

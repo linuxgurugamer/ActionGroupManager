@@ -31,7 +31,6 @@ namespace ActionGroupManager.UI
             GUILayout.BeginVertical();
             GUILayout.Label("AGM version : " + Assembly.GetAssembly(typeof(ActionGroupManager)).GetName().Version.ToString(), Style.LabelExpandStyle);
 
-            GUILayout.Label("Requires Restart:");
             bool initial = SettingsManager.Settings.GetValue<bool>(SettingsManager.DisableCareer);
             bool final = GUILayout.Toggle(initial, "Disable Career Mode", Style.ButtonToggleStyle);
             if (final != initial)

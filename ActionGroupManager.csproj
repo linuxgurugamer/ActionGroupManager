@@ -89,7 +89,9 @@
     <Compile Include="UI\RecapUi.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Flags\AGMFlag.dds" />
+    <None Include="Flags\AGMFlag.dds">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="Licenses\AGMC-License.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
