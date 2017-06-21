@@ -14,7 +14,7 @@ namespace ActionGroupManager
     {
         //List of current UI handle
         public const string ModPath = "AquilaEnterprises/ActionGroupManager/";
-        SortedList<string, UiObject> UiList;
+        SortedList<UiType, UiObject> UiList;
         static private List<Callback> postDrawQueue = new List<Callback>();
         static ActionGroupManager _manager;
 
@@ -22,6 +22,14 @@ namespace ActionGroupManager
         public bool ShowMainWindow { get; set; }
         public bool ShowRecapWindow { get; set; }
 
+        enum UiType
+        {
+            Main,
+            Tweakable,
+            Icon,
+            Settings,
+            Recap
+        }
 
         public static ActionGroupManager Manager
         {
@@ -43,17 +51,17 @@ namespace ActionGroupManager
         {
             _manager = this;
 
-            UiList = new SortedList<string, UiObject>();
+            UiList = new SortedList<UiType, UiObject>();
             MainUi main = new MainUi();
-            UiList.Add("Main", main);
-            UiList.Add("Light", new TweakableUi());
+            UiList.Add(UiType.Main, main);
+            UiList.Add(UiType.Tweakable, new TweakableUi());
 
             if (ToolbarManager.ToolbarAvailable)
                 // Blizzy's Toolbar support
-                UiList.Add("Icon", new Toolbar(main));
+                UiList.Add(UiType.Icon, new Toolbar(main));
             else
                 // Stock Application Launcher
-                UiList.Add("Icon", new AppLauncher(main));
+                UiList.Add(UiType.Icon, new AppLauncher(main));
 
             main.SetVisible(SettingsManager.Settings.GetValue<bool>(SettingsManager.IsMainWindowVisible));
 
@@ -66,47 +74,52 @@ namespace ActionGroupManager
 
         void Update()
         {
-            if (ShowSettings && !UiList.ContainsKey("Settings"))
+            if (ShowSettings && !UiList.ContainsKey(UiType.Settings))
             {
-                UiList.Add("Settings", new SettingsUi(true));
+                UiList.Add(UiType.Settings, new SettingsUi(true));
             }
-            else if (!ShowSettings && UiList.ContainsKey("Settings"))
+            else if (!ShowSettings && UiList.ContainsKey(UiType.Settings))
             {
-                UiList["Settings"].SetVisible(false);
-                UiList["Settings"].Terminate();
-                UiList.Remove("Settings");
+                UiList[UiType.Settings].SetVisible(false);
+                UiList[UiType.Settings].Terminate();
+                UiList.Remove(UiType.Settings);
             }
 
-            if (ShowRecapWindow && !UiList.ContainsKey("Recap"))
+            if (ShowRecapWindow && !UiList.ContainsKey(UiType.Recap))
             {
-                UiList.Add("Recap", new RecapUi(true));
+                UiList.Add(UiType.Recap, new RecapUi(true));
             }
-            else if (!ShowRecapWindow && UiList.ContainsKey("Recap"))
+            else if (!ShowRecapWindow && UiList.ContainsKey(UiType.Recap))
             {
-                UiList["Recap"].SetVisible(false);
-                UiList["Recap"].Terminate();
-                UiList.Remove("Recap");
+                UiList[UiType.Recap].SetVisible(false);
+                UiList[UiType.Recap].Terminate();
+                UiList.Remove(UiType.Recap);
             }
         }
 
         public void UpdateIcon(bool val)
         {
             UiObject o;
-            if (UiList.TryGetValue("Icon", out o))
+            if (UiList.TryGetValue(UiType.Icon, out o))
                 (o as IButtonBar).SwitchTexture(val);
         }
 
         public void HideUI()
         {
+            ShowMainWindow = false;
+            ShowSettings = false;
+            ShowRecapWindow = false;
+            /*
             UiObject o;
-            if (UiList.TryGetValue("Recap", out o))
+            if (UiList.TryGetValue(UiType.Recap, out o))
                 (o as UiObject).SetVisible(false);
 
-            if (UiList.TryGetValue("Settings", out o))
+            if (UiList.TryGetValue(UiType.Settings, out o))
                 (o as UiObject).SetVisible(false);
 
-            if (UiList.TryGetValue("Main", out o))
+            if (UiList.TryGetValue(UiType.Main, out o))
                 (o as UiObject).SetVisible(false);
+            */
         }
 
         public void OnGUI()
