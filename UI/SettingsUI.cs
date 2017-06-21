@@ -1,6 +1,7 @@
 ﻿using System.Reflection;
 using UnityEngine;
 using KSP.UI.Dialogs;
+using KSP.Localization;
 
 namespace ActionGroupManager.UI
 {
@@ -17,30 +18,30 @@ namespace ActionGroupManager.UI
             }
 
             GUI.skin = Style.BaseSkin;
-            settingsWindowPositon = GUILayout.Window(this.GetHashCode(), settingsWindowPositon, DoMySettingsView, "AGM : Settings");
+            settingsWindowPositon = GUILayout.Window(this.GetHashCode(), settingsWindowPositon, DoMySettingsView, Localizer.GetStringByTag("#autoLOC_AGM_002"));
         }
 
         void DoMySettingsView(int id)
         {
             int size = Style.UseUnitySkin ? 10 : 20;
-            if (GUI.Button(new Rect(settingsWindowPositon.width - 24, 4, size, size), "X", Style.CloseButtonStyle))
+            if (GUI.Button(new Rect(settingsWindowPositon.width - 24, 4, size, size), Localizer.GetStringByTag("#autoLOC_AGM_153"), Style.CloseButtonStyle))
             {
                 ActionGroupManager.Manager.ShowSettings = false;
                 return;
             }
             GUILayout.BeginVertical();
-            GUILayout.Label("AGM version : " + Assembly.GetAssembly(typeof(ActionGroupManager)).GetName().Version.ToString(), Style.LabelExpandStyle);
+            GUILayout.Label(Localizer.GetStringByTag("#autoLOC_AGM_057") + " " + Assembly.GetAssembly(typeof(ActionGroupManager)).GetName().Version.ToString(), Style.LabelExpandStyle);
 
-            GUILayout.Label("Requires Return to Space Center :");
+            GUILayout.Label(Localizer.GetStringByTag("#autoLOC_AGM_058"));
             bool initial = SettingsManager.Settings.GetValue<bool>(SettingsManager.DisableCareer);
-            bool final = GUILayout.Toggle(initial, "Disable Career Mode", Style.ButtonToggleStyle);
+            bool final = GUILayout.Toggle(initial, Localizer.GetStringByTag("#autoLOC_AGM_060"), Style.ButtonToggleStyle);
             if (final != initial)
             {
                 SettingsManager.Settings.SetValue(SettingsManager.DisableCareer, final);
             }
 
             initial = SettingsManager.Settings.GetValue<bool>(SettingsManager.ClassicView);
-            final = GUILayout.Toggle(initial, "Classic View", Style.ButtonToggleStyle);
+            final = GUILayout.Toggle(initial, Localizer.GetStringByTag("#autoLOC_AGM_061"), Style.ButtonToggleStyle);
             if (final != initial)
             {
                 SettingsManager.Settings.SetValue(SettingsManager.ClassicView, final);
@@ -53,7 +54,7 @@ namespace ActionGroupManager.UI
             }
 
             initial = SettingsManager.Settings.GetValue<bool>(SettingsManager.TextCategories);
-            final = GUILayout.Toggle(initial, "Use Text Category Buttons", Style.ButtonToggleStyle);
+            final = GUILayout.Toggle(initial, Localizer.GetStringByTag("#autoLOC_AGM_062"), Style.ButtonToggleStyle);
             if (final != initial)
             {
                 SettingsManager.Settings.SetValue(SettingsManager.TextCategories, final);
@@ -62,7 +63,7 @@ namespace ActionGroupManager.UI
             }
 
             initial = SettingsManager.Settings.GetValue<bool>(SettingsManager.TextActionGroups);
-            final = GUILayout.Toggle(initial, "Use Text Action Group Buttons", Style.ButtonToggleStyle);
+            final = GUILayout.Toggle(initial, Localizer.GetStringByTag("#autoLOC_AGM_063"), Style.ButtonToggleStyle);
             if (final != initial)
             {
                 SettingsManager.Settings.SetValue(SettingsManager.TextActionGroups, final);
@@ -70,9 +71,9 @@ namespace ActionGroupManager.UI
                 if (final) SettingsManager.Settings.SetValue(SettingsManager.ClassicView, false);
             }
 
-            GUILayout.Label("Requires Restart :");
+            GUILayout.Label(Localizer.GetStringByTag("#autoLOC_AGM_059"));
             initial = SettingsManager.Settings.GetValue<bool>(SettingsManager.UseUnitySkin);
-            final = GUILayout.Toggle(initial, "Use Unity Skin", Style.ButtonToggleStyle);
+            final = GUILayout.Toggle(initial, Localizer.GetStringByTag("#autoLOC_AGM_064"), Style.ButtonToggleStyle);
             if (final != initial)
             {
                 SettingsManager.Settings.SetValue(SettingsManager.UseUnitySkin, final);

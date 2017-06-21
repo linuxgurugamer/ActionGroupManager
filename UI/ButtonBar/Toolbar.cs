@@ -1,4 +1,5 @@
 ﻿using System;
+using KSP.Localization;
 
 namespace ActionGroupManager.UI.ButtonBar
 {
@@ -20,7 +21,7 @@ namespace ActionGroupManager.UI.ButtonBar
             string str = SettingsManager.Settings.GetValue<bool>( SettingsManager.IsMainWindowVisible, true) ? 
                 mainPath + onButton :
                 mainPath + offButton;
-            mainButton.ToolTip = "Action Group Manager";
+            mainButton.ToolTip = Localizer.GetStringByTag("#autoLOC_AGM_001");
 
             mainButton.TexturePath = str;
 

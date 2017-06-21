@@ -95,6 +95,9 @@
     <None Include="Licenses\AGMC-License.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="Localization\en-us.cfg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="Resources\ButtonMaster.pdn" />
     <None Include="Resources\IconsMaster.pdn" />
   </ItemGroup>

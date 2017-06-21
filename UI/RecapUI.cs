@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using KSP.UI.Dialogs;
+using KSP.Localization;
 
 namespace ActionGroupManager.UI
 {
@@ -28,7 +29,7 @@ namespace ActionGroupManager.UI
                 return;
 
             GUI.skin = Style.BaseSkin;
-            recapWindowSize = GUILayout.Window(this.GetHashCode(), recapWindowSize, new GUI.WindowFunction(DoMyRecapView), "AGM : Recap", Style.BaseSkin.window, GUILayout.Width(250));
+            recapWindowSize = GUILayout.Window(this.GetHashCode(), recapWindowSize, new GUI.WindowFunction(DoMyRecapView), Localizer.GetStringByTag("#autoLOC_AGM_002"), Style.BaseSkin.window, GUILayout.Width(250));
 
         }
 
@@ -37,7 +38,7 @@ namespace ActionGroupManager.UI
             List<KSPActionGroup> actionGroups;
             List<BaseAction> baseActions;
             int size = Style.UseUnitySkin ? 10 : 20;
-            if (GUI.Button(new Rect(recapWindowSize.width - 24, 4, size, size), new GUIContent("X", "Close the window."), Style.CloseButtonStyle))
+            if (GUI.Button(new Rect(recapWindowSize.width - 24, 4, size, size), new GUIContent(Localizer.GetStringByTag("#autoLOC_AGM_153"), Localizer.GetStringByTag("#autoLOC_AGM_102")), Style.CloseButtonStyle))
             {
                 ActionGroupManager.Manager.ShowRecapWindow = false;
                 return;
@@ -64,7 +65,7 @@ namespace ActionGroupManager.UI
                     for(j = 0; j < baseActions.Count; j++)
                     {
 
-                        string str = baseActions[j].listParent.part.partInfo.title + "\n(" + baseActions[j].guiName + ")";
+                        string str = baseActions[j].listParent.part.partInfo.title + "\n" + Localizer.Format(Localizer.GetStringByTag("#autoLOC_AGM_150"), baseActions[j].guiName);
                         if (!dic.ContainsKey(str))
                         {
                             listCount += 2; // Size for entry

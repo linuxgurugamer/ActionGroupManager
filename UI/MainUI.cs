@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using KSP.UI.Dialogs;
 using KSP.UI.Screens;
+using KSP.Localization;
 using UnityEngine;
 
 namespace ActionGroupManager.UI
@@ -84,7 +85,7 @@ namespace ActionGroupManager.UI
                 return;
 
             GUI.skin = Style.BaseSkin;
-            mainWindowSize = GUILayout.Window(GetHashCode(), mainWindowSize, DrawMainView, "Action Group Manager - " + VesselManager.Instance.ActiveVessel.GetName(), Style.BaseSkin.window);
+            mainWindowSize = GUILayout.Window(GetHashCode(), mainWindowSize, DrawMainView, Localizer.Format(Localizer.GetStringByTag("#autoLOC_AGM_001"), VesselManager.Instance.ActiveVessel.GetName()), Style.BaseSkin.window);
         }
 
         public override void SetVisible(bool vis)
@@ -101,11 +102,11 @@ namespace ActionGroupManager.UI
 
             int size = Style.UseUnitySkin ? 10 : 20;
             // Window Buttons
-            if (GUI.Button(new Rect(mainWindowSize.width - 66, 4, size, size), NewGuiContent("R", "Show recap."), Style.CloseButtonStyle))
+            if (GUI.Button(new Rect(mainWindowSize.width - 66, 4, size, size), NewGuiContent(Localizer.GetStringByTag("#autoLOC_AGM_151"), Localizer.GetStringByTag("#autoLOC_AGM_100")), Style.CloseButtonStyle))
                 ActionGroupManager.Manager.ShowRecapWindow = !ActionGroupManager.Manager.ShowRecapWindow;
-            if (GUI.Button(new Rect(mainWindowSize.width - 45, 4, size, size), NewGuiContent("S", "Show settings."), Style.CloseButtonStyle))
+            if (GUI.Button(new Rect(mainWindowSize.width - 45, 4, size, size), NewGuiContent(Localizer.GetStringByTag("#autoLOC_AGM_152"), Localizer.GetStringByTag("#autoLOC_AGM_101")), Style.CloseButtonStyle))
                 ActionGroupManager.Manager.ShowSettings = !ActionGroupManager.Manager.ShowSettings;
-            if (GUI.Button(new Rect(mainWindowSize.width - 24, 4, size, size), NewGuiContent("X", "Close the window."), Style.CloseButtonStyle))
+            if (GUI.Button(new Rect(mainWindowSize.width - 24, 4, size, size), NewGuiContent(Localizer.GetStringByTag("#autoLOC_AGM_153"), Localizer.GetStringByTag("#autoLOC_AGM_102")), Style.CloseButtonStyle))
                 SetVisible(!IsVisible());
 
             if (!classicView)
@@ -147,7 +148,6 @@ namespace ActionGroupManager.UI
             bool result, initial;
             int iconCount = 0;
             string buttonText;
-            string tooltip = "Show only {0} parts.";
             GUIStyle buttonStyle = textButtons ? Style.ButtonToggleStyle : Style.ButtonIconStyle;
             SortedList<PartCategories, int> partCounts = partFilter.GetNumberOfPartByCategory();
 
@@ -155,7 +155,7 @@ namespace ActionGroupManager.UI
             if (rowView)
                 GUILayout.BeginHorizontal();  // Begin First Row of Category Buttons (Classic View)
             else
-                GUILayout.Label("Category Filter :");
+                GUILayout.Label(Localizer.GetStringByTag("#autoLOC_AGM_050"));
 
             // Begin constructing buttons
             for (int i = 0; i < partCounts.Count; i++)
@@ -178,9 +178,10 @@ namespace ActionGroupManager.UI
                 {
                     buttonText = partCounts.Keys[i].ToString();
                     if (partCounts[partCounts.Keys[i]] > 0)
-                        buttonText += " (" + partCounts[partCounts.Keys[i]] + ")";
+                        buttonText += " " + Localizer.Format(Localizer.GetStringByTag("#autoLOC_AGM_150"), partCounts[partCounts.Keys[i]].ToString());
 
-                    guiContent = NewGuiContent(buttonText, string.Format(tooltip, partCounts.Keys[i].ToString()));
+                    guiContent = NewGuiContent(buttonText, 
+                        string.Format(Localizer.Format(Localizer.GetStringByTag("#autoLOC_AGM_103"), partCounts.Keys[i].ToString())));
                 }
                 else
                 {
@@ -190,7 +191,8 @@ namespace ActionGroupManager.UI
                     if (partCounts[partCounts.Keys[i]] > 0)
                         buttonText = partCounts[partCounts.Keys[i]].ToString();
 
-                    guiContent = NewGuiContent(buttonText, GameDatabase.Instance.GetTexture(ButtonIcons.GetIcon(partCounts.Keys[i]), false), string.Format(tooltip, partCounts.Keys[i].ToString()));
+                    guiContent = NewGuiContent(buttonText, GameDatabase.Instance.GetTexture(ButtonIcons.GetIcon(partCounts.Keys[i]), false), 
+                        string.Format(Localizer.Format(Localizer.GetStringByTag("#autoLOC_AGM_103"), partCounts.Keys[i].ToString())));
                 }
                 GUI.enabled = (partCounts[partCounts.Keys[i]] > 0);
                 result = GUILayout.Toggle(initial, guiContent, buttonStyle);
@@ -250,8 +252,8 @@ namespace ActionGroupManager.UI
                 if (textButtons)
                 {
                     buttonText = actionGroups[i].ToString();
-                    buttonText += baList.Count > 0 ? " (" + baList.Count + ")" : null;
-                    guiContent = NewGuiContent(buttonText, string.Format(tooltip, actionGroups[i]));
+                    buttonText += baList.Count > 0 ? " " + Localizer.Format(Localizer.GetStringByTag("#autoLOC_AGM_150"), baList.Count) : null;
+                    guiContent = NewGuiContent(buttonText, Localizer.Format(Localizer.GetStringByTag("#autoLOC_AGM_104"), actionGroups[i]));
                 }
                 else
                 {
@@ -261,7 +263,8 @@ namespace ActionGroupManager.UI
                     if (baList.Count > 0)
                         buttonText = baList.Count.ToString();
 
-                    guiContent = NewGuiContent(buttonText, GameDatabase.Instance.GetTexture(ButtonIcons.GetIcon(actionGroups[i]), false), string.Format(tooltip, actionGroups[i]));
+                    guiContent = NewGuiContent(buttonText, GameDatabase.Instance.GetTexture(ButtonIcons.GetIcon(actionGroups[i]), false),
+                        string.Format(Localizer.Format(Localizer.GetStringByTag("#autoLOC_AGM_104"), actionGroups[i])));
                 }
 
                 // Create the button
@@ -294,7 +297,7 @@ namespace ActionGroupManager.UI
             partsList = GUILayout.BeginScrollView(partsList, Style.ScrollViewStyle, GUILayout.Width(275)); // Begin Parts List
             GUILayout.BeginVertical(); // Begin Parts List
 
-            bool final = GUILayout.Toggle(orderByStage, "Sort Parts by Stage", Style.ButtonEmphasisToggle);
+            bool final = GUILayout.Toggle(orderByStage, Localizer.GetStringByTag("#autoLOC_AGM_052"), Style.ButtonEmphasisToggle);
             if (final != orderByStage)
             {
                 SettingsManager.Settings.SetValue(SettingsManager.OrderByStage, final);
@@ -317,9 +320,9 @@ namespace ActionGroupManager.UI
                     if (list.Count > 0)
                     {
                         if (i == -1)
-                            GUILayout.Label("Not in Stage :", Style.ScrollTextEmphasisStyle);
+                            GUILayout.Label(Localizer.GetStringByTag("#autoLOC_AGM_055"), Style.ScrollTextEmphasisStyle);
                         else
-                            GUILayout.Label("Stage " + i.ToString() + " :", Style.ScrollTextEmphasisStyle);
+                            GUILayout.Label(Localizer.Format(Localizer.GetStringByTag("#autoLOC_AGM_056"), i.ToString()), Style.ScrollTextEmphasisStyle);
 
                         InternalDrawParts(list);
                     }
@@ -348,7 +351,7 @@ namespace ActionGroupManager.UI
                 {
                     initial = highlighter.Contains(list[i]);
 
-                    final = GUILayout.Toggle(initial, NewGuiContent("!", "Highlight the part."), Style.ButtonToggleStyle, GUILayout.Width(20));
+                    final = GUILayout.Toggle(initial, NewGuiContent(Localizer.GetStringByTag("#autoLOC_AGM_154"), Localizer.GetStringByTag("#autoLOC_AGM_105")), Style.ButtonToggleStyle, GUILayout.Width(20));
 
                     if (final != initial)
                         highlighter.Switch(list[i]);
@@ -389,7 +392,7 @@ namespace ActionGroupManager.UI
 
                         if (list[i] != currentSelectedPart)
                         {
-                            if (GUILayout.Button(NewGuiContent(currentAG[j].ToShortString(), "Part has an action linked to action group " + currentAG[j].ToString()), Style.ButtonToggleStyle, GUILayout.Width(Style.UseUnitySkin ? 30 : 20)))
+                            if (GUILayout.Button(NewGuiContent(currentAG[j].ToShortString(), Localizer.Format(Localizer.GetStringByTag("#autoLOC_AGM_106"), currentAG[j].ToString())), Style.ButtonToggleStyle, GUILayout.Width(Style.UseUnitySkin ? 30 : 20)))
                             {
                                 currentSelectedBaseAction = partFilter.GetBaseActionAttachedToActionGroup(currentAG[j]);
                                 currentSelectedActionGroup = currentAG[j];
@@ -429,7 +432,9 @@ namespace ActionGroupManager.UI
                         actionGroups = BaseActionFilter.GetActionGroupList(baseActions[i]);
                         for (int j = 0; j < actionGroups.Count; j++)
                         {
-                            if (GUILayout.Button(NewGuiContent(actionGroups[j].ToShortString(), actionGroups[j].ToString()), Style.ButtonToggleStyle, GUILayout.Width(Style.UseUnitySkin ? 30 : 20)))
+                            if (GUILayout.Button(NewGuiContent(actionGroups[j].ToShortString(), 
+                                Localizer.Format(Localizer.GetStringByTag("#autoLOC_AGM_107"), actionGroups[j].ToString())), 
+                                Style.ButtonToggleStyle, GUILayout.Width(Style.UseUnitySkin ? 30 : 20)))
                             {
                                 currentSelectedBaseAction = partFilter.GetBaseActionAttachedToActionGroup(actionGroups[j]);
                                 currentSelectedActionGroup = actionGroups[j];
@@ -443,7 +448,7 @@ namespace ActionGroupManager.UI
                         // Action Remove Buttons
                         if (currentSelectedBaseAction.Contains(baseActions[i]))
                         {
-                            if (GUILayout.Button(NewGuiContent("<", "Remove from selection."), Style.ButtonToggleStyle, GUILayout.Width(20)))
+                            if (GUILayout.Button(NewGuiContent(Localizer.GetStringByTag("#autoLOC_AGM_155"), Localizer.GetStringByTag("#autoLOC_AGM_108")), Style.ButtonToggleStyle, GUILayout.Width(20)))
                             {
                                 baseActions[i].RemoveActionToAnActionGroup(currentSelectedActionGroup);
                                 currentSelectedBaseAction.Remove(baseActions[i]);
@@ -453,8 +458,8 @@ namespace ActionGroupManager.UI
                             //Remove all symetry parts.
                             if (currentSelectedPart.symmetryCounterparts.Count > 0)
                             {
-                                if (GUILayout.Button(NewGuiContent((currentSelectedPart.symmetryCounterparts.Count + 1).ToString() + "<",
-                                    "Remove part and all symmetry linked parts from selection."), Style.ButtonToggleStyle, GUILayout.Width(25)))
+                                if (GUILayout.Button(NewGuiContent((currentSelectedPart.symmetryCounterparts.Count + 1).ToString() + Localizer.GetStringByTag("#autoLOC_AGM_155"),
+                                    Localizer.GetStringByTag("#autoLOC_AGM_109")), Style.ButtonToggleStyle, GUILayout.Width(25)))
                                 {
                                     symmetryActions = BaseActionFilter.FromParts(currentSelectedPart.symmetryCounterparts);
                                     for (int j = 0; j < symmetryActions.Count; j++)
@@ -472,7 +477,7 @@ namespace ActionGroupManager.UI
                         else
                         {
                             // Action Add Buttons
-                            if (GUILayout.Button(NewGuiContent(">", "Add to selection."), Style.ButtonToggleStyle, GUILayout.Width(20)))
+                            if (GUILayout.Button(NewGuiContent(Localizer.GetStringByTag("#autoLOC_AGM_156"), Localizer.GetStringByTag("#autoLOC_AGM_110")), Style.ButtonToggleStyle, GUILayout.Width(20)))
                             {
                                 currentSelectedBaseAction.Add(baseActions[i]);
                                 baseActions[i].AddActionToAnActionGroup(currentSelectedActionGroup);
@@ -482,8 +487,8 @@ namespace ActionGroupManager.UI
                             //Add all symetry parts.
                             if (currentSelectedPart.symmetryCounterparts.Count > 0)
                             {
-                                if (GUILayout.Button(NewGuiContent(">" + (currentSelectedPart.symmetryCounterparts.Count + 1).ToString(),
-                                    "Add part and all symmetry linked parts to selection."), Style.ButtonToggleStyle, GUILayout.Width(25)))
+                                if (GUILayout.Button(NewGuiContent(Localizer.GetStringByTag("#autoLOC_AGM_156") + (currentSelectedPart.symmetryCounterparts.Count + 1).ToString(),
+                                    Localizer.GetStringByTag("#autoLOC_AGM_111")), Style.ButtonToggleStyle, GUILayout.Width(25)))
                                 {
                                     baseActions[i].AddActionToAnActionGroup(currentSelectedActionGroup);
                                     if (!currentSelectedBaseAction.Contains(baseActions[i]))
@@ -530,8 +535,8 @@ namespace ActionGroupManager.UI
                 
                     GUILayout.Space(Style.BaseSkin.verticalScrollbar.margin.left);
                 str = confirmDelete ? 
-                    string.Format("OK to delete all actions in {0}?", currentSelectedActionGroup.ToString()) : 
-                    string.Format("Remove all from {0}", currentSelectedActionGroup.ToString());
+                    Localizer.Format(Localizer.GetStringByTag("#autoLOC_AGM_054"), currentSelectedActionGroup.ToString()) : 
+                    Localizer.Format(Localizer.GetStringByTag("#autoLOC_AGM_053"), currentSelectedActionGroup.ToString());
 
                 if ((disableCareer || (!currentSelectedActionGroup.ToString().Contains("Custom") && CareerLevel > 0f) || (CareerLevel > 0.5f)))
                 {
@@ -570,7 +575,7 @@ namespace ActionGroupManager.UI
                     else
                     {
                         // "Find" function (New View)
-                        if (GUILayout.Button(NewGuiContent(currentSelectedBaseAction[i].listParent.part.partInfo.title, "Find action in parts list."), Style.ButtonPartStyle))
+                        if (GUILayout.Button(NewGuiContent(currentSelectedBaseAction[i].listParent.part.partInfo.title, Localizer.GetStringByTag("#autoLOC_AGM_112")), Style.ButtonPartStyle))
                         {
                             confirmDelete = false; // Reset the deletion confirmation
                             highlighter.Remove(currentSelectedPart);
@@ -584,7 +589,7 @@ namespace ActionGroupManager.UI
                     if (classicView)
                     {
                         initial = highlighter.Contains(currentSelectedBaseAction[i].listParent.part);
-                        final = GUILayout.Toggle(initial, NewGuiContent("!", "Highlight the part."), Style.ButtonToggleStyle, GUILayout.Width(20));
+                        final = GUILayout.Toggle(initial, NewGuiContent(Localizer.GetStringByTag("#autoLOC_AGM_154"), Localizer.GetStringByTag("#autoLOC_AGM_105")), Style.ButtonToggleStyle, GUILayout.Width(20));
                         if (final != initial)
                             highlighter.Switch(currentSelectedBaseAction[i].listParent.part);
 
@@ -596,7 +601,7 @@ namespace ActionGroupManager.UI
                 GUILayout.BeginHorizontal();  // Begin Action Line
                 if ((disableCareer || (!currentSelectedActionGroup.ToString().Contains("Custom") && CareerLevel > 0f) || (CareerLevel > 0.5f)))
                 {
-                    if (GUILayout.Button(NewGuiContent("<", "Remove from selection."), Style.ButtonToggleStyle, GUILayout.Width(20)))
+                    if (GUILayout.Button(NewGuiContent(Localizer.GetStringByTag("#autoLOC_AGM_155"), Localizer.GetStringByTag("#autoLOC_AGM_108")), Style.ButtonToggleStyle, GUILayout.Width(20)))
                     {
                         currentSelectedBaseAction[i].RemoveActionToAnActionGroup(currentSelectedActionGroup);
                         currentSelectedBaseAction.Remove(currentSelectedBaseAction[i]);
@@ -604,8 +609,8 @@ namespace ActionGroupManager.UI
 
                     if (currentSelectedBaseAction[i].listParent.part.symmetryCounterparts.Count > 0)
                     {
-                        if (GUILayout.Button(NewGuiContent((currentSelectedBaseAction[i].listParent.part.symmetryCounterparts.Count + 1).ToString() + "<",
-                            "Remove part and all symmetry linked parts from selection."), Style.ButtonToggleStyle, GUILayout.Width(25)))
+                        if (GUILayout.Button(NewGuiContent((currentSelectedBaseAction[i].listParent.part.symmetryCounterparts.Count + 1).ToString() + Localizer.GetStringByTag("#autoLOC_AGM_155"),
+                            Localizer.GetStringByTag("#autoLOC_AGM_109")), Style.ButtonToggleStyle, GUILayout.Width(25)))
                         {
                             actions = BaseActionFilter.FromParts(currentSelectedBaseAction[i].listParent.part.symmetryCounterparts);
                             for (int j = 0; j < actions.Count; j++)
@@ -628,7 +633,7 @@ namespace ActionGroupManager.UI
 
                 // Draw the find button (Classic View)
                 if (classicView) {
-                    if (GUILayout.Button(NewGuiContent("F", "Find action in parts list."), Style.ButtonToggleStyle, GUILayout.Width(20)))
+                    if (GUILayout.Button(NewGuiContent(Localizer.GetStringByTag("#autoLOC_AGM_157"), Localizer.GetStringByTag("#autoLOC_AGM_112")), Style.ButtonToggleStyle, GUILayout.Width(20)))
                     {
                         confirmDelete = false; // Reset the deletion confirmation
                         currentSelectedPart = currentSelectedBaseAction[i].listParent.part;
@@ -643,14 +648,14 @@ namespace ActionGroupManager.UI
         private void DrawSearch()
         {
             GUILayout.BeginHorizontal();
-            GUILayout.Label("Part Search :");
+            GUILayout.Label(Localizer.GetStringByTag("#autoLOC_AGM_051"));
             GUILayout.Space(5);
             string searchString = GUILayout.TextField(partFilter.CurrentSearch);
             if (partFilter.CurrentSearch != searchString)
                 OnUpdate(FilterModification.Search, searchString);
 
             GUILayout.Space(5);
-            if (GUILayout.Button(NewGuiContent("X", "Remove all text from the input box."), Style.ButtonToggleStyle, GUILayout.Width(Style.ButtonToggleStyle.fixedHeight)))
+            if (GUILayout.Button(NewGuiContent(Localizer.GetStringByTag("#autoLOC_AGM_153"), Localizer.GetStringByTag("#autoLOC_AGM_113")), Style.ButtonToggleStyle, GUILayout.Width(Style.ButtonToggleStyle.fixedHeight)))
                 OnUpdate(FilterModification.Search, string.Empty);
 
             GUILayout.EndHorizontal();
