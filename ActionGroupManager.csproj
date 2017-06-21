@@ -89,6 +89,7 @@
     <Compile Include="UI\RecapUi.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Flags\AGMFlag.dds" />
     <None Include="Licenses\AGMC-License.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -115,24 +116,19 @@
     <Content Include="Resources\Abort.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\AppLauncher.png">
+    <Content Include="Resources\AppLauncher.png" />
+    <Content Include="Resources\AppLauncherOld.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\ArrowLeft.png" />
-    <Content Include="Resources\ArrowRight.png" />
-    <Content Include="Resources\ChevronLeft.png" />
-    <Content Include="Resources\ChevronRight.png" />
     <Content Include="Resources\number0.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="Resources\ToolbarOff.png" />
     <Content Include="Resources\ToolbarOffLarge.png" />
-    <Content Include="Resources\ToolbarOff.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
+    <Content Include="Resources\ToolbarOffOld.png" />
+    <Content Include="Resources\ToolbarOn.png" />
     <Content Include="Resources\ToolbarOnLarge.png" />
-    <Content Include="Resources\ToolbarOn.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
+    <Content Include="Resources\ToolbarOnOld.png" />
     <None Include="ActionGroupManager.version">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -140,7 +136,7 @@
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>xcopy /Y /S "$(TargetDir)*.*" "C:\KSP_win_dev\GameData\ActionGroupManager\"</PostBuildEvent>
+    <PostBuildEvent>xcopy /Y /S "$(TargetDir)*.*" "C:\KSP_win_dev\GameData\AquilaEnterprises\ActionGroupManager\"</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

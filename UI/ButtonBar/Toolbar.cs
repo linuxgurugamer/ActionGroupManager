@@ -5,7 +5,7 @@ namespace ActionGroupManager.UI.ButtonBar
     class Toolbar : UiObject, IButtonBar
     {
         IButton mainButton;
-        readonly string mainPath = "ActionGroupManager/Resources/";
+        readonly string mainPath = ActionGroupManager.ModPath + "Resources/";
         readonly string onButton = "ToolbarOn";
         readonly string offButton = "ToolbarOff";
         UiObject controlled;

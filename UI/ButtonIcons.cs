@@ -34,7 +34,7 @@ namespace ActionGroupManager.UI
             {KSPActionGroup.RCS, "Squad/PartList/SimpleIcons/R&D_node_icon_advflightcontrol"},
             {KSPActionGroup.SAS, "Squad/PartList/SimpleIcons/R&D_node_icon_specializedcontrol"},
             {KSPActionGroup.Brakes, "Squad/PartList/SimpleIcons/R&D_node_icon_advancedmotors"},
-            {KSPActionGroup.Abort, "ActionGroupManager/Resources/Abort"},
+            {KSPActionGroup.Abort, ActionGroupManager.ModPath + "Resources/Abort"},
             {KSPActionGroup.Custom01, "Squad/PartList/SimpleIcons/number1"},
             {KSPActionGroup.Custom02, "Squad/PartList/SimpleIcons/number2"},
             {KSPActionGroup.Custom03, "Squad/PartList/SimpleIcons/number3"},
@@ -44,7 +44,7 @@ namespace ActionGroupManager.UI
             {KSPActionGroup.Custom07, "Squad/PartList/SimpleIcons/number7"},
             {KSPActionGroup.Custom08, "Squad/PartList/SimpleIcons/number8"},
             {KSPActionGroup.Custom09, "Squad/PartList/SimpleIcons/number9"},
-            {KSPActionGroup.Custom10, "ActionGroupManager/Resources/number0"}
+            {KSPActionGroup.Custom10, ActionGroupManager.ModPath + "Resources/number0"}
 
         };
 

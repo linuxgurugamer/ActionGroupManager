@@ -13,6 +13,7 @@ namespace ActionGroupManager
     public class ActionGroupManager : MonoBehaviour
     {
         //List of current UI handle
+        public const string ModPath = "AquilaEnterprises/ActionGroupManager/";
         SortedList<string, UiObject> UiList;
         static private List<Callback> postDrawQueue = new List<Callback>();
         static ActionGroupManager _manager;
