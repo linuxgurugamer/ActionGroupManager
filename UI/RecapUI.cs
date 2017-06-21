@@ -53,7 +53,7 @@ namespace ActionGroupManager.UI
                 baseActions = BaseActionFilter.FromParts(VesselManager.Instance.GetParts(), actionGroups[i]);
                 if (baseActions.Count > 0)
                 {
-                    GUILayout.Label(actionGroups[i].ToString() + " :", Style.BaseSkin.label);
+                    GUILayout.Label(actionGroups[i].ToString() + " :", Style.ScrollTextEmphasisStyle);
 
 
                     SortedList<string, int> dic = new SortedList<string, int>();
@@ -74,7 +74,7 @@ namespace ActionGroupManager.UI
                         string str = dic.Keys[j];
                         if (dic[str] > 1)
                             str += " * " + dic[str];
-                        GUILayout.Label(str, Style.BaseSkin.label);
+                        GUILayout.Label(str, Style.ScrollTextStyle);
                         GUILayout.EndHorizontal();
                     }
                 }

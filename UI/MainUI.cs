@@ -24,7 +24,7 @@ namespace ActionGroupManager.UI
         bool classicView = SettingsManager.Settings.GetValue<bool>(SettingsManager.ClassicView);
         bool textCategories = SettingsManager.Settings.GetValue<bool>(SettingsManager.TextCategories);
         bool textActionGroups = SettingsManager.Settings.GetValue<bool>(SettingsManager.TextActionGroups);
-        bool useCareer = !SettingsManager.Settings.GetValue<bool>(SettingsManager.DisableCareer);
+        bool disableCareer = SettingsManager.Settings.GetValue<bool>(SettingsManager.DisableCareer);
         float CareerLevel = Math.Max(ScenarioUpgradeableFacilities.GetFacilityLevel(SpaceCenterFacility.SpaceplaneHangar), ScenarioUpgradeableFacilities.GetFacilityLevel(SpaceCenterFacility.VehicleAssemblyBuilding));
 
         //Inital window rect
@@ -155,7 +155,7 @@ namespace ActionGroupManager.UI
             if (rowView)
                 GUILayout.BeginHorizontal();  // Begin First Row of Category Buttons (Classic View)
             else
-                GUILayout.Label("Category Filter");
+                GUILayout.Label("Category Filter :");
 
             // Begin constructing buttons
             for (int i = 0; i < partCounts.Count; i++)
@@ -317,9 +317,9 @@ namespace ActionGroupManager.UI
                     if (list.Count > 0)
                     {
                         if (i == -1)
-                            GUILayout.Label("Not in active stage.", Style.BaseSkin.label);
+                            GUILayout.Label("Not in Stage :", Style.ScrollTextEmphasisStyle);
                         else
-                            GUILayout.Label("Stage " + i.ToString(), Style.BaseSkin.label);
+                            GUILayout.Label("Stage " + i.ToString() + " :", Style.ScrollTextEmphasisStyle);
 
                         InternalDrawParts(list);
                     }
@@ -437,7 +437,7 @@ namespace ActionGroupManager.UI
                         }
                     }
 
-                    if ((useCareer && (CareerLevel > 0.5f || (!currentSelectedActionGroup.ToString().Contains("Custom") && CareerLevel > 0f))))
+                    if ((disableCareer || (!currentSelectedActionGroup.ToString().Contains("Custom") && CareerLevel > 0f) || (CareerLevel > 0.5f)))
                     {
 
                         // Action Remove Buttons
@@ -533,7 +533,7 @@ namespace ActionGroupManager.UI
                     string.Format("OK to delete all actions in {0}?", currentSelectedActionGroup.ToString()) : 
                     string.Format("Remove all from {0}", currentSelectedActionGroup.ToString());
 
-                if ((useCareer && (CareerLevel > 0.5f || (!currentSelectedActionGroup.ToString().Contains("Custom") && CareerLevel > 0f))))
+                if ((disableCareer || (!currentSelectedActionGroup.ToString().Contains("Custom") && CareerLevel > 0f) || (CareerLevel > 0.5f)))
                 {
                     if (GUILayout.Button(str, confirmDelete ? Style.ButtonStrongEmphasisToggleStyle : Style.ButtonEmphasisToggle))
                     {
@@ -594,11 +594,7 @@ namespace ActionGroupManager.UI
 
                 // Draw the action controls
                 GUILayout.BeginHorizontal();  // Begin Action Line
-#if DEBUG
-                Debug.Log("AGM: Found Career Level:" + CareerLevel);
-                    #endif
-
-                if ((useCareer && (CareerLevel > 0.5f || (!currentSelectedActionGroup.ToString().Contains("Custom") && CareerLevel > 0f))))
+                if ((disableCareer || (!currentSelectedActionGroup.ToString().Contains("Custom") && CareerLevel > 0f) || (CareerLevel > 0.5f)))
                 {
                     if (GUILayout.Button(NewGuiContent("<", "Remove from selection."), Style.ButtonToggleStyle, GUILayout.Width(20)))
                     {
@@ -647,7 +643,7 @@ namespace ActionGroupManager.UI
         private void DrawSearch()
         {
             GUILayout.BeginHorizontal();
-            GUILayout.Label("Part Search:");
+            GUILayout.Label("Part Search :");
             GUILayout.Space(5);
             string searchString = GUILayout.TextField(partFilter.CurrentSearch);
             if (partFilter.CurrentSearch != searchString)

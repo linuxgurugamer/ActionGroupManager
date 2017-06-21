@@ -3,6 +3,8 @@
 * Add Unity Skin option
 * Add new flags and icons
 * Moved "Order by Parts" option to the main UI
+* Move Symmetry Linked parts button now indicated how many symmetry linked parts there are
+* Font Rework on KSP Visual Style to match modern KSP
 * Fixed bug where most of the UI would be disabled if a craft had nothing in the coupling category
 * Fixed incorrect text on the "Use Text Action Groups" button
 * Fixed version checking which had an incorrect check URL

@@ -17,7 +17,7 @@ namespace ActionGroupManager.UI
             }
 
             GUI.skin = Style.BaseSkin;
-            settingsWindowPositon = GUILayout.Window(this.GetHashCode(), settingsWindowPositon, DoMySettingsView, "Settings");
+            settingsWindowPositon = GUILayout.Window(this.GetHashCode(), settingsWindowPositon, DoMySettingsView, "AGM : Settings");
         }
 
         void DoMySettingsView(int id)
@@ -38,7 +38,7 @@ namespace ActionGroupManager.UI
                 SettingsManager.Settings.SetValue(SettingsManager.DisableCareer, final);
             }
 
-            GUILayout.Label("Requires Return to Space Center:");
+            GUILayout.Label("Requires Return to Space Center :");
             initial = SettingsManager.Settings.GetValue<bool>(SettingsManager.ClassicView);
             final = GUILayout.Toggle(initial, "Classic View", Style.ButtonToggleStyle);
             if (final != initial)
@@ -70,7 +70,7 @@ namespace ActionGroupManager.UI
                 if (final) SettingsManager.Settings.SetValue(SettingsManager.ClassicView, false);
             }
 
-            GUILayout.Label("Requires Restart:");
+            GUILayout.Label("Requires Restart :");
             initial = SettingsManager.Settings.GetValue<bool>(SettingsManager.UseUnitySkin);
             final = GUILayout.Toggle(initial, "Use Unity Skin", Style.ButtonToggleStyle);
             if (final != initial)

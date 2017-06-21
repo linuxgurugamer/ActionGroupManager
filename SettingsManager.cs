@@ -15,7 +15,7 @@ namespace ActionGroupManager
         public static readonly string FrequencyOfAutomaticUpdate = "FrequencyOfAutomaticUpdate";
         public static readonly string OrderByStage = "OrderByStage";
         public static readonly string ClassicView = "ClassicView";
-        public static readonly string DisableCareer = "ClassicView";
+        public static readonly string DisableCareer = "DisableCareer";
         public static readonly string UseUnitySkin = "UseUnitySkin";
         public static readonly string TextCategories = "TextCategories";
         public static readonly string TextActionGroups = "TextActionGroups";

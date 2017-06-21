@@ -6,6 +6,8 @@ namespace ActionGroupManager
     {
         static readonly GUISkin UnitySkin = GUI.skin;
         public static GUIStyle ScrollViewStyle;
+        public static GUIStyle ScrollTextStyle;
+        public static GUIStyle ScrollTextEmphasisStyle;
         public static GUIStyle CloseButtonStyle;
         //public static GUIStyle ButtonToggleYellowStyle;
         //public static GUIStyle ButtonToggleGreenStyle;
@@ -33,10 +35,42 @@ namespace ActionGroupManager
 
         static Style()
         {
+            if(!UseUnitySkin)
+            {
+                BaseSkin.label.font = Font.CreateDynamicFontFromOSFont("Verdana", 12);
+                BaseSkin.label.fontStyle = FontStyle.Bold;
+                BaseSkin.label.normal.textColor = Color.white;
+                BaseSkin.label.hover.textColor = Color.white;
+                BaseSkin.label.active.textColor = Color.white;
+                BaseSkin.label.focused.textColor = Color.white;
+
+                BaseSkin.button.font = Font.CreateDynamicFontFromOSFont("Arial", 12);
+                BaseSkin.window.font = Font.CreateDynamicFontFromOSFont("Arial Black", 12);
+            }
+
             
             ScrollViewStyle = new GUIStyle(BaseSkin.scrollView);
             ScrollViewStyle.padding = new RectOffset(1, 1, 1, 1);
 
+            ScrollTextStyle = new GUIStyle(BaseSkin.label);
+            if (!UseUnitySkin)
+            {
+                Color c = new Color(0.75f, 0.77f, 0.69f);
+                ScrollTextStyle.normal.textColor = c;
+                ScrollTextStyle.hover.textColor = c;
+                ScrollTextStyle.active.textColor = c;
+                ScrollTextStyle.focused.textColor = c;
+            }
+
+            ScrollTextEmphasisStyle = new GUIStyle(BaseSkin.label);
+            if (!UseUnitySkin)
+            {
+                Color c = new Color(1f, 0.70f, 0);
+                ScrollTextEmphasisStyle.normal.textColor = c;
+                ScrollTextEmphasisStyle.hover.textColor = c;
+                ScrollTextEmphasisStyle.active.textColor = c;
+                ScrollTextEmphasisStyle.focused.textColor = c;
+            }
             CloseButtonStyle = new GUIStyle(BaseSkin.button);
             CloseButtonStyle.margin = new RectOffset(3, 3, 3, 3);
 
@@ -58,28 +92,32 @@ namespace ActionGroupManager
             ButtonPartStyle.margin = new RectOffset(BaseSkin.button.margin.left, BaseSkin.button.margin.right, 5, 5);
             ButtonPartStyle.fontSize = 12;
 
-            LabelExpandStyle = new GUIStyle(BaseSkin.label);
+            LabelExpandStyle = new GUIStyle(ScrollTextStyle);
             LabelExpandStyle.alignment = TextAnchor.MiddleCenter;
             LabelExpandStyle.stretchWidth = true;
+
+
 
             ButtonEmphasisToggle = new GUIStyle(ButtonToggleStyle);
             if (UseUnitySkin)
                 ButtonEmphasisToggle.fontStyle = FontStyle.Bold;
             else
             {
-                Color c = new Color(0.71f, 0.99f, 0);
+                Color focused = new Color(0.96f, 0.92f, 0.81f);
+                Color normal = new Color(0.75f, 0.77f, 0.69f);
+                //Color c = new Color(1f, 0.70f, 0);
+                ButtonEmphasisToggle.font = Font.CreateDynamicFontFromOSFont("Arial Black", 14);
+                
+                ButtonEmphasisToggle.normal.textColor = normal;
+                ButtonEmphasisToggle.active.textColor = focused ;
+                ButtonEmphasisToggle.focused.textColor = focused;
+                ButtonEmphasisToggle.hover.textColor = focused;
 
-                ButtonEmphasisToggle.normal.textColor = c;
-                ButtonEmphasisToggle.active.textColor = c;
-                ButtonEmphasisToggle.focused.textColor = c;
-                ButtonEmphasisToggle.hover.textColor = c;
-
-                ButtonEmphasisToggle.onNormal.textColor = c;
-                ButtonEmphasisToggle.onActive.textColor = c;
-                ButtonEmphasisToggle.onFocused.textColor = c;
-                ButtonEmphasisToggle.onHover.textColor = c;
+                ButtonEmphasisToggle.onNormal.textColor = normal;
+                ButtonEmphasisToggle.onActive.textColor = focused;
+                ButtonEmphasisToggle.onFocused.textColor = focused;
+                ButtonEmphasisToggle.onHover.textColor = focused;
             }
-
 
             ButtonStrongEmphasisToggleStyle = new GUIStyle(ButtonToggleStyle);
             if (UseUnitySkin)
