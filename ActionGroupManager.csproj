@@ -95,8 +95,31 @@
     <None Include="Licenses\AGMC-License.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="Resources\ButtonMaster.pdn" />
+    <None Include="Resources\IconsMaster.pdn" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Resources\AppLauncherOn.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\RCS.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <None Include="Resources\SAS.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Resources\Gear.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Resources\Light.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Resources\Brakes.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Resources\Stage.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="Licenses\MiniAVC-License.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -115,22 +138,21 @@
     <Content Include="Changelog.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\Abort.png">
+    <None Include="Resources\Abort.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\AppLauncher.png" />
-    <Content Include="Resources\AppLauncherOld.png">
+    </None>
+    <None Include="Resources\AppLauncherOff.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\number0.png">
+    </None>
+    <None Include="Resources\number0.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\ToolbarOff.png" />
-    <Content Include="Resources\ToolbarOffLarge.png" />
-    <Content Include="Resources\ToolbarOffOld.png" />
-    <Content Include="Resources\ToolbarOn.png" />
-    <Content Include="Resources\ToolbarOnLarge.png" />
-    <Content Include="Resources\ToolbarOnOld.png" />
+    </None>
+    <None Include="Resources\ToolbarOff.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Resources\ToolbarOn.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="ActionGroupManager.version">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

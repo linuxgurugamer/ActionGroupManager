@@ -8,7 +8,7 @@ namespace ActionGroupManager.UI.ButtonBar
     {
         ApplicationLauncherButton mainButton;
         static readonly string appPath = ActionGroupManager.ModPath + "Resources/";
-        static readonly Texture2D appLauncherButton = GameDatabase.Instance.GetTexture(appPath + "AppLauncher", false);
+        static readonly Texture2D appLauncherButton = GameDatabase.Instance.GetTexture(appPath + "AppLauncherOff", false);
         UiObject controlled;
 
         public AppLauncher(params object[] list)
@@ -53,9 +53,11 @@ namespace ActionGroupManager.UI.ButtonBar
         {
             if (vis)
             {
+                mainButton.SetTexture(GameDatabase.Instance.GetTexture(appPath + "AppLauncherOn", false));
                 mainButton.SetTrue(false);
             } else
             {
+                mainButton.SetTexture(GameDatabase.Instance.GetTexture(appPath + "AppLauncherOff", false));
                 mainButton.SetFalse(false);
             }
         }

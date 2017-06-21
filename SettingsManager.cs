@@ -23,7 +23,6 @@ namespace ActionGroupManager
         public static readonly string RecapWindocRect = "RecapWindowRect";
         public static readonly string IsRecapWindowVisible = "IsRecapWindowVisible";
 
-
         static SettingsManager()
         {
             Settings = PluginConfiguration.CreateForType<ActionGroupManager>();

@@ -31,6 +31,7 @@ namespace ActionGroupManager.UI
             GUILayout.BeginVertical();
             GUILayout.Label("AGM version : " + Assembly.GetAssembly(typeof(ActionGroupManager)).GetName().Version.ToString(), Style.LabelExpandStyle);
 
+            GUILayout.Label("Requires Return to Space Center :");
             bool initial = SettingsManager.Settings.GetValue<bool>(SettingsManager.DisableCareer);
             bool final = GUILayout.Toggle(initial, "Disable Career Mode", Style.ButtonToggleStyle);
             if (final != initial)
@@ -38,7 +39,6 @@ namespace ActionGroupManager.UI
                 SettingsManager.Settings.SetValue(SettingsManager.DisableCareer, final);
             }
 
-            GUILayout.Label("Requires Return to Space Center :");
             initial = SettingsManager.Settings.GetValue<bool>(SettingsManager.ClassicView);
             final = GUILayout.Toggle(initial, "Classic View", Style.ButtonToggleStyle);
             if (final != initial)
