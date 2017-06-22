@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
+using KSP.Localization;
 
 namespace ActionGroupManager.UI
 {
@@ -31,7 +32,7 @@ namespace ActionGroupManager.UI
 
         public void Initialize()
         {
-            this.Events[EVENTNAME].guiName = "      AGM : " + ActionGroup.ToString();
+            this.Events[EVENTNAME].guiName = "      " + Localizer.Format(Localizer.GetStringByTag("#autoLOC_AGM_254"), ActionGroup.displayDescription());
         }
 
         [KSPEvent(name = EVENTNAME, active = true, guiActive = true)]
@@ -45,11 +46,11 @@ namespace ActionGroupManager.UI
         {
             if (!Isfolder)
             {
-                string str;
+                string str = "      ";
                 if (Current != null && Current.Action.IsInActionGroup(ActionGroup))
-                    str = "      AGM : * " + ActionGroup.ToString() + " *";
+                    str += Localizer.Format(Localizer.GetStringByTag("#autoLOC_AGM_255"), ActionGroup.displayDescription());
                 else
-                    str = "      AGM : " + ActionGroup.ToString();
+                    str += Localizer.Format(Localizer.GetStringByTag("#autoLOC_AGM_254"), ActionGroup.displayDescription());
 
                 this.Events[EVENTNAME].guiName = str;
             }
@@ -68,7 +69,7 @@ namespace ActionGroupManager.UI
 
         public void Initialize()
         {
-            this.Events[EVENTNAME].guiName = "  AGM : " + Action.guiName;
+            this.Events[EVENTNAME].guiName = "  " + Localizer.Format(Localizer.GetStringByTag("#autoLOC_AGM_254"), Action.guiName);
         }
 
         [KSPEvent(name = EVENTNAME, active = true, guiActive = true)]
@@ -81,8 +82,8 @@ namespace ActionGroupManager.UI
 
     class UIRootManager : PartModule
     {
-        public const string GUIISON = "AGM : Disable";
-        public const string GUIISOFF = "AGM : Enable";
+        public static readonly string GUIISON = Localizer.GetStringByTag("#autoLOC_AGM_251");
+        public static readonly string GUIISOFF = Localizer.GetStringByTag("#autoLOC_AGM_250");
         public const string EVENTNAME = "RootButtonClicked";
         public bool enable = false;
 
@@ -169,7 +170,7 @@ namespace ActionGroupManager.UI
             UIActionGroupManager agm = Part.AddModule("UIActionGroupManager") as UIActionGroupManager;
             Part.Modules.Remove(agm);
 
-            agm.Events[UIActionGroupManager.EVENTNAME].guiName = "    AGM : General";
+            agm.Events[UIActionGroupManager.EVENTNAME].guiName = "    " + Localizer.GetStringByTag("#autoLOC_AGM_252");
             agm.Origin = this;
             agm.Isfolder = true;
             agm.Type = UIActionGroupManager.FolderType.General;
@@ -180,7 +181,7 @@ namespace ActionGroupManager.UI
             agm = Part.AddModule("UIActionGroupManager") as UIActionGroupManager;
             Part.Modules.Remove(agm);
 
-            agm.Events[UIActionGroupManager.EVENTNAME].guiName = "    AGM : Custom";
+            agm.Events[UIActionGroupManager.EVENTNAME].guiName = "    " + Localizer.GetStringByTag("#autoLOC_AGM_253");
             agm.Origin = this;
             agm.Isfolder = true;
             agm.Type = UIActionGroupManager.FolderType.Custom;
@@ -192,7 +193,7 @@ namespace ActionGroupManager.UI
             KSPActionGroup[] actionGroups = Enum.GetValues(typeof(KSPActionGroup)) as KSPActionGroup[];
             for (i = 0; i < actionGroups.Length; i++)
             {
-                if (actionGroups[i] == KSPActionGroup.None)
+                if (actionGroups[i] == KSPActionGroup.None || actionGroups[i] == KSPActionGroup.REPLACEWITHDEFAULT)
                     continue;
 
                 agm = Part.AddModule("UIActionGroupManager") as UIActionGroupManager;
@@ -209,7 +210,7 @@ namespace ActionGroupManager.UI
             agm = Part.AddModule("UIActionGroupManager") as UIActionGroupManager;
             Part.Modules.Remove(agm);
 
-            agm.Events[UIActionGroupManager.EVENTNAME].guiName = "        Only this part";
+            agm.Events[UIActionGroupManager.EVENTNAME].guiName = "        " + Localizer.GetStringByTag("#autoLOC_AGM_256");
             agm.Origin = this;
             agm.IsSymmetrySelector = true;
             agm.SymmetryMode = UIActionGroupManager.SymmetryType.One;
@@ -220,7 +221,7 @@ namespace ActionGroupManager.UI
             agm = Part.AddModule("UIActionGroupManager") as UIActionGroupManager;
             Part.Modules.Remove(agm);
 
-            agm.Events[UIActionGroupManager.EVENTNAME].guiName = "        This part and all symmetry counterparts";
+            agm.Events[UIActionGroupManager.EVENTNAME].guiName = "        " + Localizer.GetStringByTag("#autoLOC_AGM_257");
             agm.Origin = this;
             agm.IsSymmetrySelector = true;
             agm.SymmetryMode = UIActionGroupManager.SymmetryType.All;
@@ -516,7 +517,9 @@ namespace ActionGroupManager.UI
 
         private void SetupRootModule()
         {
+#if DEBUG
             Debug.Log("AGM : Setup root !");
+#endif
 
             int i, j;
             if (!VesselManager.Instance.ActiveVessel.rootPart.Modules.Contains("UIRootManager"))
@@ -587,7 +590,9 @@ namespace ActionGroupManager.UI
 
         private void OnPartDie(Part data)
         {
+#if DEBUG
             Debug.Log("Part removed : " + data.partInfo.title);
+#endif
             if (cache.ContainsKey(data))
                 cache.Remove(data);
         }
@@ -603,8 +608,9 @@ namespace ActionGroupManager.UI
 
             if (!cache.ContainsKey(p))
             {
+#if DEBUG
                 Debug.Log("The cache doesn't contain the part !");
-
+#endif
                 // Build the UI for the part.
                 manager = new UIPartManager(p);
                 cache.Add(p, manager);
