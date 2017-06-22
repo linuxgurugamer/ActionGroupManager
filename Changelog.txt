@@ -1,4 +1,4 @@
-﻿Version 2.x.x - Future Release
+﻿Version 2.1.0 - June 22, 2017
 * Add support for Career mode limitations (optional)
 * Add Unity Skin (optional)
 * Add new flags and icons
