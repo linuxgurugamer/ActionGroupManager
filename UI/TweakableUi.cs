@@ -316,57 +316,55 @@ namespace ActionGroupManager.UI
                 {
                     currentActionGroup = obj;
 
-                    actionGroupList.ForEach(
-                        (e) =>
+                    for (int i = 0; i < actionGroupList.Count; i++)
+                    {
+                        // Hide all action groups
+                        if (!actionGroupList[i].Isfolder && !actionGroupList[i].IsSymmetrySelector && actionGroupList[i] != obj)
                         {
-                            // Hide all action groups
-                            if (!e.Isfolder && !e.IsSymmetrySelector && e != obj)
-                            {
-                                e.Events[UIActionGroupManager.EVENTNAME].guiActive = false;
-                                e.Events[UIActionGroupManager.EVENTNAME].active = false;
-                            }
-                            
-                            // Show Symmetry selector
-                            if (e.IsSymmetrySelector)
-                            {
-                                e.Events[UIActionGroupManager.EVENTNAME].guiActive = true;
-                                e.Events[UIActionGroupManager.EVENTNAME].active = true;
+                            actionGroupList[i].Events[UIActionGroupManager.EVENTNAME].guiActive = false;
+                            actionGroupList[i].Events[UIActionGroupManager.EVENTNAME].active = false;
+                        }
 
-                                e.ActionGroup = obj.ActionGroup;
-                            }
-                        });
+                        // Show Symmetry selector
+                        if (actionGroupList[i].IsSymmetrySelector)
+                        {
+                            actionGroupList[i].Events[UIActionGroupManager.EVENTNAME].guiActive = true;
+                            actionGroupList[i].Events[UIActionGroupManager.EVENTNAME].active = true;
+
+                            actionGroupList[i].ActionGroup = obj.ActionGroup;
+                        }
+                    }
 
                     IsSymmetryModeVisible = true;
                 }
                 else
                 {
 
-                    actionGroupList.ForEach(
-                        (e) =>
+                    for (int i = 0; i < actionGroupList.Count; i++)
+                    {
+                        if (!actionGroupList[i].Isfolder && !actionGroupList[i].IsSymmetrySelector)
                         {
-                            if (!e.Isfolder && !e.IsSymmetrySelector)
+                            if (currentFolder.Type == UIActionGroupManager.FolderType.General)
                             {
-                                if (currentFolder.Type == UIActionGroupManager.FolderType.General)
-                                {
-                                    e.Events[UIActionGroupManager.EVENTNAME].guiActive = !e.ActionGroup.ToString().Contains("Custom");
-                                    e.Events[UIActionGroupManager.EVENTNAME].active = !e.ActionGroup.ToString().Contains("Custom");
-                                }
-                                else
-                                {
-                                    e.Events[UIActionGroupManager.EVENTNAME].guiActive = e.ActionGroup.ToString().Contains("Custom");
-                                    e.Events[UIActionGroupManager.EVENTNAME].active = e.ActionGroup.ToString().Contains("Custom");
-                                }
+                                actionGroupList[i].Events[UIActionGroupManager.EVENTNAME].guiActive = !actionGroupList[i].ActionGroup.ToString().Contains("Custom");
+                                actionGroupList[i].Events[UIActionGroupManager.EVENTNAME].active = !actionGroupList[i].ActionGroup.ToString().Contains("Custom");
                             }
-
-                            
-                            if (e.IsSymmetrySelector)
+                            else
                             {
-                                e.Events[UIActionGroupManager.EVENTNAME].guiActive = false;
-                                e.Events[UIActionGroupManager.EVENTNAME].active = false;
-
-                                e.ActionGroup = KSPActionGroup.None;
+                                actionGroupList[i].Events[UIActionGroupManager.EVENTNAME].guiActive = actionGroupList[i].ActionGroup.ToString().Contains("Custom");
+                                actionGroupList[i].Events[UIActionGroupManager.EVENTNAME].active = actionGroupList[i].ActionGroup.ToString().Contains("Custom");
                             }
-                        });
+                        }
+
+
+                        if (actionGroupList[i].IsSymmetrySelector)
+                        {
+                            actionGroupList[i].Events[UIActionGroupManager.EVENTNAME].guiActive = false;
+                            actionGroupList[i].Events[UIActionGroupManager.EVENTNAME].active = false;
+
+                            actionGroupList[i].ActionGroup = KSPActionGroup.None;
+                        }
+                    }
 
                     IsSymmetryModeVisible = false;
                     currentActionGroup = null;
@@ -385,46 +383,47 @@ namespace ActionGroupManager.UI
 
         void BaseAction_Clicked(UIBaseActionManager obj)
         {
+            int i;
             if (IsFolderVisible)
             {
                 //Folder already visible, so clean the folders, and redisplay all baseaction
-                foreach (UIActionGroupManager item in actionGroupList)
+                for(i = 0; i < actionGroupList.Count; i++)
                 {
-                    item.Events[UIActionGroupManager.EVENTNAME].guiActive = false;
-                    item.Events[UIActionGroupManager.EVENTNAME].active = false;
-                    item.Current = null;
+                    actionGroupList[i].Events[UIActionGroupManager.EVENTNAME].guiActive = false;
+                    actionGroupList[i].Events[UIActionGroupManager.EVENTNAME].active = false;
+                    actionGroupList[i].Current = null;
                 }
 
-                foreach (UIBaseActionManager item in baseActionList)
+                for (i = 0; i < baseActionList.Count; i++)
                 {
-                    item.Events[UIBaseActionManager.EVENTNAME].guiActive = true;
-                    item.Events[UIBaseActionManager.EVENTNAME].active = true;
+                    baseActionList[i].Events[UIBaseActionManager.EVENTNAME].guiActive = true;
+                    baseActionList[i].Events[UIBaseActionManager.EVENTNAME].active = true;
                 }
 
                 IsFolderVisible = false;
             }
             else
             {
-                foreach (UIBaseActionManager item in baseActionList)
+                for (i = 0; i < baseActionList.Count; i++)
                 {
                     //There is a weird issue, if there is only one action on the part, and so we don't want to hide any other actions
                     //the folder won't show. So a dirty solution is to hide this part when it's the only one.
-                    if (item == obj && baseActionList.Count > 1)
+                    if (baseActionList[i] == obj && baseActionList.Count > 1)
                         continue;
 
-                    item.Events[UIBaseActionManager.EVENTNAME].guiActive = false;
-                    item.Events[UIBaseActionManager.EVENTNAME].active = false;
+                    baseActionList[i].Events[UIBaseActionManager.EVENTNAME].guiActive = false;
+                    baseActionList[i].Events[UIBaseActionManager.EVENTNAME].active = false;
                 }
 
-                foreach (UIActionGroupManager item in actionGroupList)
+                for (i = 0; i < actionGroupList.Count; i++)
                 {
-                    item.Current = obj;
+                    actionGroupList[i].Current = obj;
 
-                    if (!item.Isfolder)
+                    if (!actionGroupList[i].Isfolder)
                         continue;
 
-                    item.Events[UIActionGroupManager.EVENTNAME].guiActive = true;
-                    item.Events[UIActionGroupManager.EVENTNAME].active = true;
+                    actionGroupList[i].Events[UIActionGroupManager.EVENTNAME].guiActive = true;
+                    actionGroupList[i].Events[UIActionGroupManager.EVENTNAME].active = true;
                 }
 
                 IsFolderVisible = true;
@@ -433,31 +432,33 @@ namespace ActionGroupManager.UI
 
         internal void Active(bool active)
         {
+            int i;
             if (active)
             {
-                foreach (UIBaseActionManager man in baseActionList)
+                for (i = 0; i < baseActionList.Count; i++)
                 {
-                    Part.Modules.Add(man);
-                    man.Events[UIBaseActionManager.EVENTNAME].guiActive = true;
-                    man.Events[UIBaseActionManager.EVENTNAME].active = true;
+                    Part.Modules.Add(baseActionList[i]);
+                    baseActionList[i].Events[UIBaseActionManager.EVENTNAME].guiActive = true;
+                    baseActionList[i].Events[UIBaseActionManager.EVENTNAME].active = true;
                 }
-                foreach (UIActionGroupManager item in actionGroupList)
+
+                for (i = 0; i < actionGroupList.Count; i++)
                 {
-                    Part.Modules.Add(item);
-                    item.Events[UIActionGroupManager.EVENTNAME].guiActive = false;
-                    item.Events[UIActionGroupManager.EVENTNAME].active = false;
-                }
+                    Part.Modules.Add(actionGroupList[i]);
+                    actionGroupList[i].Events[UIActionGroupManager.EVENTNAME].guiActive = false;
+                    actionGroupList[i].Events[UIActionGroupManager.EVENTNAME].active = false;
+                } 
             }
             else
             {
-                foreach (UIBaseActionManager man in baseActionList)
+                for (i = 0; i < baseActionList.Count; i++)
                 {
-                    Part.Modules.Remove(man);
+                    Part.Modules.Remove(actionGroupList[i]);
                 }
 
-                foreach (UIActionGroupManager item in actionGroupList)
+                for (i = 0; i < actionGroupList.Count; i++)
                 {
-                    Part.Modules.Remove(item);
+                    Part.Modules.Remove(actionGroupList[i]);
                 }
 
                 IsActionGroupsVisible = false;
@@ -472,14 +473,15 @@ namespace ActionGroupManager.UI
         {
             if (IsActive)
             {
-                foreach (PartModule mod in baseActionList)
+                int i;
+                for (i = 0; i < baseActionList.Count; i++)
                 {
-                    Part.RemoveModule(mod);
+                    Part.RemoveModule(baseActionList[i]);
                 }
 
-                foreach (PartModule mod in actionGroupList)
+                for (i = 0; i < actionGroupList.Count; i++)
                 {
-                    Part.RemoveModule(mod);
+                    Part.RemoveModule(baseActionList[i]);
                 }
 
                 IsActive = false;
@@ -516,16 +518,18 @@ namespace ActionGroupManager.UI
         {
             Debug.Log("AGM : Setup root !");
 
+            int i, j;
             if (!VesselManager.Instance.ActiveVessel.rootPart.Modules.Contains("UIRootManager"))
             {
                 rootManager = VesselManager.Instance.ActiveVessel.rootPart.AddModule("UIRootManager") as UIRootManager;
             }
             else
             {
-                foreach (PartModule item in VesselManager.Instance.ActiveVessel.rootPart.Modules)
+                PartModuleList list = VesselManager.Instance.ActiveVessel.rootPart.Modules;
+                for(i = 0; i < list.Count; i++)
                 {
-                    if (item is UIRootManager)
-                        rootManager = item as UIRootManager;
+                    if (list[i] is UIRootManager)
+                        rootManager = list[i] as UIRootManager;
                 }
 
                 rootManager.SwitchName();
@@ -533,22 +537,23 @@ namespace ActionGroupManager.UI
             }
 
             //Case of docked vessel : Remove other Root manager
-            foreach (Part p in VesselManager.Instance.ActiveVessel.Parts)
+            List<Part> pList = VesselManager.Instance.ActiveVessel.Parts;
+            for (i = 0; i < pList.Count; i++)
             {
-                if (p == VesselManager.Instance.ActiveVessel.rootPart)
+                if (pList[i] == VesselManager.Instance.ActiveVessel.rootPart)
                     continue;
 
-                if (p.Modules.Contains("UIRootManager"))
+                if (pList[i].Modules.Contains("UIRootManager"))
                 {
                     PartModule toRemove = null;
-                    foreach (PartModule mod in p.Modules)
+                    for (j = 0; j < pList[i].Modules.Count; j++)
                     {
-                        if (mod is UIRootManager)
-                            toRemove = mod;
+                        if (pList[i].Modules[j] is UIRootManager)
+                            toRemove = pList[i].Modules[j];
                     }
 
                     if (toRemove != null)
-                        p.RemoveModule(toRemove);
+                        pList[i].RemoveModule(toRemove);
                 }
             }
 
@@ -621,9 +626,13 @@ namespace ActionGroupManager.UI
 
         public override void Terminate()
         {
-            foreach (KeyValuePair<Part, UIPartManager> pair in cache)
+            for(int i=0; i < cache.Count; i ++)
+            //foreach (KeyValuePair<Part, UIPartManager> pair in cache)
             {
-                pair.Value.Terminate();
+                    Part[] keys = new Part[cache.Count];
+                    cache.Keys.CopyTo(keys, 0);
+                    cache[keys[i]].Terminate();
+                //pair.Value.Terminate();
             }
 
             GameEvents.onPartActionUICreate.Remove(new EventData<Part>.OnEvent(OnPartActionUICreate));

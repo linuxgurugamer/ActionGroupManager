@@ -45,6 +45,7 @@ namespace ActionGroupManager
                 Debug.Log("AGM : Action Group Manager is awake.");
 #endif
             GameEvents.onHideUI.Add(HideUI);
+            GameEvents.onGameSceneSwitchRequested.Add(ResetWindows);
         }
 
         void Start()
@@ -104,22 +105,28 @@ namespace ActionGroupManager
                 (o as IButtonBar).SwitchTexture(val);
         }
 
+        // Clears out old windows without forcing them to hide permanently
+        public void ResetWindows(GameEvents.FromToAction<GameScenes, GameScenes> e)
+        {
+            if (e.from == GameScenes.FLIGHT && e.to != GameScenes.FLIGHT)
+            {
+                UiObject o;
+                if (UiList.TryGetValue(UiType.Recap, out o))
+                    (o as UiObject).SetVisible(false);
+
+                if (UiList.TryGetValue(UiType.Settings, out o))
+                    (o as UiObject).SetVisible(false);
+
+                if (UiList.TryGetValue(UiType.Main, out o))
+                    (o as UiObject).SetVisible(false);
+            }
+        }
+
         public void HideUI()
         {
             ShowMainWindow = false;
             ShowSettings = false;
             ShowRecapWindow = false;
-            /*
-            UiObject o;
-            if (UiList.TryGetValue(UiType.Recap, out o))
-                (o as UiObject).SetVisible(false);
-
-            if (UiList.TryGetValue(UiType.Settings, out o))
-                (o as UiObject).SetVisible(false);
-
-            if (UiList.TryGetValue(UiType.Main, out o))
-                (o as UiObject).SetVisible(false);
-            */
         }
 
         public void OnGUI()

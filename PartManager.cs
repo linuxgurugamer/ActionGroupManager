@@ -9,7 +9,6 @@ namespace ActionGroupManager
      * GetCurrentParts return always the current filtered data. 
      */
 
-    //TODO: Optimize this class for Unity (remove Linq/foreach)
     class PartFilter
     {
         VesselManager manager;
@@ -89,6 +88,7 @@ namespace ActionGroupManager
             {
                 returnPart.Clear();
 
+
                 IEnumerable<Part> baseList = manager.GetParts();
 
                 if (CurrentPartCategory != PartCategories.none)
@@ -102,17 +102,24 @@ namespace ActionGroupManager
 
                 if (CurrentStage != int.MinValue)
                     baseList = baseList.Where(FilterStage);
+
+                // TODO: Remove Linq
+                // This filter code breaks the search bar. 
+                // There must be a better way than Linq.
+                // It becomes so slow it loses focus constantly on large craft.
+
                 /*
+
+                List<Part> baseList = manager.GetParts();
+                List<Part> filteredList = new List<Part>();
+
                 if (CurrentPartCategory != PartCategories.none)
                 {
-                    List<Part> filteredList = new List<Part>();
+                    filteredList.Clear();
                     for (int i = 0; i < baseList.Count; i++)
-                    {
                         if (FilterCategory(baseList[i]))
-                        {
                             filteredList.Add(baseList[i]);
-                        }
-                    }
+
                     baseList = filteredList;
                 }
 
@@ -120,41 +127,32 @@ namespace ActionGroupManager
 
                 if (CurrentActionGroup != KSPActionGroup.None)
                 {
-                    List<Part> filteredList = new List<Part>();
+                    filteredList.Clear();
                     for (int i = 0; i < baseList.Count; i++)
-                    {
                         if (FilterActionGroup(baseList[i]))
-                        {
                             filteredList.Add(baseList[i]);
-                        }
-                    }
+
                     baseList = filteredList;
                 }
 
 
                 if (CurrentSearch != string.Empty)
                 {
-                    List<Part> filteredList = new List<Part>();
+                    filteredList.Clear();
                     for (int i = 0; i < baseList.Count; i++)
-                    {
                         if (FilterString(baseList[i]))
-                        {
                             filteredList.Add(baseList[i]);
-                        }
-                    }
+
                     baseList = filteredList;
                 }
 
                 if (CurrentStage != int.MinValue)
                 {
-                    List<Part> filteredList = new List<Part>();
+                    filteredList.Clear();
                     for (int i = 0; i < baseList.Count; i++)
-                    {
                         if (FilterStage(baseList[i]))
-                        {
                             filteredList.Add(baseList[i]);
-                        }
-                    }
+
                     baseList = filteredList;
                 }
                 */
@@ -173,18 +171,15 @@ namespace ActionGroupManager
 
         bool FilterActionGroup(Part p)
         {
-            foreach (BaseAction ba in p.Actions)
-                if (ba.IsInActionGroup(CurrentActionGroup))
+            int i, j;
+            for(i = 0; i < p.Actions.Count; i++)
+                if (p.Actions[i].IsInActionGroup(CurrentActionGroup))
                     return true;
-            foreach (PartModule pm in p.Modules)
-            {
-                foreach (BaseAction ba in pm.Actions)
-                {
-                    if (ba.IsInActionGroup(CurrentActionGroup))
+            
+            for(i = 0; i < p.Modules.Count; i++)
+                for(j = 0; j < p.Modules[i].Actions.Count; j++)
+                    if (p.Modules[i].Actions[j].IsInActionGroup(CurrentActionGroup))
                         return true;
-                }
-
-            }
 
             return false;
         }
@@ -202,20 +197,16 @@ namespace ActionGroupManager
         public List<KSPActionGroup> GetActionGroupAttachedToPart(Part p)
         {
             List<KSPActionGroup> ret = new List<KSPActionGroup>();
-            foreach (KSPActionGroup ag in Enum.GetValues(typeof(KSPActionGroup)))
+            KSPActionGroup[] ag = Enum.GetValues(typeof(KSPActionGroup)) as KSPActionGroup[];
+            int i, j, k;
+            for (i = 0; i < ag.Length; i++)
             {
-                if (ag == KSPActionGroup.None)
+                if (ag[i] == KSPActionGroup.None)
                     continue;
-
-                foreach (PartModule mod in p.Modules)
-                {
-                    foreach (BaseAction ba in mod.Actions)
-                    {
-                        if (ba.IsInActionGroup(ag) && !ret.Contains(ag))
-                            ret.Add(ag);
-                    }
-
-                }
+                for(j = 0; j < p.Modules.Count; j++)
+                    for(k = 0; k < p.Modules[j].Actions.Count; k++)
+                        if (p.Modules[j].Actions[k].IsInActionGroup(ag[i]) && !ret.Contains(ag[i]))
+                            ret.Add(ag[i]);
             }
 
             return ret;
@@ -223,23 +214,20 @@ namespace ActionGroupManager
      
         public List<BaseAction> GetBaseActionAttachedToActionGroup(KSPActionGroup ag)
         {
-            IEnumerable<Part> parts = manager.GetParts();
+            List<Part> parts = manager.GetParts();
 
             List<BaseAction> ret = new List<BaseAction>();
-            foreach (Part p in parts)
-            {
-                foreach (BaseAction ba in p.Actions)
-                    if (ba.IsInActionGroup(ag))
-                        ret.Add(ba);
-                foreach (PartModule pm in p.Modules)
-                {
-                    foreach (BaseAction ba in pm.Actions)
-                    {
-                        if (ba.IsInActionGroup(ag))
-                            ret.Add(ba);
-                    }
+            int i, j, k;
+            for (i = 0; i < parts.Count; i++)
+            { 
+                for(j = 0; j < parts[i].Actions.Count; j++)
+                    if (parts[i].Actions[j].IsInActionGroup(ag))
+                        ret.Add(parts[i].Actions[j]);
 
-                }
+                for(j = 0; j < parts[i].Modules.Count; j++)
+                    for(k = 0; k < parts[i].Modules[j].Actions.Count; k++)
+                        if (parts[i].Modules[j].Actions[k].IsInActionGroup(ag))
+                            ret.Add(parts[i].Modules[j].Actions[k]);
             }
             return ret;
         }
@@ -250,15 +238,14 @@ namespace ActionGroupManager
             {
                 dic = new SortedList<PartCategories, int>();
 
-                foreach (PartCategories item in Enum.GetValues(typeof(PartCategories)))
-                {
-                    dic.Add(item, 0);
-                }
+                int i;
+                PartCategories[] pc = Enum.GetValues(typeof(PartCategories)) as PartCategories[];
+                for (i = 0; i < pc.Length; i++)
+                    dic.Add(pc[i], 0);
 
-                foreach (Part p in manager.GetParts())
-                {
-                    dic[p.partInfo.category] += 1;
-                }
+                List<Part> p = manager.GetParts();
+                for (i = 0; i < p.Count; i++)
+                    dic[p[i].partInfo.category] += 1;
             }
             return dic;
         }

@@ -11,7 +11,7 @@
 * Fixed incorrect text on the "Use Text Action Groups" button
 * Fixed version checking which had an incorrect check URL
 * Added Changelog to the version checking system
-* Removed unused "Propulsion" category (this exists in KSP's library for some reason)
+* Removed unused "Propulsion" category that exists in KSP's enumeration
 * Minor GUI enhancments
 * More Large Code Optimizations
 
