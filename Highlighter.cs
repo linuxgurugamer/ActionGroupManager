@@ -4,7 +4,6 @@ namespace ActionGroupManager
 {
     class Highlighter
     {
-        private readonly Color highlightColor = new Color(1, 0.64f, 0);
         List<Part> internalHighlight;
         
         public Highlighter()
@@ -16,7 +15,7 @@ namespace ActionGroupManager
         {
             for(int i = 0; i < internalHighlight.Count; i++)
             {
-                internalHighlight[i].SetHighlightColor(highlightColor);
+                internalHighlight[i].SetHighlightColor(Style.ksp_orange);
                 internalHighlight[i].SetHighlight(true, false);
             }
         }
@@ -27,7 +26,7 @@ namespace ActionGroupManager
                 return;
 
             internalHighlight.Add(p);
-            p.highlightColor = highlightColor;
+            p.highlightColor = Style.ksp_orange;
             p.SetHighlight(true, false);
         }
 

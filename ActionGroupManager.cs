@@ -62,15 +62,11 @@ namespace ActionGroupManager
             {
                 // Blizzy's Toolbar support
                 UiList.Add(UiType.Icon, new Toolbar(main));
-                //if (!SettingsManager.Settings.GetValue<bool>(SettingsManager.HideListIcon))
-                    //UiList.Add(UiType.RecapIcon, new ToolbarRecap());
             }
             else
             {
                 // Stock Application Launcher
                 UiList.Add(UiType.Icon, new AppLauncher(main));
-                //if (!SettingsManager.Settings.GetValue<bool>(SettingsManager.HideListIcon))
-                    //UiList.Add(UiType.RecapIcon, new AppLauncherRecap());
             }
 
             main.SetVisible(SettingsManager.Settings.GetValue<bool>(SettingsManager.IsMainWindowVisible));

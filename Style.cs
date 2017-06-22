@@ -7,6 +7,7 @@ namespace ActionGroupManager
         public static readonly Color ksp_cream = new Color(0.96f, 0.92f, 0.81f);
         public static readonly Color ksp_offwhite = new Color(0.75f, 0.77f, 0.69f);
         public static readonly Color ksp_orange = new Color(1f, 0.70f, 0);
+        public static readonly Color orange = new Color(1, 0.64f, 0);
 
         static readonly GUISkin UnitySkin = GUI.skin;
         public static GUIStyle ScrollViewStyle;
