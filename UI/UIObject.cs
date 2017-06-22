@@ -1,7 +1,7 @@
 ﻿namespace ActionGroupManager.UI
 {
     //Interface for all UI object
-    abstract class UiObject
+    public abstract class UiObject
     {
         bool visible;
 

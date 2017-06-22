@@ -1,11 +1,13 @@
 ﻿Version 2.x.x - Future Release
-* Add support for Career mode limitations
-* Add Unity Skin option
+* Add support for Career mode limitations (optional)
+* Add Unity Skin (optional)
 * Add new flags and icons
 * Add auto-size to Recap window
+* Add toolbar/launcher button for Recap window (optional)
 * Add localization support
-* Moved "Order by Parts" option to the main UI
-* Move Symmetry Linked parts button now indicated how many symmetry linked parts there are
+* Moved "Order by Stage" option to the main UI
+* "Move Symmetry Linked parts" button now indicates how many symmetry linked parts there are
+* Renamed "Recap" to "Action Group List"
 * Font Rework on KSP Visual Style to match modern KSP
 * Fixed bug where most of the UI would be disabled if a craft had nothing in the coupling category
 * Fixed incorrect text on the "Use Text Action Groups" button

@@ -1,6 +1,6 @@
 ﻿namespace ActionGroupManager.UI.ButtonBar
 {
-    interface IButtonBar
+    public interface IButtonBar
     {
         void SwitchTexture(bool vis);
     }

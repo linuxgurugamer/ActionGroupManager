@@ -27,6 +27,7 @@ namespace ActionGroupManager
             Main,
             Tweakable,
             Icon,
+            RecapIcon,
             Settings,
             Recap
         }
@@ -58,11 +59,19 @@ namespace ActionGroupManager
             UiList.Add(UiType.Tweakable, new TweakableUi());
 
             if (ToolbarManager.ToolbarAvailable)
+            {
                 // Blizzy's Toolbar support
                 UiList.Add(UiType.Icon, new Toolbar(main));
+                //if (!SettingsManager.Settings.GetValue<bool>(SettingsManager.HideListIcon))
+                    //UiList.Add(UiType.RecapIcon, new ToolbarRecap());
+            }
             else
+            {
                 // Stock Application Launcher
                 UiList.Add(UiType.Icon, new AppLauncher(main));
+                //if (!SettingsManager.Settings.GetValue<bool>(SettingsManager.HideListIcon))
+                    //UiList.Add(UiType.RecapIcon, new AppLauncherRecap());
+            }
 
             main.SetVisible(SettingsManager.Settings.GetValue<bool>(SettingsManager.IsMainWindowVisible));
 
@@ -75,6 +84,21 @@ namespace ActionGroupManager
 
         void Update()
         {
+            
+            if (!SettingsManager.Settings.GetValue<bool>(SettingsManager.HideListIcon) && !UiList.ContainsKey(UiType.RecapIcon))
+            {
+                if(ToolbarManager.ToolbarAvailable)
+                    UiList.Add(UiType.RecapIcon, new ToolbarRecap());
+                else
+                    UiList.Add(UiType.RecapIcon, new AppLauncherRecap());
+            }
+            else if (SettingsManager.Settings.GetValue<bool>(SettingsManager.HideListIcon) && UiList.ContainsKey(UiType.RecapIcon))
+            {
+                UiList[UiType.RecapIcon].SetVisible(false);
+                UiList[UiType.RecapIcon].Terminate();
+                UiList.Remove(UiType.RecapIcon);
+            }
+
             if (ShowSettings && !UiList.ContainsKey(UiType.Settings))
             {
                 UiList.Add(UiType.Settings, new SettingsUi(true));

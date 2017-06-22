@@ -69,7 +69,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="UI\ButtonBar\AppLauncher.cs" />
+    <Compile Include="UI\ButtonBar\AppLauncherRecap.cs" />
     <Compile Include="UI\ButtonBar\IButtonBar.cs" />
+    <Compile Include="UI\ButtonBar\ToolBarRecap.cs" />
     <Compile Include="UI\ButtonBar\ToolbarWrapper.cs" />
     <Compile Include="UI\TweakableUi.cs" />
     <Compile Include="BaseActionManager.cs" />
@@ -101,6 +103,18 @@
     <None Include="Resources\IconsMaster.pdn" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Resources\ToolbarListOff.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Resources\ToolbarListOn.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Resources\AppLauncherListOff.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Resources\AppLauncherListOn.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <Content Include="Resources\AppLauncherOn.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

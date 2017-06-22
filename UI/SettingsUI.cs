@@ -32,9 +32,16 @@ namespace ActionGroupManager.UI
             GUILayout.BeginVertical();
             GUILayout.Label(Localizer.GetStringByTag("#autoLOC_AGM_057") + " " + Assembly.GetAssembly(typeof(ActionGroupManager)).GetName().Version.ToString(), Style.LabelExpandStyle);
 
+            bool initial = SettingsManager.Settings.GetValue<bool>(SettingsManager.HideListIcon);
+            bool  final = GUILayout.Toggle(initial, Localizer.GetStringByTag("#autoLOC_AGM_065"), Style.ButtonToggleStyle);
+            if (final != initial)
+            {
+                SettingsManager.Settings.SetValue(SettingsManager.HideListIcon, final);
+            }
+
             GUILayout.Label(Localizer.GetStringByTag("#autoLOC_AGM_058"));
-            bool initial = SettingsManager.Settings.GetValue<bool>(SettingsManager.DisableCareer);
-            bool final = GUILayout.Toggle(initial, Localizer.GetStringByTag("#autoLOC_AGM_060"), Style.ButtonToggleStyle);
+            initial = SettingsManager.Settings.GetValue<bool>(SettingsManager.DisableCareer);
+            final = GUILayout.Toggle(initial, Localizer.GetStringByTag("#autoLOC_AGM_060"), Style.ButtonToggleStyle);
             if (final != initial)
             {
                 SettingsManager.Settings.SetValue(SettingsManager.DisableCareer, final);

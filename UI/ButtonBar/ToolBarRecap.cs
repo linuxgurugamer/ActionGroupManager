@@ -3,25 +3,20 @@ using KSP.Localization;
 
 namespace ActionGroupManager.UI.ButtonBar
 {
-    class Toolbar : UiObject, IButtonBar
+    class ToolbarRecap : UiObject, IButtonBar
     {
         IButton mainButton;
         readonly string mainPath = ActionGroupManager.ModPath + "Resources/";
-        readonly string onButton = "ToolbarOn";
-        readonly string offButton = "ToolbarOff";
-        UiObject controlled;
+        readonly string onButton = "ToolbarListOn";
+        readonly string offButton = "ToolbarListOff";
 
-        public Toolbar(params object[] list)
+        public ToolbarRecap(params object[] list)
         {
-            if (list != null && list[0] != null)
-            {
-                controlled = list[0] as UiObject;
-            }
-            mainButton = ToolbarManager.Instance.add("AGM", "AGMMainSwitch");
-            string str = SettingsManager.Settings.GetValue<bool>( SettingsManager.IsMainWindowVisible, true) ? 
+            mainButton = ToolbarManager.Instance.add("AGMRecap", "AGMRecapSwitch");
+            string str = SettingsManager.Settings.GetValue<bool>(SettingsManager.IsMainWindowVisible, true) ?
                 mainPath + onButton :
                 mainPath + offButton;
-            mainButton.ToolTip = Localizer.GetStringByTag("#autoLOC_AGM_004");
+            mainButton.ToolTip = Localizer.GetStringByTag("#autoLOC_AGM_003");
 
             mainButton.TexturePath = str;
 
@@ -32,8 +27,8 @@ namespace ActionGroupManager.UI.ButtonBar
                 {
                     if (e.MouseButton == 0)
                     {
-                        controlled.SetVisible(!controlled.IsVisible());
-                        mainButton.TexturePath = controlled.IsVisible() ? mainPath + onButton : mainPath + offButton;
+                        ActionGroupManager.Manager.ShowRecapWindow = !ActionGroupManager.Manager.ShowRecapWindow;
+                        mainButton.TexturePath = ActionGroupManager.Manager.ShowRecapWindow ? mainPath + onButton : mainPath + offButton;
                     }
                 };
 

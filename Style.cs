@@ -4,6 +4,10 @@ namespace ActionGroupManager
 {
     static class Style
     {
+        public static readonly Color ksp_cream = new Color(0.96f, 0.92f, 0.81f);
+        public static readonly Color ksp_offwhite = new Color(0.75f, 0.77f, 0.69f);
+        public static readonly Color ksp_orange = new Color(1f, 0.70f, 0);
+
         static readonly GUISkin UnitySkin = GUI.skin;
         public static GUIStyle ScrollViewStyle;
         public static GUIStyle ScrollTextStyle;
@@ -17,6 +21,7 @@ namespace ActionGroupManager
         public static GUIStyle ButtonArrowStyle;
         public static GUIStyle ButtonIconStyle;
         public static GUIStyle ButtonPartStyle;
+        public static GUIStyle ButtonPartCondensedStyle;
 
         public static GUIStyle LabelExpandStyle;
 
@@ -55,21 +60,19 @@ namespace ActionGroupManager
             ScrollTextStyle = new GUIStyle(BaseSkin.label);
             if (!UseUnitySkin)
             {
-                Color c = new Color(0.75f, 0.77f, 0.69f);
-                ScrollTextStyle.normal.textColor = c;
-                ScrollTextStyle.hover.textColor = c;
-                ScrollTextStyle.active.textColor = c;
-                ScrollTextStyle.focused.textColor = c;
+                ScrollTextStyle.normal.textColor = ksp_offwhite;
+                ScrollTextStyle.hover.textColor = ksp_offwhite;
+                ScrollTextStyle.active.textColor = ksp_offwhite;
+                ScrollTextStyle.focused.textColor = ksp_offwhite;
             }
 
             ScrollTextEmphasisStyle = new GUIStyle(BaseSkin.label);
             if (!UseUnitySkin)
             {
-                Color c = new Color(1f, 0.70f, 0);
-                ScrollTextEmphasisStyle.normal.textColor = c;
-                ScrollTextEmphasisStyle.hover.textColor = c;
-                ScrollTextEmphasisStyle.active.textColor = c;
-                ScrollTextEmphasisStyle.focused.textColor = c;
+                ScrollTextEmphasisStyle.normal.textColor = ksp_orange;
+                ScrollTextEmphasisStyle.hover.textColor = ksp_orange;
+                ScrollTextEmphasisStyle.active.textColor = ksp_orange;
+                ScrollTextEmphasisStyle.focused.textColor = ksp_orange;
             }
             CloseButtonStyle = new GUIStyle(BaseSkin.button);
             CloseButtonStyle.margin = new RectOffset(3, 3, 3, 3);
@@ -92,6 +95,10 @@ namespace ActionGroupManager
             ButtonPartStyle.margin = new RectOffset(BaseSkin.button.margin.left, BaseSkin.button.margin.right, 5, 5);
             ButtonPartStyle.fontSize = 12;
 
+            ButtonPartCondensedStyle = new GUIStyle(ButtonPartStyle);
+            ButtonPartCondensedStyle.fontSize = 10;
+            ButtonPartStyle.clipping = TextClipping.Clip;
+
             LabelExpandStyle = new GUIStyle(ScrollTextStyle);
             LabelExpandStyle.alignment = TextAnchor.MiddleCenter;
             LabelExpandStyle.stretchWidth = true;
@@ -103,20 +110,17 @@ namespace ActionGroupManager
                 ButtonEmphasisToggle.fontStyle = FontStyle.Bold;
             else
             {
-                Color focused = new Color(0.96f, 0.92f, 0.81f);
-                Color normal = new Color(0.75f, 0.77f, 0.69f);
-                //Color c = new Color(1f, 0.70f, 0);
                 ButtonEmphasisToggle.font = Font.CreateDynamicFontFromOSFont("Arial Black", 14);
                 
-                ButtonEmphasisToggle.normal.textColor = normal;
-                ButtonEmphasisToggle.active.textColor = focused ;
-                ButtonEmphasisToggle.focused.textColor = focused;
-                ButtonEmphasisToggle.hover.textColor = focused;
+                ButtonEmphasisToggle.normal.textColor = ksp_offwhite;
+                ButtonEmphasisToggle.active.textColor = ksp_cream ;
+                ButtonEmphasisToggle.focused.textColor = ksp_cream;
+                ButtonEmphasisToggle.hover.textColor = ksp_cream;
 
-                ButtonEmphasisToggle.onNormal.textColor = normal;
-                ButtonEmphasisToggle.onActive.textColor = focused;
-                ButtonEmphasisToggle.onFocused.textColor = focused;
-                ButtonEmphasisToggle.onHover.textColor = focused;
+                ButtonEmphasisToggle.onNormal.textColor = ksp_offwhite;
+                ButtonEmphasisToggle.onActive.textColor = ksp_cream;
+                ButtonEmphasisToggle.onFocused.textColor = ksp_cream;
+                ButtonEmphasisToggle.onHover.textColor = ksp_cream;
             }
 
             ButtonStrongEmphasisToggleStyle = new GUIStyle(ButtonToggleStyle);

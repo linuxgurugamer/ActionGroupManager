@@ -102,8 +102,9 @@ namespace ActionGroupManager.UI
 
             int size = Style.UseUnitySkin ? 10 : 20;
             // Window Buttons
-            if (GUI.Button(new Rect(mainWindowSize.width - 66, 4, size, size), NewGuiContent(Localizer.GetStringByTag("#autoLOC_AGM_151"), Localizer.GetStringByTag("#autoLOC_AGM_100")), Style.CloseButtonStyle))
-                ActionGroupManager.Manager.ShowRecapWindow = !ActionGroupManager.Manager.ShowRecapWindow;
+            if(SettingsManager.Settings.GetValue<bool>(SettingsManager.HideListIcon))
+                if (GUI.Button(new Rect(mainWindowSize.width - 66, 4, size, size), NewGuiContent(Localizer.GetStringByTag("#autoLOC_AGM_151"), Localizer.GetStringByTag("#autoLOC_AGM_100")), Style.CloseButtonStyle))
+                    ActionGroupManager.Manager.ShowRecapWindow = !ActionGroupManager.Manager.ShowRecapWindow;
             if (GUI.Button(new Rect(mainWindowSize.width - 45, 4, size, size), NewGuiContent(Localizer.GetStringByTag("#autoLOC_AGM_152"), Localizer.GetStringByTag("#autoLOC_AGM_101")), Style.CloseButtonStyle))
                 ActionGroupManager.Manager.ShowSettings = !ActionGroupManager.Manager.ShowSettings;
             if (GUI.Button(new Rect(mainWindowSize.width - 24, 4, size, size), NewGuiContent(Localizer.GetStringByTag("#autoLOC_AGM_153"), Localizer.GetStringByTag("#autoLOC_AGM_102")), Style.CloseButtonStyle))
@@ -293,7 +294,7 @@ namespace ActionGroupManager.UI
             List<Part> list;
             highlighter.Update();
             bool orderByStage = SettingsManager.Settings.GetValue<bool>(SettingsManager.OrderByStage);
-            partsList = GUILayout.BeginScrollView(partsList, Style.ScrollViewStyle, GUILayout.Width(275)); // Begin Parts List
+            partsList = GUILayout.BeginScrollView(partsList, Style.ScrollViewStyle, GUILayout.Width(285)); // Begin Parts List
             GUILayout.BeginVertical(); // Begin Parts List
 
             bool final = GUILayout.Toggle(orderByStage, Localizer.GetStringByTag("#autoLOC_AGM_052"), Style.ButtonEmphasisToggle);
@@ -361,7 +362,7 @@ namespace ActionGroupManager.UI
                 initial = list[i] == currentSelectedPart;
                 str = list[i].partInfo.title;
 
-                final = GUILayout.Toggle(initial, str, Style.ButtonPartStyle);
+                final = GUILayout.Toggle(initial, str, str.Length > 32 ? Style.ButtonPartCondensedStyle : Style.ButtonPartStyle);
                 if (initial != final)
                 {
                     if (final)
@@ -525,7 +526,7 @@ namespace ActionGroupManager.UI
             if (classicView)
                 actionList = GUILayout.BeginScrollView(actionList, Style.ScrollViewStyle);  // Begin Actions List (Classic View)
             else
-                actionList = GUILayout.BeginScrollView(actionList, Style.ScrollViewStyle, GUILayout.Width(275)); // Begin Actions List (New View)
+                actionList = GUILayout.BeginScrollView(actionList, Style.ScrollViewStyle, GUILayout.Width(285)); // Begin Actions List (New View)
 
             GUILayout.BeginVertical(); // Begin Actions List
 
