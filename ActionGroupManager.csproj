@@ -115,6 +115,7 @@
     <None Include="Resources\AppLauncherListOn.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="Localization\es-es.cfg" />
     <Content Include="Resources\AppLauncherOn.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
