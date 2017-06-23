@@ -2,6 +2,7 @@
 using UnityEngine;
 using ActionGroupManager.UI;
 using ActionGroupManager.UI.ButtonBar;
+using KSP.Localization;
 
 namespace ActionGroupManager
 {
@@ -47,6 +48,9 @@ namespace ActionGroupManager
 #endif
             GameEvents.onHideUI.Add(HideUI);
             GameEvents.onGameSceneSwitchRequested.Add(ResetWindows);
+#if DEBUG
+            //Localizer.SwitchToLanguage("en-us");
+#endif
         }
 
         void Start()
@@ -73,9 +77,9 @@ namespace ActionGroupManager
 
             ShowRecapWindow = SettingsManager.Settings.GetValue<bool>(SettingsManager.IsRecapWindowVisible, false);
 
-            #if DEBUG
+#if DEBUG
                 Debug.Log("AGM : Action Group Manager has started.");
-            #endif
+#endif
         }      
 
         void Update()
@@ -112,6 +116,10 @@ namespace ActionGroupManager
             }
             else if (!ShowRecapWindow && UiList.ContainsKey(UiType.Recap))
             {
+                UiObject b;
+                if (UiList.TryGetValue(UiType.RecapIcon, out b))
+                    (b as IButtonBar).SwitchTexture(false);
+
                 UiList[UiType.Recap].SetVisible(false);
                 UiList[UiType.Recap].Terminate();
                 UiList.Remove(UiType.Recap);
@@ -171,9 +179,9 @@ namespace ActionGroupManager
 
             VesselManager.Terminate();
 
-            #if DEBUG
+#if DEBUG
                 Debug.Log("AGM : Terminated.");
-            #endif
+#endif
         }
     }
 }
