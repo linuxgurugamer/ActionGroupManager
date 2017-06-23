@@ -99,6 +99,8 @@
     <None Include="Localization\en-us.cfg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="Resources\AGMFlagMaster.pdn" />
+    <None Include="Resources\AGMInstructiosnMaster.pdn" />
     <None Include="Resources\ButtonMaster.pdn" />
     <None Include="Resources\IconsMaster.pdn" />
   </ItemGroup>
