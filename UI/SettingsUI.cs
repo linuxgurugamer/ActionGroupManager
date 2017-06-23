@@ -93,7 +93,7 @@ namespace ActionGroupManager.UI
 
         public SettingsUi(bool visible)
         {
-            settingsWindowPositon = new Rect(Screen.width / 2f - 100, Screen.height / 2f - 100, 250, 150);
+            settingsWindowPositon = new Rect(Screen.width / 2f - 100, Screen.height / 2f - 100, 275, 150);
             SetVisible(visible);
         }
 
