@@ -28,8 +28,7 @@ namespace ActionGroupManager.UI
             if (!IsVisible() || PauseMenu.isOpen || FlightResultsDialog.isDisplaying)
                 return;
 
-            //GUI.skin = Style.BaseSkin;
-            recapWindowSize = GUILayout.Window(this.GetHashCode(), recapWindowSize, new GUI.WindowFunction(DoMyRecapView), Localizer.GetStringByTag("#autoLOC_AGM_003"), Style.BaseSkin.window, GUILayout.Width(250));
+            recapWindowSize = GUILayout.Window(this.GetHashCode(), recapWindowSize, new GUI.WindowFunction(DoMyRecapView), Localizer.GetStringByTag("#autoLOC_AGM_003"), Style.Window, GUILayout.Width(250));
 
         }
 
@@ -38,13 +37,13 @@ namespace ActionGroupManager.UI
             List<KSPActionGroup> actionGroups;
             List<BaseAction> baseActions;
             int size = Style.UseUnitySkin ? 10 : 20;
-            if (GUI.Button(new Rect(recapWindowSize.width - 24, 4, size, size), new GUIContent(Localizer.GetStringByTag("#autoLOC_AGM_153"), Localizer.GetStringByTag("#autoLOC_AGM_102")), Style.CloseButtonStyle))
+            if (GUI.Button(new Rect(recapWindowSize.width - 24, 4, size, size), new GUIContent(Localizer.GetStringByTag("#autoLOC_AGM_153"), Localizer.GetStringByTag("#autoLOC_AGM_102")), Style.CloseButton))
             {
                 ActionGroupManager.Manager.ShowRecapWindow = false;
                 return;
             }
 
-            recapWindowScrollposition = GUILayout.BeginScrollView(recapWindowScrollposition, Style.ScrollViewStyle);
+            recapWindowScrollposition = GUILayout.BeginScrollView(recapWindowScrollposition, Style.ScrollView);
             GUILayout.BeginVertical();
             int listCount = 0;
             actionGroups = VesselManager.Instance.AllActionGroups;
@@ -57,7 +56,7 @@ namespace ActionGroupManager.UI
                 if (baseActions.Count > 0)
                 {
                     listCount += 1;  // Size for title
-                    GUILayout.Label(actionGroups[i].displayDescription() + " :", Style.ScrollTextEmphasisStyle);
+                    GUILayout.Label(actionGroups[i].displayDescription() + " :", Style.ScrollTextEmphasis);
 
 
                     SortedList<string, int> dic = new SortedList<string, int>();
@@ -82,7 +81,7 @@ namespace ActionGroupManager.UI
                         string str = dic.Keys[j];
                         if (dic[str] > 1)
                             str += " * " + dic[str];
-                        GUILayout.Label(str, Style.ScrollTextStyle);
+                        GUILayout.Label(str, Style.ScrollText);
                         GUILayout.EndHorizontal();
                     }
                 }

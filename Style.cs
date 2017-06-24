@@ -9,22 +9,21 @@ namespace ActionGroupManager
         public static readonly Color ksp_orange = new Color(1f, 0.70f, 0);
         public static readonly Color orange = new Color(1, 0.64f, 0);
 
-        static readonly GUISkin UnitySkin = GUI.skin;
-        public static GUIStyle ScrollViewStyle;
-        public static GUIStyle ScrollTextStyle;
-        public static GUIStyle ScrollTextEmphasisStyle;
-        public static GUIStyle CloseButtonStyle;
-        //public static GUIStyle ButtonToggleYellowStyle;
-        //public static GUIStyle ButtonToggleGreenStyle;
-        public static GUIStyle ButtonStrongEmphasisToggleStyle;
-        public static GUIStyle ButtonEmphasisToggle;
-        public static GUIStyle ButtonToggleStyle;
-        public static GUIStyle ButtonArrowStyle;
-        public static GUIStyle ButtonIconStyle;
-        public static GUIStyle ButtonPartStyle;
-        public static GUIStyle ButtonPartCondensedStyle;
-
-        public static GUIStyle LabelExpandStyle;
+        //static readonly GUISkin UnitySkin = GUI.skin;
+        public static GUIStyle Window;
+        public static GUIStyle ScrollView;
+        public static GUIStyle Label;
+        public static GUIStyle ScrollText;
+        public static GUIStyle ScrollTextEmphasis;
+        public static GUIStyle CloseButton;
+        public static GUIStyle ButtonStrongEmphasis;
+        public static GUIStyle ButtonEmphasis;
+        public static GUIStyle Button;
+        public static GUIStyle ButtonArrow;
+        public static GUIStyle ButtonIcon;
+        public static GUIStyle ButtonPart;
+        public static GUIStyle ButtonPartCondensed;
+        public static GUIStyle LabelExpand;
 
         public static bool UseUnitySkin = SettingsManager.Settings.GetValue<bool>("UseUnitySkin");
 
@@ -36,134 +35,94 @@ namespace ActionGroupManager
 
         static Style()
         {
-            if (SettingsManager.Settings.GetValue<bool>("UseUnitySkin"))
+            if (UseUnitySkin)
                 BaseSkin = GUI.skin;
             else
                 BaseSkin = HighLogic.Skin;
 
+            Window = new GUIStyle(BaseSkin.window);
             if(!UseUnitySkin)
-            {
-                BaseSkin.label.font = Font.CreateDynamicFontFromOSFont("Verdana", 12);
-                BaseSkin.label.fontStyle = FontStyle.Bold;
-                BaseSkin.label.normal.textColor = Color.white;
-                BaseSkin.label.hover.textColor = Color.white;
-                BaseSkin.label.active.textColor = Color.white;
-                BaseSkin.label.focused.textColor = Color.white;
+                Window.font = Font.CreateDynamicFontFromOSFont("Arial Black", 12);
 
-                BaseSkin.button.font = Font.CreateDynamicFontFromOSFont("Arial", 12);
-                BaseSkin.window.font = Font.CreateDynamicFontFromOSFont("Arial Black", 12);
-            }
-           
-            ScrollViewStyle = new GUIStyle(BaseSkin.scrollView);
-            ScrollViewStyle.padding = new RectOffset(1, 1, 1, 1);
+            ScrollView = new GUIStyle(BaseSkin.scrollView);
+            ScrollView.padding = new RectOffset(1, 1, 1, 1);
 
-
-            ScrollTextStyle = new GUIStyle(BaseSkin.label);
+            #region Label Styles
+            Label = new GUIStyle(BaseSkin.label);
             if (!UseUnitySkin)
             {
-                ScrollTextStyle.normal.textColor = ksp_offwhite;
-                ScrollTextStyle.hover.textColor = ksp_offwhite;
-                ScrollTextStyle.active.textColor = ksp_offwhite;
-                ScrollTextStyle.focused.textColor = ksp_offwhite;
+                Label.font = Font.CreateDynamicFontFromOSFont("Verdana", 12);
+                Label.fontStyle = FontStyle.Bold;
+                Label.normal.textColor = Label.hover.textColor = 
+                    Label.active.textColor = Label.focused.textColor = Color.white;
             }
 
-            ScrollTextEmphasisStyle = new GUIStyle(BaseSkin.label);
+            ScrollText = new GUIStyle(Label);
             if (!UseUnitySkin)
             {
-                ScrollTextEmphasisStyle.normal.textColor = ksp_orange;
-                ScrollTextEmphasisStyle.hover.textColor = ksp_orange;
-                ScrollTextEmphasisStyle.active.textColor = ksp_orange;
-                ScrollTextEmphasisStyle.focused.textColor = ksp_orange;
+                ScrollText.normal.textColor = ScrollText.hover.textColor =
+                    ScrollText.active.textColor = ScrollText.focused.textColor = ksp_offwhite;
+            }
+
+            ScrollTextEmphasis = new GUIStyle(Label);
+            if (!UseUnitySkin)
+            {
+                ScrollTextEmphasis.normal.textColor = ScrollTextEmphasis.hover.textColor =
+                    ScrollTextEmphasis.active.textColor = ScrollTextEmphasis.focused.textColor = ksp_orange;
             }
             else
             {
-                ScrollTextEmphasisStyle.fontStyle = FontStyle.Bold;
+                ScrollTextEmphasis.fontStyle = FontStyle.Bold;
             }
-            CloseButtonStyle = new GUIStyle(BaseSkin.button);
-            CloseButtonStyle.margin = new RectOffset(3, 3, 3, 3);
 
-            ButtonToggleStyle = new GUIStyle(BaseSkin.button);
-            ButtonToggleStyle.margin = new RectOffset(BaseSkin.button.margin.left, BaseSkin.button.margin.right, 5, 5);
-            ButtonToggleStyle.fixedHeight = 25f;
+            LabelExpand = new GUIStyle(ScrollText);
+            LabelExpand.alignment = TextAnchor.MiddleCenter;
+            LabelExpand.stretchWidth = true;
+            #endregion
 
-            ButtonArrowStyle = new GUIStyle(ButtonToggleStyle);
-            ButtonArrowStyle.fixedWidth = 25f;
-            ButtonArrowStyle.fontSize = 10;
-            ButtonArrowStyle.alignment = TextAnchor.MiddleCenter;
+            #region Button Styles
+            Button = new GUIStyle(BaseSkin.button);
+            Button.margin = new RectOffset(BaseSkin.button.margin.left, BaseSkin.button.margin.right, 5, 5);
+            Button.fixedHeight = 25f;
+            if (!UseUnitySkin)
+                Button.font = Font.CreateDynamicFontFromOSFont("Arial", 12);
 
-            ButtonIconStyle = new GUIStyle(BaseSkin.button);
-            ButtonIconStyle.margin = new RectOffset(BaseSkin.button.margin.left, BaseSkin.button.margin.right, 5, 5);
-            ButtonIconStyle.fixedHeight = 40f;
-            ButtonIconStyle.fixedWidth = 40f;
+            CloseButton = new GUIStyle(BaseSkin.button);
+            CloseButton.margin = new RectOffset(3, 3, 3, 3);
 
-            ButtonPartStyle = new GUIStyle(ButtonToggleStyle);
-            ButtonPartStyle.margin = new RectOffset(BaseSkin.button.margin.left, BaseSkin.button.margin.right, 5, 5);
-            ButtonPartStyle.fontSize = 12;
+            ButtonIcon = new GUIStyle(BaseSkin.button);
+            ButtonIcon.margin = new RectOffset(BaseSkin.button.margin.left, BaseSkin.button.margin.right, 5, 5);
+            ButtonIcon.fixedHeight = ButtonIcon.fixedWidth = 40f;
 
-            ButtonPartCondensedStyle = new GUIStyle(ButtonPartStyle);
-            ButtonPartCondensedStyle.fontSize = 10;
-            ButtonPartStyle.clipping = TextClipping.Clip;
+            ButtonArrow = new GUIStyle(Button);
+            ButtonArrow.fixedWidth = 25f;
+            ButtonArrow.fontSize = 10;
+            ButtonArrow.alignment = TextAnchor.MiddleCenter;
 
-            LabelExpandStyle = new GUIStyle(ScrollTextStyle);
-            LabelExpandStyle.alignment = TextAnchor.MiddleCenter;
-            LabelExpandStyle.stretchWidth = true;
+            ButtonPart = new GUIStyle(Button);
+            ButtonPart.margin = new RectOffset(BaseSkin.button.margin.left, BaseSkin.button.margin.right, 5, 5);
+            ButtonPart.fontSize = 12;
 
+            ButtonPartCondensed = new GUIStyle(ButtonPart);
+            ButtonPartCondensed.fontSize = 10;
+            ButtonPart.clipping = TextClipping.Clip;
 
-
-            ButtonEmphasisToggle = new GUIStyle(ButtonToggleStyle);
+            ButtonEmphasis = new GUIStyle(Button);
             if (UseUnitySkin)
-                ButtonEmphasisToggle.fontStyle = FontStyle.Bold;
+                ButtonEmphasis.fontStyle = FontStyle.Bold;
             else
             {
-                ButtonEmphasisToggle.font = Font.CreateDynamicFontFromOSFont("Arial Black", 14);
-                
-                ButtonEmphasisToggle.normal.textColor = ksp_offwhite;
-                ButtonEmphasisToggle.active.textColor = ksp_cream ;
-                ButtonEmphasisToggle.focused.textColor = ksp_cream;
-                ButtonEmphasisToggle.hover.textColor = ksp_cream;
-
-                ButtonEmphasisToggle.onNormal.textColor = ksp_offwhite;
-                ButtonEmphasisToggle.onActive.textColor = ksp_cream;
-                ButtonEmphasisToggle.onFocused.textColor = ksp_cream;
-                ButtonEmphasisToggle.onHover.textColor = ksp_cream;
+                ButtonEmphasis.font = Font.CreateDynamicFontFromOSFont("Arial Black", 14);
+                ButtonEmphasis.normal.textColor = ButtonEmphasis.onNormal.textColor = ksp_offwhite;
+                ButtonEmphasis.active.textColor = ButtonEmphasis.focused.textColor = ButtonEmphasis.hover.textColor = 
+                    ButtonEmphasis.onActive.textColor = ButtonEmphasis.onFocused.textColor = ButtonEmphasis.onHover.textColor = ksp_cream;
             }
 
-            ButtonStrongEmphasisToggleStyle = new GUIStyle(ButtonToggleStyle);
-            if (UseUnitySkin)
-                ButtonStrongEmphasisToggleStyle.fontStyle = FontStyle.Bold;
-            ButtonStrongEmphasisToggleStyle.normal.textColor = Color.red;
-            ButtonStrongEmphasisToggleStyle.active.textColor = Color.red;
-            ButtonStrongEmphasisToggleStyle.focused.textColor = Color.red;
-            ButtonStrongEmphasisToggleStyle.hover.textColor = Color.red;
-
-            ButtonStrongEmphasisToggleStyle.onNormal.textColor = Color.red;
-            ButtonStrongEmphasisToggleStyle.onActive.textColor = Color.red;
-            ButtonStrongEmphasisToggleStyle.onFocused.textColor = Color.red;
-            ButtonStrongEmphasisToggleStyle.onHover.textColor = Color.red;
-
-            /*
-                ButtonToggleYellowStyle = new GUIStyle(ButtonToggleStyle);
-                ButtonToggleYellowStyle.normal.textColor = Color.yellow;
-                ButtonToggleYellowStyle.active.textColor = Color.yellow;
-                ButtonToggleYellowStyle.focused.textColor = Color.yellow;
-                ButtonToggleYellowStyle.hover.textColor = Color.yellow;
-
-                ButtonToggleYellowStyle.onNormal.textColor = Color.yellow;
-                ButtonToggleYellowStyle.onActive.textColor = Color.yellow;
-                ButtonToggleYellowStyle.onFocused.textColor = Color.yellow;
-                ButtonToggleYellowStyle.onHover.textColor = Color.yellow;
-
-                ButtonToggleGreenStyle = new GUIStyle(ButtonToggleStyle);
-                ButtonToggleGreenStyle.normal.textColor = Color.green;
-                ButtonToggleGreenStyle.active.textColor = Color.green;
-                ButtonToggleGreenStyle.focused.textColor = Color.green;
-                ButtonToggleGreenStyle.hover.textColor = Color.green;
-
-                ButtonToggleGreenStyle.onNormal.textColor = Color.green;
-                ButtonToggleGreenStyle.onActive.textColor = Color.green;
-                ButtonToggleGreenStyle.onFocused.textColor = Color.green;
-                ButtonToggleGreenStyle.onHover.textColor = Color.green;
-            */
+            ButtonStrongEmphasis = new GUIStyle(ButtonEmphasis);
+            ButtonStrongEmphasis.normal.textColor = ButtonStrongEmphasis.active.textColor = ButtonStrongEmphasis.focused.textColor =
+                ButtonStrongEmphasis.hover.textColor = ButtonStrongEmphasis.onNormal.textColor = ButtonStrongEmphasis.onActive.textColor = 
+                ButtonStrongEmphasis.onFocused.textColor = ButtonStrongEmphasis.onHover.textColor = Color.red;
+#endregion
         }
     }
 }
