@@ -28,7 +28,7 @@ namespace ActionGroupManager.UI
             if (!IsVisible() || PauseMenu.isOpen || FlightResultsDialog.isDisplaying)
                 return;
 
-            GUI.skin = Style.BaseSkin;
+            //GUI.skin = Style.BaseSkin;
             recapWindowSize = GUILayout.Window(this.GetHashCode(), recapWindowSize, new GUI.WindowFunction(DoMyRecapView), Localizer.GetStringByTag("#autoLOC_AGM_003"), Style.BaseSkin.window, GUILayout.Width(250));
 
         }

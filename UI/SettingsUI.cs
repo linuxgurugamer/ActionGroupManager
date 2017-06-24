@@ -17,8 +17,8 @@ namespace ActionGroupManager.UI
                 return;
             }
 
-            GUI.skin = Style.BaseSkin;
-            settingsWindowPositon = GUILayout.Window(this.GetHashCode(), settingsWindowPositon, DoMySettingsView, Localizer.GetStringByTag("#autoLOC_AGM_002"));
+            //GUI.skin = Style.BaseSkin;
+            settingsWindowPositon = GUILayout.Window(this.GetHashCode(), settingsWindowPositon, DoMySettingsView, Localizer.GetStringByTag("#autoLOC_AGM_002"), Style.BaseSkin.window);
         }
 
         void DoMySettingsView(int id)
@@ -39,7 +39,7 @@ namespace ActionGroupManager.UI
                 SettingsManager.Settings.SetValue(SettingsManager.HideListIcon, final);
             }
 
-            GUILayout.Label(Localizer.GetStringByTag("#autoLOC_AGM_058"));
+            GUILayout.Label(Localizer.GetStringByTag("#autoLOC_AGM_058"), Style.BaseSkin.label);  // autoLoc = Requires Return to Space Center :
             initial = SettingsManager.Settings.GetValue<bool>(SettingsManager.DisableCareer);
             final = GUILayout.Toggle(initial, Localizer.GetStringByTag("#autoLOC_AGM_060"), Style.ButtonToggleStyle);
             if (final != initial)
@@ -78,7 +78,7 @@ namespace ActionGroupManager.UI
                 if (final) SettingsManager.Settings.SetValue(SettingsManager.ClassicView, false);
             }
 
-            GUILayout.Label(Localizer.GetStringByTag("#autoLOC_AGM_059"));
+            GUILayout.Label(Localizer.GetStringByTag("#autoLOC_AGM_059"), Style.BaseSkin.label); // autoLoc = Requires Restart :
             initial = SettingsManager.Settings.GetValue<bool>(SettingsManager.UseUnitySkin);
             final = GUILayout.Toggle(initial, Localizer.GetStringByTag("#autoLOC_AGM_064"), Style.ButtonToggleStyle);
             if (final != initial)

@@ -84,7 +84,7 @@ namespace ActionGroupManager.UI
             if (!IsVisible() || PauseMenu.isOpen || FlightResultsDialog.isDisplaying)
                 return;
 
-            GUI.skin = Style.BaseSkin;
+            if(!Style.UseUnitySkin) GUI.skin = HighLogic.Skin;
             mainWindowSize = GUILayout.Window(GetHashCode(), mainWindowSize, DrawMainView, Localizer.Format(Localizer.GetStringByTag("#autoLOC_AGM_001"), VesselManager.Instance.ActiveVessel.GetName()), Style.BaseSkin.window);
         }
 
@@ -138,9 +138,9 @@ namespace ActionGroupManager.UI
 
             // Tooltip Label
             if(Style.UseUnitySkin)
-                GUILayout.Label(GUI.tooltip);
+                GUILayout.Label(GUI.tooltip, Style.BaseSkin.label);
             else
-                GUILayout.Label(GUI.tooltip, GUILayout.Height(15));
+                GUILayout.Label(GUI.tooltip, Style.BaseSkin.label, GUILayout.Height(15));
             GUI.DragWindow();
         }
 
@@ -156,7 +156,7 @@ namespace ActionGroupManager.UI
             if (rowView)
                 GUILayout.BeginHorizontal();  // Begin First Row of Category Buttons (Classic View)
             else
-                GUILayout.Label(Localizer.GetStringByTag("#autoLOC_AGM_050"));
+                GUILayout.Label(Localizer.GetStringByTag("#autoLOC_AGM_050"), Style.BaseSkin.label); // autoLoc = Category Filter
 
             // Begin constructing buttons
             for (int i = 0; i < partCounts.Count; i++)
@@ -297,7 +297,7 @@ namespace ActionGroupManager.UI
             partsList = GUILayout.BeginScrollView(partsList, Style.ScrollViewStyle, GUILayout.Width(285)); // Begin Parts List
             GUILayout.BeginVertical(); // Begin Parts List
 
-            bool final = GUILayout.Toggle(orderByStage, Localizer.GetStringByTag("#autoLOC_AGM_052"), Style.ButtonEmphasisToggle);
+            bool final = GUILayout.Toggle(orderByStage, Localizer.GetStringByTag("#autoLOC_AGM_052"), Style.ButtonEmphasisToggle);  // autoLoc = Sort Parts By Stage
             if (final != orderByStage)
             {
                 SettingsManager.Settings.SetValue(SettingsManager.OrderByStage, final);
@@ -533,12 +533,10 @@ namespace ActionGroupManager.UI
             // Add the Remove All Button
             if (currentSelectedBaseAction.Count > 0)
             {
-                
-                
-                    GUILayout.Space(Style.BaseSkin.verticalScrollbar.margin.left);
+                GUILayout.Space(Style.BaseSkin.verticalScrollbar.margin.left);
                 str = confirmDelete ? 
-                    Localizer.Format(Localizer.GetStringByTag("#autoLOC_AGM_054"), currentSelectedActionGroup.displayDescription()) : 
-                    Localizer.Format(Localizer.GetStringByTag("#autoLOC_AGM_053"), currentSelectedActionGroup.displayDescription());
+                Localizer.Format(Localizer.GetStringByTag("#autoLOC_AGM_054"), currentSelectedActionGroup.displayDescription()) : 
+                Localizer.Format(Localizer.GetStringByTag("#autoLOC_AGM_053"), currentSelectedActionGroup.displayDescription());
 
                 if ((disableCareer || (!currentSelectedActionGroup.ToString().Contains("Custom") && CareerLevel > 0f) || (CareerLevel > 0.5f)))
                 {
@@ -650,9 +648,9 @@ namespace ActionGroupManager.UI
         private void DrawSearch()
         {
             GUILayout.BeginHorizontal();
-            GUILayout.Label(Localizer.GetStringByTag("#autoLOC_AGM_051"));
+            GUILayout.Label(Localizer.GetStringByTag("#autoLOC_AGM_051"), Style.BaseSkin.label); // autoLoc = Part Search :
             GUILayout.Space(5);
-            string searchString = GUILayout.TextField(partFilter.CurrentSearch);
+            string searchString = GUILayout.TextField(partFilter.CurrentSearch, Style.BaseSkin.textField);
             if (partFilter.CurrentSearch != searchString)
                 OnUpdate(FilterModification.Search, searchString);
 

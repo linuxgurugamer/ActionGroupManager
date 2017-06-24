@@ -1,4 +1,10 @@
-﻿Version 2.1.0 - June 22, 2017
+﻿Version 2.1.1 - xxxx
+* Add Spanish localization dictionary
+* Slightly widen settings window for Spanish localization
+* Fix and issue where the AG List icon wouldn't change if closed from the window
+* Fix an issue where AGM styles were bleeding over to other mods (like KER)
+
+Version 2.1.0 - June 22, 2017
 * Add support for Career mode limitations (optional)
 * Add Unity Skin (optional)
 * Add new flags and icons

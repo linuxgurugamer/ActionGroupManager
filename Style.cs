@@ -30,17 +30,17 @@ namespace ActionGroupManager
 
         public static GUISkin BaseSkin
         {
-            get
-            {
-                if(UseUnitySkin)
-                    return UnitySkin;
-                else
-                    return HighLogic.Skin;
-            }
+            get;
+            private set;
         }
 
         static Style()
         {
+            if (SettingsManager.Settings.GetValue<bool>("UseUnitySkin"))
+                BaseSkin = GUI.skin;
+            else
+                BaseSkin = HighLogic.Skin;
+
             if(!UseUnitySkin)
             {
                 BaseSkin.label.font = Font.CreateDynamicFontFromOSFont("Verdana", 12);
@@ -53,10 +53,10 @@ namespace ActionGroupManager
                 BaseSkin.button.font = Font.CreateDynamicFontFromOSFont("Arial", 12);
                 BaseSkin.window.font = Font.CreateDynamicFontFromOSFont("Arial Black", 12);
             }
-
-            
+           
             ScrollViewStyle = new GUIStyle(BaseSkin.scrollView);
             ScrollViewStyle.padding = new RectOffset(1, 1, 1, 1);
+
 
             ScrollTextStyle = new GUIStyle(BaseSkin.label);
             if (!UseUnitySkin)
@@ -74,6 +74,10 @@ namespace ActionGroupManager
                 ScrollTextEmphasisStyle.hover.textColor = ksp_orange;
                 ScrollTextEmphasisStyle.active.textColor = ksp_orange;
                 ScrollTextEmphasisStyle.focused.textColor = ksp_orange;
+            }
+            else
+            {
+                ScrollTextEmphasisStyle.fontStyle = FontStyle.Bold;
             }
             CloseButtonStyle = new GUIStyle(BaseSkin.button);
             CloseButtonStyle.margin = new RectOffset(3, 3, 3, 3);
