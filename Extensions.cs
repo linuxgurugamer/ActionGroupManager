@@ -9,7 +9,7 @@ namespace ActionGroupManager
     {
         static Dictionary<KSPActionGroup, string> abbreviations = new Dictionary<KSPActionGroup, string>()
         {
-            {KSPActionGroup.None, "None"},
+            //{KSPActionGroup.None, "None"},
             {KSPActionGroup.Stage, Localizer.GetStringByTag("#autoLOC_AGM_200")},
             {KSPActionGroup.Gear, Localizer.GetStringByTag("#autoLOC_AGM_201")},
             {KSPActionGroup.Light, Localizer.GetStringByTag("#autoLOC_AGM_202")},
@@ -28,31 +28,31 @@ namespace ActionGroupManager
             {KSPActionGroup.Custom09, "09"},
             {KSPActionGroup.Custom10, "10"},
         };
-
+        /*
         static Dictionary<PartCategories, string> categoryIcons = new Dictionary<PartCategories, string>()
         {
-            {PartCategories.none, "None"},
-            {PartCategories.Aero, "R&D_node_icon_stability"},
-            {PartCategories.Communication, "R&D_node_icon_advunmanned"},
-            {PartCategories.Control, "R&D_node_icon_flightcontrol"},
-            {PartCategories.Coupling, "R&D_node_icon_advconstruction"},
-            {PartCategories.Electrical, "R&D_node_icon_electrics"},
-            {PartCategories.Engine, "R&D_node_icon_generalrocketry"},
-            {PartCategories.FuelTank, "RDicon_fuelSystems-advanced"},
-            {PartCategories.Ground, "R&D_node_icon_advlanding"},
-            {PartCategories.Payload, "R&D_node_icon_composites"},
-            {PartCategories.Pods, "RDicon_commandmodules"},
-            {PartCategories.Propulsion, "RDicon_propulsionSystems"},
-            {PartCategories.Science, "R&D_node_icon_advsciencetech"},
-            {PartCategories.Structural, "R&D_node_icon_generalconstruction"},
-            {PartCategories.Thermal, "fuels_solidfuel"},
-            {PartCategories.Utility, "R&D_node_icon_generic"}
+            //{PartCategories.none, "None"},
+            {PartCategories.Aero, ActionGroupManager.ModPath + "Resources/Aero"},
+            {PartCategories.Communication,  ActionGroupManager.ModPath + "Resources/Communication"},
+            {PartCategories.Control, ActionGroupManager.ModPath + "Resources/Control"},
+            {PartCategories.Coupling, ActionGroupManager.ModPath + "Resources/Coupling"},
+            {PartCategories.Electrical, ActionGroupManager.ModPath + "Resources/Electrical"},
+            {PartCategories.Engine, ActionGroupManager.ModPath + "Resources/Engine"},
+            {PartCategories.FuelTank, ActionGroupManager.ModPath + "Resources/FuelTank"},
+            {PartCategories.Ground, ActionGroupManager.ModPath + "Resources/Ground"},
+            {PartCategories.Payload, ActionGroupManager.ModPath + "Resources/Payload"},
+            {PartCategories.Pods, ActionGroupManager.ModPath + "Resources/Pods"},
+            //{PartCategories.Propulsion, "Squad/PartList/SimpleIcons/RDicon_propulsionSystems"},
+            {PartCategories.Science, ActionGroupManager.ModPath + "Resources/Science"},
+            {PartCategories.Structural, "Squad/PartList/SimpleIcons/R&D_node_icon_generalconstruction"},
+            {PartCategories.Thermal, ActionGroupManager.ModPath + "Resources/Thermal"},
+            {PartCategories.Utility, ActionGroupManager.ModPath + "Resources/Utility"}
 
-        };
+        };*/
 
         static Dictionary<KSPActionGroup, string> actionGroupIcons = new Dictionary<KSPActionGroup, string>()
         {
-            {KSPActionGroup.None, "None"},
+            //{KSPActionGroup.None, "None"},
             {KSPActionGroup.Stage, ActionGroupManager.ModPath + "Resources/Stage"},
             {KSPActionGroup.Gear, ActionGroupManager.ModPath + "Resources/Gear"},
             {KSPActionGroup.Light, ActionGroupManager.ModPath + "Resources/Light"},
@@ -69,13 +69,13 @@ namespace ActionGroupManager
             {KSPActionGroup.Custom07, "Squad/PartList/SimpleIcons/number7"},
             {KSPActionGroup.Custom08, "Squad/PartList/SimpleIcons/number8"},
             {KSPActionGroup.Custom09, "Squad/PartList/SimpleIcons/number9"},
-            {KSPActionGroup.Custom10, ActionGroupManager.ModPath + "Resources/number0"}
+            {KSPActionGroup.Custom10, ActionGroupManager.ModPath + "Resources/Custom10"}
 
         };
 
         public static Texture GetIcon(this PartCategories c)
         {
-            return GameDatabase.Instance.GetTexture("Squad/PartList/SimpleIcons/" + categoryIcons[c], false);
+            return GameDatabase.Instance.GetTexture(ActionGroupManager.ModPath + "Resources/" + c.ToString(), false);
         }
 
         public static Texture GetIcon(this KSPActionGroup ag)
