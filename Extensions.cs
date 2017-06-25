@@ -10,23 +10,23 @@ namespace ActionGroupManager
         static Dictionary<KSPActionGroup, string> abbreviations = new Dictionary<KSPActionGroup, string>()
         {
             //{KSPActionGroup.None, "None"},
-            {KSPActionGroup.Stage, Localizer.GetStringByTag("#autoLOC_AGM_200")},
-            {KSPActionGroup.Gear, Localizer.GetStringByTag("#autoLOC_AGM_201")},
-            {KSPActionGroup.Light, Localizer.GetStringByTag("#autoLOC_AGM_202")},
-            {KSPActionGroup.RCS, Localizer.GetStringByTag("#autoLOC_AGM_203")},
-            {KSPActionGroup.SAS, Localizer.GetStringByTag("#autoLOC_AGM_204")},
-            {KSPActionGroup.Brakes, Localizer.GetStringByTag("#autoLOC_AGM_205")},
-            {KSPActionGroup.Abort, Localizer.GetStringByTag("#autoLOC_AGM_206") },
-            {KSPActionGroup.Custom01, "01"},
-            {KSPActionGroup.Custom02, "02"},
-            {KSPActionGroup.Custom03, "03"},
-            {KSPActionGroup.Custom04, "04"},
-            {KSPActionGroup.Custom05, "05"},
-            {KSPActionGroup.Custom06, "06"},
-            {KSPActionGroup.Custom07, "07"},
-            {KSPActionGroup.Custom08, "08"},
-            {KSPActionGroup.Custom09, "09"},
-            {KSPActionGroup.Custom10, "10"},
+            {KSPActionGroup.Stage, "#autoLOC_AGM_200"},
+            {KSPActionGroup.Gear, "#autoLOC_AGM_201"},
+            {KSPActionGroup.Light, "#autoLOC_AGM_202"},
+            {KSPActionGroup.RCS, "#autoLOC_AGM_203"},
+            {KSPActionGroup.SAS, "#autoLOC_AGM_204"},
+            {KSPActionGroup.Brakes, "#autoLOC_AGM_205"},
+            {KSPActionGroup.Abort, "#autoLOC_AGM_206"},
+            {KSPActionGroup.Custom01, "#autoLOC_AGM_207"},
+            {KSPActionGroup.Custom02, "#autoLOC_AGM_208"},
+            {KSPActionGroup.Custom03, "#autoLOC_AGM_209"},
+            {KSPActionGroup.Custom04, "#autoLOC_AGM_210"},
+            {KSPActionGroup.Custom05, "#autoLOC_AGM_211"},
+            {KSPActionGroup.Custom06, "#autoLOC_AGM_212"},
+            {KSPActionGroup.Custom07, "#autoLOC_AGM_213"},
+            {KSPActionGroup.Custom08, "#autoLOC_AGM_214"},
+            {KSPActionGroup.Custom09, "#autoLOC_AGM_215"},
+            {KSPActionGroup.Custom10, "#autoLOC_AGM_216"},
         };
 
         public static Texture GetIcon(this PartCategories c)
@@ -41,7 +41,7 @@ namespace ActionGroupManager
 
         public static string ToShortString(this KSPActionGroup ag)
         {
-            return abbreviations[ag];
+            return Localizer.GetStringByTag(abbreviations[ag]);
         }
 
         public static bool IsInActionGroup(this BaseAction bA, KSPActionGroup aG)
