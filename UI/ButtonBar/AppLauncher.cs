@@ -13,15 +13,20 @@ namespace ActionGroupManager.UI.ButtonBar
 
         public AppLauncher(params object[] list)
         {
-            if (mainButton == null)
-            {
-                mainButton = ApplicationLauncher.Instance.AddModApplication(OnClick, OnClick, null, null, null, null,
-                    ApplicationLauncher.AppScenes.FLIGHT, appLauncherButton);
-            }
+            GameEvents.onGUIApplicationLauncherReady.Add(Create);
 
             if (list != null && list[0] != null)
             {
                 controlled = list[0] as UiObject;
+            }
+        }
+
+        private void Create()
+        {
+            if (mainButton == null)
+            {
+                mainButton = ApplicationLauncher.Instance.AddModApplication(OnClick, OnClick, null, null, null, null,
+                    ApplicationLauncher.AppScenes.FLIGHT, appLauncherButton);
             }
         }
 
