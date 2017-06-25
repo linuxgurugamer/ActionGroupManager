@@ -28,50 +28,6 @@ namespace ActionGroupManager
             {KSPActionGroup.Custom09, "09"},
             {KSPActionGroup.Custom10, "10"},
         };
-        /*
-        static Dictionary<PartCategories, string> categoryIcons = new Dictionary<PartCategories, string>()
-        {
-            //{PartCategories.none, "None"},
-            {PartCategories.Aero, ActionGroupManager.ModPath + "Resources/Aero"},
-            {PartCategories.Communication,  ActionGroupManager.ModPath + "Resources/Communication"},
-            {PartCategories.Control, ActionGroupManager.ModPath + "Resources/Control"},
-            {PartCategories.Coupling, ActionGroupManager.ModPath + "Resources/Coupling"},
-            {PartCategories.Electrical, ActionGroupManager.ModPath + "Resources/Electrical"},
-            {PartCategories.Engine, ActionGroupManager.ModPath + "Resources/Engine"},
-            {PartCategories.FuelTank, ActionGroupManager.ModPath + "Resources/FuelTank"},
-            {PartCategories.Ground, ActionGroupManager.ModPath + "Resources/Ground"},
-            {PartCategories.Payload, ActionGroupManager.ModPath + "Resources/Payload"},
-            {PartCategories.Pods, ActionGroupManager.ModPath + "Resources/Pods"},
-            //{PartCategories.Propulsion, "Squad/PartList/SimpleIcons/RDicon_propulsionSystems"},
-            {PartCategories.Science, ActionGroupManager.ModPath + "Resources/Science"},
-            {PartCategories.Structural, "Squad/PartList/SimpleIcons/R&D_node_icon_generalconstruction"},
-            {PartCategories.Thermal, ActionGroupManager.ModPath + "Resources/Thermal"},
-            {PartCategories.Utility, ActionGroupManager.ModPath + "Resources/Utility"}
-
-        };*/
-
-        static Dictionary<KSPActionGroup, string> actionGroupIcons = new Dictionary<KSPActionGroup, string>()
-        {
-            //{KSPActionGroup.None, "None"},
-            {KSPActionGroup.Stage, ActionGroupManager.ModPath + "Resources/Stage"},
-            {KSPActionGroup.Gear, ActionGroupManager.ModPath + "Resources/Gear"},
-            {KSPActionGroup.Light, ActionGroupManager.ModPath + "Resources/Light"},
-            {KSPActionGroup.RCS, ActionGroupManager.ModPath + "Resources/RCS"},
-            {KSPActionGroup.SAS, ActionGroupManager.ModPath + "Resources/SAS"},
-            {KSPActionGroup.Brakes, ActionGroupManager.ModPath + "Resources/Brakes"},
-            {KSPActionGroup.Abort, ActionGroupManager.ModPath + "Resources/Abort"},
-            {KSPActionGroup.Custom01, "Squad/PartList/SimpleIcons/number1"},
-            {KSPActionGroup.Custom02, "Squad/PartList/SimpleIcons/number2"},
-            {KSPActionGroup.Custom03, "Squad/PartList/SimpleIcons/number3"},
-            {KSPActionGroup.Custom04, "Squad/PartList/SimpleIcons/number4"},
-            {KSPActionGroup.Custom05, "Squad/PartList/SimpleIcons/number5"},
-            {KSPActionGroup.Custom06, "Squad/PartList/SimpleIcons/number6"},
-            {KSPActionGroup.Custom07, "Squad/PartList/SimpleIcons/number7"},
-            {KSPActionGroup.Custom08, "Squad/PartList/SimpleIcons/number8"},
-            {KSPActionGroup.Custom09, "Squad/PartList/SimpleIcons/number9"},
-            {KSPActionGroup.Custom10, ActionGroupManager.ModPath + "Resources/Custom10"}
-
-        };
 
         public static Texture GetIcon(this PartCategories c)
         {
@@ -80,7 +36,7 @@ namespace ActionGroupManager
 
         public static Texture GetIcon(this KSPActionGroup ag)
         {
-            return GameDatabase.Instance.GetTexture(actionGroupIcons[ag], false);
+            return GameDatabase.Instance.GetTexture(ActionGroupManager.ModPath + "Resources/" + ag.ToString(), false);
         }
 
         public static string ToShortString(this KSPActionGroup ag)
