@@ -103,60 +103,6 @@ namespace ActionGroupManager
                 if (CurrentStage != int.MinValue)
                     baseList = baseList.Where(FilterStage);
 
-                // TODO: Remove Linq
-                // This filter code breaks the search bar. 
-                // There must be a better way than Linq.
-                // It becomes so slow it loses focus constantly on large craft.
-
-                /*
-
-                List<Part> baseList = manager.GetParts();
-                List<Part> filteredList = new List<Part>();
-
-                if (CurrentPartCategory != PartCategories.none)
-                {
-                    filteredList.Clear();
-                    for (int i = 0; i < baseList.Count; i++)
-                        if (FilterCategory(baseList[i]))
-                            filteredList.Add(baseList[i]);
-
-                    baseList = filteredList;
-                }
-
-
-
-                if (CurrentActionGroup != KSPActionGroup.None)
-                {
-                    filteredList.Clear();
-                    for (int i = 0; i < baseList.Count; i++)
-                        if (FilterActionGroup(baseList[i]))
-                            filteredList.Add(baseList[i]);
-
-                    baseList = filteredList;
-                }
-
-
-                if (CurrentSearch != string.Empty)
-                {
-                    filteredList.Clear();
-                    for (int i = 0; i < baseList.Count; i++)
-                        if (FilterString(baseList[i]))
-                            filteredList.Add(baseList[i]);
-
-                    baseList = filteredList;
-                }
-
-                if (CurrentStage != int.MinValue)
-                {
-                    filteredList.Clear();
-                    for (int i = 0; i < baseList.Count; i++)
-                        if (FilterStage(baseList[i]))
-                            filteredList.Add(baseList[i]);
-
-                    baseList = filteredList;
-                }
-                */
-
                 returnPart.AddRange(baseList);
 
                 Dirty = false;

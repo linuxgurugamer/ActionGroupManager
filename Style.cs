@@ -7,7 +7,9 @@ namespace ActionGroupManager
         public static readonly Color ksp_cream = new Color(0.96f, 0.92f, 0.81f);
         public static readonly Color ksp_offwhite = new Color(0.75f, 0.77f, 0.69f);
         public static readonly Color ksp_orange = new Color(1f, 0.70f, 0);
+        public static readonly Color ksp_gold = new Color(0.99f, 0.85f, 0);
         public static readonly Color orange = new Color(1, 0.64f, 0);
+        public static readonly Color maroon = new Color(0.5f, 0, 0);
 
         //static readonly GUISkin UnitySkin = GUI.skin;
         public static GUIStyle Window;
@@ -121,7 +123,7 @@ namespace ActionGroupManager
             ButtonStrongEmphasis = new GUIStyle(ButtonEmphasis);
             ButtonStrongEmphasis.normal.textColor = ButtonStrongEmphasis.active.textColor = ButtonStrongEmphasis.focused.textColor =
                 ButtonStrongEmphasis.hover.textColor = ButtonStrongEmphasis.onNormal.textColor = ButtonStrongEmphasis.onActive.textColor = 
-                ButtonStrongEmphasis.onFocused.textColor = ButtonStrongEmphasis.onHover.textColor = Color.red;
+                ButtonStrongEmphasis.onFocused.textColor = ButtonStrongEmphasis.onHover.textColor = ksp_gold;
 #endregion
         }
     }
