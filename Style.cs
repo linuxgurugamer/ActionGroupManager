@@ -12,20 +12,9 @@ namespace ActionGroupManager
         public static readonly Color maroon = new Color(0.5f, 0, 0);
 
         //static readonly GUISkin UnitySkin = GUI.skin;
-        public static GUIStyle Window;
-        public static GUIStyle ScrollView;
-        public static GUIStyle Label;
-        public static GUIStyle ScrollText;
-        public static GUIStyle ScrollTextEmphasis;
-        public static GUIStyle CloseButton;
-        public static GUIStyle ButtonStrongEmphasis;
-        public static GUIStyle ButtonEmphasis;
-        public static GUIStyle Button;
-        public static GUIStyle ButtonArrow;
-        public static GUIStyle ButtonIcon;
-        public static GUIStyle ButtonPart;
-        public static GUIStyle ButtonPartCondensed;
-        public static GUIStyle LabelExpand;
+        public static GUIStyle Window, ScrollView, Label, ScrollText, ScrollTextEmphasis, LabelExpand;
+        public static GUIStyle Button, CloseButton, ButtonEmphasis, ButtonStrongEmphasis, ButtonArrow;
+        public static GUIStyle ButtonIcon, ButtonPart, ButtonPartCondensed;
 
         public static bool UseUnitySkin = SettingsManager.Settings.GetValue<bool>("UseUnitySkin");
 

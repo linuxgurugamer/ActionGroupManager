@@ -5,6 +5,11 @@ namespace ActionGroupManager
 {
     static class BaseActionFilter
     {
+        /// <summary>
+        /// Returns a list of base actions that exist for the provided part.
+        /// </summary>
+        /// <param name="part">The part to get base actions from.</param>
+        /// <returns>The base actions available to the part.</returns>
         public static List<BaseAction> FromParts(Part part)
         {
             List<BaseAction> ret = new List<BaseAction>();
@@ -20,6 +25,11 @@ namespace ActionGroupManager
             return ret;
         }
 
+        /// <summary>
+        /// Returns a list of base actions that exist for the provided parts.
+        /// </summary>
+        /// <param name="parts">A list of part to get base actions from.</param>
+        /// <returns>The base actions available to the parts.</returns>
         public static List<BaseAction> FromParts(List<Part> parts)
         {
             List<BaseAction> ret = new List<BaseAction>();
@@ -37,6 +47,12 @@ namespace ActionGroupManager
             return ret;
         }
 
+        /// <summary>
+        /// Returns a list of base actions that exist for the provided parts in the provided action group.
+        /// </summary>
+        /// <param name="parts">A list of part to get base actions from.</param>
+        /// <param name="ag">The action group to filter actions by.</param>
+        /// <returns>The base actions available to the parts that are in the action group.</returns>
         public static List<BaseAction> FromParts(List<Part> parts, KSPActionGroup ag)
         {
             List<BaseAction> list = FromParts(parts);
@@ -48,6 +64,11 @@ namespace ActionGroupManager
             return ret;
         }
 
+        /// <summary>
+        /// Returns a list of action groups that the provided base action belongs to.
+        /// </summary>
+        /// <param name="bA">The base action to find actiong groups for.</param>
+        /// <returns>A list of action groups the base action is assigned to.</returns>
         public static List<KSPActionGroup> GetActionGroupList(BaseAction bA)
         {
             List<KSPActionGroup> ret = new List<KSPActionGroup>();

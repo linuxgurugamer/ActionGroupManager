@@ -2,8 +2,10 @@
 * Add icons similar to the VAB/SPH category icons
 * Converted icons to Direct Draw Surfaces
 * Add Spanish localization dictionary
+* Modify the disable career setting effects to be immediate
 * Fix and issue where the AG List icon wouldn't change if closed from the window button
 * Fix an issue where AGM styles were bleeding over to other mods (like KER)
+* Fix Tweakable Ui not respecting career mode setting
 
 Version 2.1.0 - June 22, 2017
 * Add support for Career mode limitations (optional)

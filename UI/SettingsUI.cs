@@ -31,21 +31,21 @@ namespace ActionGroupManager.UI
             GUILayout.BeginVertical();
             GUILayout.Label(Localizer.GetStringByTag("#autoLOC_AGM_057") + " " + Assembly.GetAssembly(typeof(ActionGroupManager)).GetName().Version.ToString(), Style.LabelExpand);
 
-            bool initial = SettingsManager.Settings.GetValue<bool>(SettingsManager.HideListIcon);
-            bool  final = GUILayout.Toggle(initial, Localizer.GetStringByTag("#autoLOC_AGM_065"), Style.Button);
+            bool initial = SettingsManager.Settings.GetValue<bool>(SettingsManager.DisableCareer);
+            bool final = GUILayout.Toggle(initial, Localizer.GetStringByTag("#autoLOC_AGM_060"), Style.Button);
+            if (final != initial)
+            {
+                SettingsManager.Settings.SetValue(SettingsManager.DisableCareer, final);
+            }
+
+            initial = SettingsManager.Settings.GetValue<bool>(SettingsManager.HideListIcon);
+            final = GUILayout.Toggle(initial, Localizer.GetStringByTag("#autoLOC_AGM_065"), Style.Button);
             if (final != initial)
             {
                 SettingsManager.Settings.SetValue(SettingsManager.HideListIcon, final);
             }
 
             GUILayout.Label(Localizer.GetStringByTag("#autoLOC_AGM_058"), Style.Label);  // autoLoc = Requires Return to Space Center :
-            initial = SettingsManager.Settings.GetValue<bool>(SettingsManager.DisableCareer);
-            final = GUILayout.Toggle(initial, Localizer.GetStringByTag("#autoLOC_AGM_060"), Style.Button);
-            if (final != initial)
-            {
-                SettingsManager.Settings.SetValue(SettingsManager.DisableCareer, final);
-            }
-
             initial = SettingsManager.Settings.GetValue<bool>(SettingsManager.ClassicView);
             final = GUILayout.Toggle(initial, Localizer.GetStringByTag("#autoLOC_AGM_061"), Style.Button);
             if (final != initial)

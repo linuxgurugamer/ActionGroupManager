@@ -25,8 +25,6 @@ namespace ActionGroupManager.UI
         bool classicView = SettingsManager.Settings.GetValue<bool>(SettingsManager.ClassicView);
         bool textCategories = SettingsManager.Settings.GetValue<bool>(SettingsManager.TextCategories);
         bool textActionGroups = SettingsManager.Settings.GetValue<bool>(SettingsManager.TextActionGroups);
-        bool disableCareer = SettingsManager.Settings.GetValue<bool>(SettingsManager.DisableCareer);
-        float CareerLevel = Math.Max(ScenarioUpgradeableFacilities.GetFacilityLevel(SpaceCenterFacility.SpaceplaneHangar), ScenarioUpgradeableFacilities.GetFacilityLevel(SpaceCenterFacility.VehicleAssemblyBuilding));
 
         //Inital window rect
         Rect mainWindowSize;
@@ -54,14 +52,6 @@ namespace ActionGroupManager.UI
 
             partFilter = new PartFilter();
             FilterChanged += partFilter.ViewFilterChanged;
-            GameEvents.OnUpgradeableObjLevelChange.Add(UpgradeBuilding);
-        }
-
-        private void UpgradeBuilding(Upgradeables.UpgradeableObject o, int level)
-        {
-            if(o.GetType() == typeof(Upgradeables.UpgradeableFacility))
-                CareerLevel = Math.Max(ScenarioUpgradeableFacilities.GetFacilityLevel(SpaceCenterFacility.SpaceplaneHangar), ScenarioUpgradeableFacilities.GetFacilityLevel(SpaceCenterFacility.VehicleAssemblyBuilding));
-            SetVisible(false);
         }
 
         private void OnUpdate(FilterModification mod, object o)
@@ -119,7 +109,7 @@ namespace ActionGroupManager.UI
                 GUILayout.BeginHorizontal(); // Begin Collection Area for Scroll Lists (Classic View)
 
             DrawPartsScrollList();
-            GUILayout.Space(10);
+            GUILayout.Space(5);
             DrawActionsScrollList();
 
             if (classicView)
@@ -192,7 +182,7 @@ namespace ActionGroupManager.UI
                     if (partCounts[partCounts.Keys[i]] > 0)
                         buttonText = partCounts[partCounts.Keys[i]].ToString();
 
-                    guiContent = NewGuiContent(buttonText, partCounts.Keys[i].GetIcon(), 
+                    guiContent = NewGuiContent(buttonText, partCounts.Keys[i].GetTexture(), 
                         string.Format(Localizer.Format(Localizer.GetStringByTag("#autoLOC_AGM_103"), partCounts.Keys[i].displayDescription())));
                 }
                 GUI.enabled = (partCounts[partCounts.Keys[i]] > 0);
@@ -263,7 +253,7 @@ namespace ActionGroupManager.UI
                     if (baList.Count > 0)
                         buttonText = baList.Count.ToString();
 
-                    guiContent = NewGuiContent(buttonText, actionGroups[i].GetIcon(),
+                    guiContent = NewGuiContent(buttonText, actionGroups[i].GetTexture(),
                         string.Format(Localizer.Format(Localizer.GetStringByTag("#autoLOC_AGM_104"), actionGroups[i].displayDescription())));
                 }
 
@@ -444,7 +434,7 @@ namespace ActionGroupManager.UI
                         }
                     }
 
-                    if ((disableCareer || (!currentSelectedActionGroup.ToString().Contains("Custom") && CareerLevel > 0f) || (CareerLevel > 0.5f)))
+                    if (currentSelectedActionGroup.Unlocked())
                     {
 
                         // Action Remove Buttons
@@ -452,7 +442,7 @@ namespace ActionGroupManager.UI
                         {
                             if (GUILayout.Button(NewGuiContent(Localizer.GetStringByTag("#autoLOC_AGM_155"), Localizer.GetStringByTag("#autoLOC_AGM_108")), Style.Button, GUILayout.Width(20)))
                             {
-                                baseActions[i].RemoveActionToAnActionGroup(currentSelectedActionGroup);
+                                baseActions[i].RemoveFromActionGroup(currentSelectedActionGroup);
                                 currentSelectedBaseAction.Remove(baseActions[i]);
                                 listIsDirty = true;
                             }
@@ -466,11 +456,11 @@ namespace ActionGroupManager.UI
                                     symmetryActions = BaseActionFilter.FromParts(currentSelectedPart.symmetryCounterparts);
                                     for (int j = 0; j < symmetryActions.Count; j++)
                                     {
-                                        symmetryActions[j].RemoveActionToAnActionGroup(currentSelectedActionGroup);
+                                        symmetryActions[j].RemoveFromActionGroup(currentSelectedActionGroup);
                                         if (symmetryActions[j].name == baseActions[i].name && currentSelectedBaseAction.Contains(symmetryActions[j]))
                                             currentSelectedBaseAction.Remove(symmetryActions[j]);
                                     }
-                                    baseActions[i].RemoveActionToAnActionGroup(currentSelectedActionGroup);
+                                    baseActions[i].RemoveFromActionGroup(currentSelectedActionGroup);
                                     currentSelectedBaseAction.Remove(baseActions[i]);
                                     listIsDirty = true;
                                 }
@@ -482,7 +472,7 @@ namespace ActionGroupManager.UI
                             if (GUILayout.Button(NewGuiContent(Localizer.GetStringByTag("#autoLOC_AGM_156"), Localizer.GetStringByTag("#autoLOC_AGM_110")), Style.Button, GUILayout.Width(20)))
                             {
                                 currentSelectedBaseAction.Add(baseActions[i]);
-                                baseActions[i].AddActionToAnActionGroup(currentSelectedActionGroup);
+                                baseActions[i].AddToActionGroup(currentSelectedActionGroup);
                                 listIsDirty = true;
                             }
 
@@ -492,7 +482,7 @@ namespace ActionGroupManager.UI
                                 if (GUILayout.Button(NewGuiContent(Localizer.GetStringByTag("#autoLOC_AGM_156") + (currentSelectedPart.symmetryCounterparts.Count + 1).ToString(),
                                     Localizer.GetStringByTag("#autoLOC_AGM_111")), Style.Button, GUILayout.Width(25)))
                                 {
-                                    baseActions[i].AddActionToAnActionGroup(currentSelectedActionGroup);
+                                    baseActions[i].AddToActionGroup(currentSelectedActionGroup);
                                     if (!currentSelectedBaseAction.Contains(baseActions[i]))
                                         currentSelectedBaseAction.Add(baseActions[i]);
 
@@ -502,7 +492,7 @@ namespace ActionGroupManager.UI
                                         if (symmetryActions[j].name == baseActions[i].name && !currentSelectedBaseAction.Contains(symmetryActions[j]))
                                         {
                                             currentSelectedBaseAction.Add(symmetryActions[j]);
-                                            symmetryActions[j].AddActionToAnActionGroup(currentSelectedActionGroup);
+                                            symmetryActions[j].AddToActionGroup(currentSelectedActionGroup);
                                         }
                                     }
                                     listIsDirty = true;
@@ -538,7 +528,7 @@ namespace ActionGroupManager.UI
                 Localizer.Format(Localizer.GetStringByTag("#autoLOC_AGM_054"), currentSelectedActionGroup.displayDescription()) : 
                 Localizer.Format(Localizer.GetStringByTag("#autoLOC_AGM_053"), currentSelectedActionGroup.displayDescription());
 
-                if ((disableCareer || (!currentSelectedActionGroup.ToString().Contains("Custom") && CareerLevel > 0f) || (CareerLevel > 0.5f)))
+                if (currentSelectedActionGroup.Unlocked())
                 {
                     if (GUILayout.Button(str, confirmDelete ? Style.ButtonStrongEmphasis : Style.ButtonEmphasis))
                     {
@@ -551,7 +541,7 @@ namespace ActionGroupManager.UI
                                 if (classicView)
                                     highlighter.Remove(currentSelectedBaseAction[i].listParent.part);
 
-                                currentSelectedBaseAction[i].RemoveActionToAnActionGroup(currentSelectedActionGroup);
+                                currentSelectedBaseAction[i].RemoveFromActionGroup(currentSelectedActionGroup);
                             }
                             currentSelectedBaseAction.Clear();
                             confirmDelete = false;
@@ -599,11 +589,11 @@ namespace ActionGroupManager.UI
 
                 // Draw the action controls
                 GUILayout.BeginHorizontal();  // Begin Action Line
-                if ((disableCareer || (!currentSelectedActionGroup.ToString().Contains("Custom") && CareerLevel > 0f) || (CareerLevel > 0.5f)))
+                if (currentSelectedActionGroup.Unlocked())
                 {
                     if (GUILayout.Button(NewGuiContent(Localizer.GetStringByTag("#autoLOC_AGM_155"), Localizer.GetStringByTag("#autoLOC_AGM_108")), Style.Button, GUILayout.Width(20)))
                     {
-                        currentSelectedBaseAction[i].RemoveActionToAnActionGroup(currentSelectedActionGroup);
+                        currentSelectedBaseAction[i].RemoveFromActionGroup(currentSelectedActionGroup);
                         currentSelectedBaseAction.Remove(currentSelectedBaseAction[i]);
                     }
 
@@ -617,11 +607,11 @@ namespace ActionGroupManager.UI
                             {
                                 if (actions[j].name == currentSelectedBaseAction[i].name && currentSelectedBaseAction.Contains(actions[j]))
                                 {
-                                    actions[j].RemoveActionToAnActionGroup(currentSelectedActionGroup);
+                                    actions[j].RemoveFromActionGroup(currentSelectedActionGroup);
                                     currentSelectedBaseAction.Remove(actions[j]);
                                 }
                             }
-                            currentSelectedBaseAction[i].RemoveActionToAnActionGroup(currentSelectedActionGroup);
+                            currentSelectedBaseAction[i].RemoveFromActionGroup(currentSelectedActionGroup);
                             currentSelectedBaseAction.Remove(currentSelectedBaseAction[i]);
                             listIsDirty = true;
                         }

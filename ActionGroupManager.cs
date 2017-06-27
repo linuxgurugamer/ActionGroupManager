@@ -49,7 +49,7 @@ namespace ActionGroupManager
             GameEvents.onHideUI.Add(HideUI);
             GameEvents.onGameSceneSwitchRequested.Add(ResetWindows);
 #if DEBUG
-            //Localizer.SwitchToLanguage("en-us");
+            Localizer.SwitchToLanguage("en-us");
 #endif
         }
 

@@ -9,7 +9,6 @@ namespace ActionGroupManager
     {
         static Dictionary<KSPActionGroup, string> abbreviations = new Dictionary<KSPActionGroup, string>()
         {
-            //{KSPActionGroup.None, "None"},
             {KSPActionGroup.Stage, "#autoLOC_AGM_200"},
             {KSPActionGroup.Gear, "#autoLOC_AGM_201"},
             {KSPActionGroup.Light, "#autoLOC_AGM_202"},
@@ -29,27 +28,55 @@ namespace ActionGroupManager
             {KSPActionGroup.Custom10, "#autoLOC_AGM_216"},
         };
 
-        public static Texture GetIcon(this PartCategories c)
+        /// <summary>
+        /// Determines if career mode is disabled or if the action group is unlocked by way of facility upgrades.
+        /// </summary>
+        /// <param name="ag">The action group to check.</param>
+        /// <returns>True if the action group is available.</returns>
+        public static bool Unlocked(this KSPActionGroup ag)
         {
-            return GameDatabase.Instance.GetTexture(ActionGroupManager.ModPath + "Resources/" + c.ToString(), false);
+            if (SettingsManager.Settings.GetValue<bool>(SettingsManager.DisableCareer))
+                return true;
+
+            float level = Math.Max(ScenarioUpgradeableFacilities.GetFacilityLevel(SpaceCenterFacility.SpaceplaneHangar), 
+                ScenarioUpgradeableFacilities.GetFacilityLevel(SpaceCenterFacility.VehicleAssemblyBuilding));
+
+            if (level > 0.5f || (level > 0.0f && !ag.ToString().Contains("Custom")))
+                return true;
+
+            return false;
         }
 
-        public static Texture GetIcon(this KSPActionGroup ag)
-        {
-            return GameDatabase.Instance.GetTexture(ActionGroupManager.ModPath + "Resources/" + ag.ToString(), false);
-        }
-
+        /// <summary>
+        /// Gets a localized abbreviation for the action group.
+        /// </summary>
+        /// <param name="ag">The action group to get.</param>
+        /// <returns>An abbreviation of the action group.</returns>
         public static string ToShortString(this KSPActionGroup ag)
         {
             return Localizer.GetStringByTag(abbreviations[ag]);
         }
 
+        /// <summary>
+        /// Returns true if the provided base action is assigned to the action group.
+        /// </summary>
+        public static bool ContainsAction(this KSPActionGroup ag, BaseAction ba)
+        {
+            return ba == null ? false : (ba.actionGroup & ag) == ag;
+        }
+
+        /// <summary>
+        /// Returns true if the provided action group contains the base action.
+        /// </summary>
         public static bool IsInActionGroup(this BaseAction bA, KSPActionGroup aG)
         {
             return bA == null ? false : (bA.actionGroup & aG) == aG;
         }
 
-        public static void AddActionToAnActionGroup(this BaseAction bA, KSPActionGroup aG)
+        /// <summary>
+        /// Adds the base action to the action group
+        /// </summary>
+        public static void AddAction(this KSPActionGroup aG, BaseAction bA)
         {
             if ((bA.actionGroup & aG) == aG)
                 return;
@@ -57,12 +84,53 @@ namespace ActionGroupManager
             bA.actionGroup |= aG;
         }
 
-        public static void RemoveActionToAnActionGroup(this BaseAction bA, KSPActionGroup aG)
+        /// <summary>
+        /// Adds the base action to the action group
+        /// </summary>
+        public static void AddToActionGroup(this BaseAction bA, KSPActionGroup aG)
+        {
+            if ((bA.actionGroup & aG) == aG)
+                return;
+
+            bA.actionGroup |= aG;
+        }
+
+        /// <summary>
+        /// Removes the action from teh action group
+        /// </summary>
+        public static void RemoveAction(this KSPActionGroup aG, BaseAction bA)
         {
             if ((bA.actionGroup & aG) != aG)
                 return;
 
             bA.actionGroup ^= aG;
+        }
+
+        /// <summary>
+        /// Removes the action from teh action group
+        /// </summary>
+        public static void RemoveFromActionGroup(this BaseAction bA, KSPActionGroup aG)
+        {
+            if ((bA.actionGroup & aG) != aG)
+                return;
+
+            bA.actionGroup ^= aG;
+        }
+
+        /// <summary>
+        /// Returns the texture associated with this action group
+        /// </summary>
+        public static Texture GetTexture(this KSPActionGroup ag)
+        {
+            return GameDatabase.Instance.GetTexture(ActionGroupManager.ModPath + "Resources/" + ag.ToString(), false);
+        }
+
+        /// <summary>
+        /// Returns the texture associated with this part category
+        /// </summary>
+        public static Texture GetTexture(this PartCategories c)
+        {
+            return GameDatabase.Instance.GetTexture(ActionGroupManager.ModPath + "Resources/" + c.ToString(), false);
         }
     }
 

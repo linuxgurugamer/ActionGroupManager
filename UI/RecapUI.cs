@@ -9,7 +9,7 @@ namespace ActionGroupManager.UI
     class RecapUi : UiObject
     {
         Rect recapWindowSize;
-        Vector2 recapWindowScrollposition;
+        Vector2 scrollView;
 
         public RecapUi(bool visible)
         {
@@ -43,7 +43,7 @@ namespace ActionGroupManager.UI
                 return;
             }
 
-            recapWindowScrollposition = GUILayout.BeginScrollView(recapWindowScrollposition, Style.ScrollView);
+            scrollView = GUILayout.BeginScrollView(scrollView, Style.ScrollView);
             GUILayout.BeginVertical();
             int listCount = 0;
             actionGroups = VesselManager.Instance.AllActionGroups;

@@ -243,9 +243,9 @@ namespace ActionGroupManager.UI
         {
 
             if (!obj.Current.Action.IsInActionGroup(obj.ActionGroup))
-                obj.Current.Action.AddActionToAnActionGroup(obj.ActionGroup);
+                obj.Current.Action.AddToActionGroup(obj.ActionGroup);
             else
-                obj.Current.Action.RemoveActionToAnActionGroup(obj.ActionGroup);
+                obj.Current.Action.RemoveFromActionGroup(obj.ActionGroup);
 
             if (obj.SymmetryMode == UIActionGroupManager.SymmetryType.All)
             {
@@ -254,9 +254,9 @@ namespace ActionGroupManager.UI
                     if (ba.name == obj.Current.Action.name)
                     {
                         if (!ba.IsInActionGroup(obj.ActionGroup))
-                            ba.AddActionToAnActionGroup(obj.ActionGroup);
+                            ba.AddToActionGroup(obj.ActionGroup);
                         else
-                            ba.RemoveActionToAnActionGroup(obj.ActionGroup);
+                            ba.RemoveFromActionGroup(obj.ActionGroup);
 
                     }
                 }
@@ -382,9 +382,9 @@ namespace ActionGroupManager.UI
             else
             {
                 if (!obj.Current.Action.IsInActionGroup(obj.ActionGroup))
-                    obj.Current.Action.AddActionToAnActionGroup(obj.ActionGroup);
+                    obj.Current.Action.AddToActionGroup(obj.ActionGroup);
                 else
-                    obj.Current.Action.RemoveActionToAnActionGroup(obj.ActionGroup);
+                    obj.Current.Action.RemoveFromActionGroup(obj.ActionGroup);
 
                 obj.UpdateName();
             }
