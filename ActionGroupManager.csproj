@@ -111,7 +111,9 @@
     <None Include="Resources\AppLauncherOff.dds">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="Resources\AppLauncherOn.dds" />
+    <None Include="Resources\AppLauncherOn.dds">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="Resources\Brakes.dds">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
