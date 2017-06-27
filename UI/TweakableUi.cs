@@ -119,6 +119,8 @@ namespace ActionGroupManager.UI
 
         public UIPartManager(Part p)
         {
+
+
             int i; // Loop iterator
 
             this.Part = p;
@@ -126,6 +128,9 @@ namespace ActionGroupManager.UI
             IsFolderVisible = false;
             IsActionGroupsVisible = false;
             IsSymmetryModeVisible = false;
+
+            bool disableCareer = SettingsManager.Settings.GetValue<bool>(SettingsManager.DisableCareer);
+            float CareerLevel = Math.Max(ScenarioUpgradeableFacilities.GetFacilityLevel(SpaceCenterFacility.SpaceplaneHangar), ScenarioUpgradeableFacilities.GetFacilityLevel(SpaceCenterFacility.VehicleAssemblyBuilding));
 
             baseActionList = new List<UIBaseActionManager>();
             actionGroupList = new List<UIActionGroupManager>();
@@ -136,19 +141,19 @@ namespace ActionGroupManager.UI
 
                 List<PartModule> toRemove = new List<PartModule>();
 
-                for(i = 0; i < Part.Modules.Count; i++)
+                for (i = 0; i < Part.Modules.Count; i++)
                 {
                     if (Part.Modules[i] is UIBaseActionManager || Part.Modules[i] is UIActionGroupManager)
                         toRemove.Add(Part.Modules[i]);
                 }
 
-                for(i = 0; i < toRemove.Count; i++)
+                for (i = 0; i < toRemove.Count; i++)
                     Part.Modules.Remove(toRemove[i]);
             }
 
 
             //We create our base action list
-            List <BaseAction> partBaseActions = BaseActionFilter.FromParts(p);
+            List<BaseAction> partBaseActions = BaseActionFilter.FromParts(p);
             for (i = 0; i < partBaseActions.Count; i++)
             {
                 //We create the module through AddModule to get the initialization done
@@ -178,16 +183,19 @@ namespace ActionGroupManager.UI
 
             actionGroupList.Add(agm);
 
-            agm = Part.AddModule("UIActionGroupManager") as UIActionGroupManager;
-            Part.Modules.Remove(agm);
+            if (disableCareer || CareerLevel > 0.5f)
+            {
+                agm = Part.AddModule("UIActionGroupManager") as UIActionGroupManager;
+                Part.Modules.Remove(agm);
 
-            agm.Events[UIActionGroupManager.EVENTNAME].guiName = "    " + Localizer.GetStringByTag("#autoLOC_AGM_253");
-            agm.Origin = this;
-            agm.Isfolder = true;
-            agm.Type = UIActionGroupManager.FolderType.Custom;
-            agm.Clicked += Folder_Clicked;
+                agm.Events[UIActionGroupManager.EVENTNAME].guiName = "    " + Localizer.GetStringByTag("#autoLOC_AGM_253");
+                agm.Origin = this;
+                agm.Isfolder = true;
+                agm.Type = UIActionGroupManager.FolderType.Custom;
+                agm.Clicked += Folder_Clicked;
 
-            actionGroupList.Add(agm);
+                actionGroupList.Add(agm);
+            }
 
             //and the rest of action groups
             KSPActionGroup[] actionGroups = Enum.GetValues(typeof(KSPActionGroup)) as KSPActionGroup[];
@@ -517,10 +525,14 @@ namespace ActionGroupManager.UI
 
         private void SetupRootModule()
         {
-#if DEBUG
-            Debug.Log("AGM : Setup root !");
-#endif
+            if (!SettingsManager.Settings.GetValue<bool>(SettingsManager.DisableCareer) &&
+                Math.Max(ScenarioUpgradeableFacilities.GetFacilityLevel(SpaceCenterFacility.SpaceplaneHangar),
+                ScenarioUpgradeableFacilities.GetFacilityLevel(SpaceCenterFacility.VehicleAssemblyBuilding)) <= 0f)
+                return;
 
+#if DEBUG
+                Debug.Log("AGM : Setup root !");
+#endif
             int i, j;
             if (!VesselManager.Instance.ActiveVessel.rootPart.Modules.Contains("UIRootManager"))
             {
