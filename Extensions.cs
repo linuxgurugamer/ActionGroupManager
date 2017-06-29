@@ -7,7 +7,7 @@ namespace ActionGroupManager
 {
     static class Extensions
     {
-        static Dictionary<KSPActionGroup, string> abbreviations = new Dictionary<KSPActionGroup, string>()
+        private static readonly Dictionary<KSPActionGroup, string> abbreviations = new Dictionary<KSPActionGroup, string>()
         {
             {KSPActionGroup.Stage, "#autoLOC_AGM_200"},
             {KSPActionGroup.Gear, "#autoLOC_AGM_201"},
@@ -64,6 +64,7 @@ namespace ActionGroupManager
         {
             return ba == null ? false : (ba.actionGroup & ag) == ag;
         }
+
 
         /// <summary>
         /// Returns true if the provided action group contains the base action.
