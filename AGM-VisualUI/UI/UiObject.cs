@@ -7,7 +7,7 @@
 namespace ActionGroupManager
 {
     /// <summary>
-    /// The base class that defines the interactiions for all interface objects.
+    /// The base class that defines the interactions for all interface objects.
     /// </summary>
     public abstract class UiObject
     {

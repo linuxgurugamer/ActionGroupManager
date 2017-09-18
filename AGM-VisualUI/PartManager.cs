@@ -11,7 +11,7 @@ namespace ActionGroupManager
     using System.Linq;
 
     /// <summary>
-    /// Represets a specific type of filter.
+    /// Represents a specific type of filter.
     /// </summary>
     internal enum FilterModification
     {
@@ -62,7 +62,7 @@ namespace ActionGroupManager
         private List<Part> filteredParts = new List<Part>();
 
         /// <summary>
-        /// Contans a dictionary of how many parts are in each <see cref="PartCategories"/>.
+        /// Contains a dictionary of how many parts are in each <see cref="PartCategories"/>.
         /// </summary>
         private SortedList<PartCategories, int> partCounts;
 
@@ -114,7 +114,7 @@ namespace ActionGroupManager
         /// <summary>
         /// Gets a list of <see cref="Part"/> matching the current filter.
         /// </summary>
-        /// <returns>A list of filtered <see cref="Part"/> on the <see cref="Vesel"/>.</returns>
+        /// <returns>A list of filtered <see cref="Part"/> on the <see cref="Vessel"/>.</returns>
         public ICollection<Part> FilteredParts
         {
             get

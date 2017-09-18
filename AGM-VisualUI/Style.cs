@@ -50,7 +50,7 @@ namespace ActionGroupManager
         /// <summary>
         /// Initializes static members of the <see cref="Style"/> class.
         /// </summary>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1810:InitializeReferenceTypeStaticFieldsInline", Justification = "Static fields are conditional at initialization and conditional cannot be inlined.")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1810:InitializeReferenceTypeStaticFieldsInline", Justification = "Static fields are conditional at initialization and conditional cannot be inline.")]
         static Style()
         {
             Program.AddDebugLog("Loading Visual User Interface Styles");
@@ -249,7 +249,7 @@ namespace ActionGroupManager
         public static GUIStyle Label { get; private set; }
 
         /// <summary>
-        /// Gets the style for Tooltips.
+        /// Gets the style for tool tips.
         /// </summary>
         public static GUIStyle LabelTooltip { get; private set; }
 
@@ -296,7 +296,7 @@ namespace ActionGroupManager
         public static GUIStyle ButtonIcon { get; private set; }
 
         /// <summary>
-        /// Gets the style for the Action Group locator buttons
+        /// Gets the style for the Action Group locater buttons
         /// </summary>
         public static GUIStyle GroupFindButton { get; private set; }
 

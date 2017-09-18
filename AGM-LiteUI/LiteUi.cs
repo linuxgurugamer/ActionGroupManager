@@ -417,7 +417,7 @@ namespace ActionGroupManager.LiteUi
             int i;
             if (this.IsFolderVisible)
             {
-                //Folder already visible, so clean the folders, and redisplay all baseaction
+                //Folder already visible, so clean the folders, and redisplay all actions
                 for(i = 0; i < this.actionGroupList.Count; i++)
                 {
                     this.actionGroupList[i].Events[UIActionGroupManager.EVENTNAME].guiActive = false;

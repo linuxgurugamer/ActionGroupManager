@@ -33,7 +33,7 @@ namespace ActionGroupManager
         private Highlighter highlighter;
 
         /// <summary>
-        /// Allows the main user inferface retrieve <see cref="Part"/>s based on filter conditions.
+        /// Allows the main user interface retrieve <see cref="Part"/>s based on filter conditions.
         /// </summary>
         private PartManager partFilter;
 
@@ -199,7 +199,7 @@ namespace ActionGroupManager
 
             GUILayout.BeginHorizontal();
 
-            // Tooltip Label
+            // Tool tip Label
             if (Style.UseUnitySkin)
             {
                 GUILayout.Label(GUI.tooltip, Style.LabelTooltip);
@@ -621,7 +621,7 @@ namespace ActionGroupManager
                                 this.actionsUnsorted = true;
                             }
 
-                            // Remove all symetry parts.
+                            // Remove all symmetry parts.
                             if (this.currentSelectedPart.symmetryCounterparts.Count > 0)
                             {
                                 if (GUILayout.Button(
@@ -657,7 +657,7 @@ namespace ActionGroupManager
                                 this.actionsUnsorted = true;
                             }
 
-                            // Add all symetry parts.
+                            // Add all symmetry parts.
                             if (this.currentSelectedPart.symmetryCounterparts.Count > 0)
                             {
                                 if (GUILayout.Button(

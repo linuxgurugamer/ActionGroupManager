@@ -150,7 +150,7 @@ namespace ActionGroupManager
         }
 
         /// <summary>
-        /// Handles the <see cref="ApplicationLauncherButton.onClick"/> callback.
+        /// Handles the <see cref="ApplicationLauncherButton.onLeftClick"/> callback.
         /// </summary>
         private void OnClick()
         {

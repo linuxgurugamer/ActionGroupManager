@@ -26,7 +26,7 @@ namespace ActionGroupManager
         private static ICollection<Callback> postDrawQueue = new List<Callback>();
 
         /// <summary>
-        /// Cotnains the singleton for this instance of <see cref="VisualUi"/>.
+        /// Contains the singleton for this instance of <see cref="VisualUi"/>.
         /// </summary>
         private static VisualUi singleton;
 

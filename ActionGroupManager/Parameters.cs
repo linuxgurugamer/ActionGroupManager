@@ -98,7 +98,7 @@ namespace ActionGroupManager
         }
 
         /// <summary>
-        /// Gets a vlue indicating whether the parameters have predefined defaults.
+        /// Gets a value indicating whether the parameters have predefined defaults.
         /// </summary>
         public override bool HasPresets
         {
@@ -108,7 +108,7 @@ namespace ActionGroupManager
         /// <summary>
         /// Determines whether a parameter is visible to the user.
         /// </summary>
-        /// <param name="member">The memeber to check for visibility.</param>
+        /// <param name="member">The member to check for visibility.</param>
         /// <param name="parameters">The game parameters.</param>
         /// <returns>True if the member should be visible.</returns>
         public override bool Enabled(System.Reflection.MemberInfo member, GameParameters parameters)
@@ -117,7 +117,7 @@ namespace ActionGroupManager
             {
                 if (member.Name == "VerboseLogging")
                 {
-                    // Versbose logging is only visible if basic logging is enabled.
+                    // Verbose logging is only visible if basic logging is enabled.
                     return this.BasicLogging;
                 }
             }

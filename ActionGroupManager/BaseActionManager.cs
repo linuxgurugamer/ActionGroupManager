@@ -99,7 +99,7 @@ namespace ActionGroupManager
         /// <summary>
         /// Returns a list of action groups that the provided base action belongs to.
         /// </summary>
-        /// <param name="action">The base action to find actiong groups for.</param>
+        /// <param name="action">The base action to find action groups for.</param>
         /// <returns>A list of action groups the base action is assigned to.</returns>
         public static ICollection<KSPActionGroup> GetActionGroupList(BaseAction action)
         {

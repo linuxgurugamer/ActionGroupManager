@@ -88,7 +88,6 @@ namespace ActionGroupManager
             GameEvents.onUndock.Remove(new EventData<EventReport>.OnEvent(this.OnUndock));
             GameEvents.onPartCouple.Remove(new EventData<GameEvents.FromToAction<Part, Part>>.OnEvent(this.OnPartCouple));
         }
-        #region Initialization stuff
 
         /// <summary>
         /// Rebuild the list of parts from active vessel.
@@ -136,7 +135,7 @@ namespace ActionGroupManager
         }
 
         /// <summary>
-        /// Handles the <see cref="onPartCouple"/> event.
+        /// Handles the <see cref="GameEvents.onPartCouple"/> event.
         /// </summary>
         /// <param name="data">The part begin coupled and the part being coupled to.</param>
         private void OnPartCouple(GameEvents.FromToAction<Part, Part> data)
@@ -146,7 +145,7 @@ namespace ActionGroupManager
         }
 
         /// <summary>
-        /// Handles the <see cref="onUndock"/> event.
+        /// Handles the <see cref="GameEvents.onUndock"/> event.
         /// </summary>
         /// <param name="data">The <see cref="EventReport"/> arguments.</param>
         private void OnUndock(EventReport data)
@@ -156,7 +155,7 @@ namespace ActionGroupManager
         }
 
         /// <summary>
-        /// Handles the <see cref="onVesselWasModified"/> event.
+        /// Handles the <see cref="GameEvents.onVesselWasModified"/> event.
         /// </summary>
         /// <param name="data">The modified <see cref="Vessel"/></param>
         private void OnVesselModified(Vessel data)
@@ -169,6 +168,5 @@ namespace ActionGroupManager
 
             this.RebuildPartDatabase();
         }
-        #endregion
     }
 }

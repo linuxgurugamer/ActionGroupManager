@@ -173,7 +173,7 @@ namespace ActionGroupManager
         /// </summary>
         /// <param name="member">The item to check visibility on.</param>
         /// <param name="parameters">The game parameters.</param>
-        /// <returns>True if the <paramref name="member"/> is visisble.</returns>
+        /// <returns>True if the <paramref name="member"/> is visible.</returns>
         public override bool Enabled(System.Reflection.MemberInfo member, GameParameters parameters)
         {
             /*
