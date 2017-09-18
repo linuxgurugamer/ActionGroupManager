@@ -174,7 +174,7 @@ namespace ActionGroupManager
             {
                 margin = new RectOffset(BaseSkin.button.margin.left, BaseSkin.button.margin.right, 5, 5),
                 padding = new RectOffset(3, 3, 0, 0),
-                fixedWidth = 32f
+                fixedWidth = 34f
             };
             Program.AddDebugLog("Button Size:" + ButtonIcon.padding.left);
             Program.AddDebugLog("Button Size:" + ButtonIcon.padding.right);

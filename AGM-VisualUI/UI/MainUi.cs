@@ -701,11 +701,6 @@ namespace ActionGroupManager
         /// </summary>
         private void DrawActionsScrollList()
         {
-            Part currentDrawn = null;
-
-            string str;
-            bool initial, final;
-
             if (VisualUi.UiSettings.ClassicView)
             {
                 this.actionList = GUILayout.BeginScrollView(this.actionList, Style.ScrollView);  // Begin Actions List (Classic View)
@@ -719,74 +714,33 @@ namespace ActionGroupManager
             {
                 // Add the Remove All Button
                 GUILayout.BeginVertical(); // Begin Actions List
-
                 GUILayout.Space(Style.BaseSkin.verticalScrollbar.margin.left);
-                str = this.confirmDelete ?
-                Localizer.Format(Localizer.GetStringByTag("#autoLOC_AGM_054"), this.currentSelectedActionGroup.displayDescription()) :
-                Localizer.Format(Localizer.GetStringByTag("#autoLOC_AGM_053"), this.currentSelectedActionGroup.displayDescription());
 
                 if (this.currentSelectedActionGroup.Unlocked())
                 {
-                    if (GUILayout.Button(str, this.confirmDelete ? Style.ButtonStrongEmphasis : Style.ButtonEmphasis))
-                    {
-                        if (!this.confirmDelete)
-                        {
-                            this.confirmDelete = true;
-                        }
-                        else if (this.assignedActions.Count > 0)
-                        {
-                            foreach (BaseAction action in this.assignedActions)
-                            {
-                                if (VisualUi.UiSettings.ClassicView)
-                                {
-                                    this.highlighter.Remove(action.listParent.part);
-                                }
-
-                                this.currentSelectedActionGroup.RemoveAction(action);
-                            }
-
-                            this.assignedActions.Clear();
-                            this.confirmDelete = false;
-                        }
-                    }
+                    this.DrawConfirmDeleteButton();
                 }
 
                 // Draw the actions buttons
                 var removedActions = new List<BaseAction>();
+                Part currentDrawn  = null;
                 foreach (BaseAction action in this.assignedActions)
                 {
+                    // Draw the part button if it hasn't been drawn already
                     if (currentDrawn != action.listParent.part)
                     {
-                        // Draw Part Label/Button
                         if (VisualUi.UiSettings.ClassicView)
                         {
                             GUILayout.BeginHorizontal();
-                            GUILayout.Label(action.listParent.part.partInfo.title, Style.ButtonPart);
-                        }
-                        else
-                        {
-                            // "Find" function (New View)
-                            if (GUILayout.Button(new GUIContent(action.listParent.part.partInfo.title, Localizer.GetStringByTag("#autoLOC_AGM_112")), action.listParent.part.partInfo.title.Length > 32 ? Style.ButtonPartCondensed : Style.ButtonPart))
-                            {
-                                this.confirmDelete = false; // Reset the deletion confirmation
-                                this.highlighter.Remove(this.currentSelectedPart);
-                                this.highlighter.Add(action.listParent.part);
-                                this.currentSelectedPart = action.listParent.part;
-                            }
                         }
 
+                        this.DrawActionPartName(action.listParent.part);
                         currentDrawn = action.listParent.part;
 
                         // Highlighter Button for Classic View
                         if (VisualUi.UiSettings.ClassicView)
                         {
-                            initial = this.highlighter.Contains(action.listParent.part);
-                            final = GUILayout.Toggle(initial, new GUIContent(Localizer.GetStringByTag("#autoLOC_AGM_154"), Localizer.GetStringByTag("#autoLOC_AGM_105")), Style.GroupFindButton, GUILayout.Width(20));
-                            if (final != initial)
-                            {
-                                this.highlighter.Switch(action.listParent.part);
-                            }
-
+                            this.DrawPartHighlightButton(currentDrawn);
                             GUILayout.EndHorizontal();
                         }
                     }
@@ -861,6 +815,85 @@ namespace ActionGroupManager
             }
 
             GUILayout.EndScrollView(); // End Actions List
+        }
+
+        /// <summary>
+        /// Draws the delete and confirm delete button in the Action Group scroll list.
+        /// </summary>
+        private void DrawConfirmDeleteButton()
+        {
+            string message;
+            if (this.confirmDelete)
+            {
+                // #autoLOC_AGM_054 = OK to delete all actions in <<1>>?
+                message = Localizer.Format(Localizer.GetStringByTag("#autoLOC_AGM_054"), this.currentSelectedActionGroup.displayDescription());
+            }
+            else
+            {
+                // #autoLOC_AGM_053 = Remove all from <<1>>
+                message = Localizer.Format(Localizer.GetStringByTag("#autoLOC_AGM_053"), this.currentSelectedActionGroup.displayDescription());
+            }
+
+            if (GUILayout.Button(message, this.confirmDelete ? Style.ButtonStrongEmphasis : Style.ButtonEmphasis))
+            {
+                if (!this.confirmDelete)
+                {
+                    this.confirmDelete = true;
+                }
+                else if (this.assignedActions.Count > 0)
+                {
+                    foreach (BaseAction action in this.assignedActions)
+                    {
+                        if (VisualUi.UiSettings.ClassicView)
+                        {
+                            this.highlighter.Remove(action.listParent.part);
+                        }
+
+                        this.currentSelectedActionGroup.RemoveAction(action);
+                    }
+
+                    this.assignedActions.Clear();
+                    this.confirmDelete = false;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Draws the part name in the Actions scroll list.
+        /// </summary>
+        /// <param name="part">The part to draw the name of.</param>
+        private void DrawActionPartName(Part part)
+        {
+            // Draw Part Label/Button
+            if (VisualUi.UiSettings.ClassicView)
+            {
+                GUILayout.Label(part.partInfo.title, Style.ButtonPart);
+            }
+            else
+            {
+                // "Find" function (New View)
+                if (GUILayout.Button(new GUIContent(part.partInfo.title, Localizer.GetStringByTag("#autoLOC_AGM_112")), part.partInfo.title.Length > 32 ? Style.ButtonPartCondensed : Style.ButtonPart))
+                {
+                    this.confirmDelete = false; // Reset the deletion confirmation
+                    this.highlighter.Remove(this.currentSelectedPart);
+                    this.highlighter.Add(part);
+                    this.currentSelectedPart = part;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Draws a button to highlight parts in classic view.
+        /// </summary>
+        /// <param name="part">The part that the highlight button affects.</param>
+        private void DrawPartHighlightButton(Part part)
+        {
+            bool initial = this.highlighter.Contains(part);
+            bool final = GUILayout.Toggle(initial, new GUIContent(Localizer.GetStringByTag("#autoLOC_AGM_154"), Localizer.GetStringByTag("#autoLOC_AGM_105")), Style.GroupFindButton, GUILayout.Width(20));
+            if (final != initial)
+            {
+                this.highlighter.Switch(part);
+            }
         }
 
         /// <summary>

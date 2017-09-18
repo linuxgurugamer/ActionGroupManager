@@ -78,6 +78,7 @@ package/
 *.pidb
 *.log
 *.scc
+*.ide
 
 # Visual C++ cache files
 ipch/
@@ -108,6 +109,9 @@ _TeamCity*
 # NCrunch
 *.ncrunch*
 .*crunch*.local.xml
+
+# StyleCop
+*.StyleCop
 
 # Installshield output folder
 [Ee]xpress/
