@@ -1,194 +1,281 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
-using ActionGroupManager.UI;
-using ActionGroupManager.UI.ButtonBar;
-using KSP.Localization;
+﻿//-----------------------------------------------------------------------
+// <copyright file="VisualUi.cs" company="Aquila Enterprises">
+//     Copyright (c) Kevin Seiden. The MIT License.
+// </copyright>
+//-----------------------------------------------------------------------
+
+using System;
+
+[assembly: CLSCompliant(false)]
 
 namespace ActionGroupManager
 {
-    /*
-     * Main class.
-     * Intercept the start call of KSP, handle UI class and The VesselPartManager.
-     */
+    using System.Collections.Generic;
+
+    using UnityEngine;
+
+    /// <summary>
+    /// Main entry point for the visual user interface component of Action Group Manager.
+    /// </summary>
     [KSPAddon(KSPAddon.Startup.Flight, false)]
     public class VisualUi : MonoBehaviour
     {
-        //List of current UI handle
-        SortedList<UiType, UiObject> UiList;
-        static private List<Callback> postDrawQueue = new List<Callback>();
-        static VisualUi _manager;
-        public static VisualUiParameters uiSettings;
+        /// <summary>
+        /// Contains a list of <see cref="Callback"/> to execute each frame.
+        /// </summary>
+        private static ICollection<Callback> postDrawQueue = new List<Callback>();
 
-        public bool ShowMainWindow { get; set; }
-        public bool ShowRecapWindow { get; set; }
+        /// <summary>
+        /// Cotnains the singleton for this instance of <see cref="VisualUi"/>.
+        /// </summary>
+        private static VisualUi singleton;
 
-        enum UiType
+        /// <summary>
+        /// List of current UI handle
+        /// </summary>
+        private IDictionary<UiType, UiObject> uiList;
+
+        /// <summary>
+        /// Represents a type for the <see cref="UiObject"/>
+        /// </summary>
+        private enum UiType
         {
+            /// <summary>
+            /// Represents a <see cref="MainUi"/>
+            /// </summary>
             Main,
+
+            /// <summary>
+            /// Represent an <see cref="IButtonBar"/> that controls <see cref="MainUi"/>
+            /// </summary>
             Icon,
-            RecapIcon,
-            Recap
+
+            /// <summary>
+            /// Represents a <see cref="ReferenceUi"/>
+            /// </summary>
+            Reference,
+
+            /// <summary>
+            /// Represent an <see cref="IButtonBar"/> that controls <see cref="ReferenceUi"/>
+            /// </summary>
+            ReferenceIcon
         }
 
+        /// <summary>
+        /// Gets the user defined parameters for the <see cref="VisualUi"/>.
+        /// </summary>
+        public static VisualUiParameters UiSettings { get; private set; }
+
+        /// <summary>
+        /// Gets a singleton for the Visual user interface component of Action Group Manager
+        /// </summary>
         public static VisualUi Manager
         {
             get
             {
-                return _manager;
+                return singleton;
             }
         }
 
-        void Awake()
+        /// <summary>
+        /// Gets or sets a value indicating whether the <see cref="MainUi"/> is visible.
+        /// </summary>
+        public bool ShowMainWindow { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the <see cref="ReferenceUi"/> is visible.
+        /// </summary>
+        public bool ShowReferenceWindow { get; set; }
+
+        /// <summary>
+        /// Updates the icon texture.
+        /// </summary>
+        /// <param name="visible">A value indicating whether the icon should indicate a visible window.</param>
+        public void UpdateIcon(bool visible)
         {
-            ActionGroupManager.AddDebugLog("VisualUI is awake.");
+            if (this.uiList.TryGetValue(UiType.Icon, out UiObject o))
+            {
+                (o as IButtonBar).SwitchTexture(visible);
+            }
+        }
+
+        /// <summary>
+        /// Clears out old windows without forcing them to hide permanently
+        /// </summary>
+        /// <param name="action">The scene transition information.</param>
+        public void ResetWindows(GameEvents.FromToAction<GameScenes, GameScenes> action)
+        {
+            if (action.from == GameScenes.FLIGHT && action.to != GameScenes.FLIGHT)
+            {
+                if (this.uiList.TryGetValue(UiType.Reference, out UiObject o))
+                {
+                    (o as UiObject).Visible = false;
+                }
+
+                if (this.uiList.TryGetValue(UiType.Main, out o))
+                {
+                    (o as UiObject).Visible = false;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Hides all user interface elements.
+        /// </summary>
+        public void HideUI()
+        {
+            this.ShowMainWindow = false;
+            this.ShowReferenceWindow = false;
+        }
+
+        /// <summary>
+        /// <see cref="MonoBehaviour"/> that executes actions every frame.
+        /// </summary>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly", MessageId = "GUI", Justification = "Do not change the name of MonoBehavior invoked methods.")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Do not make MonoBehavior invoked methods static.")]
+        public void OnGUI()
+        {
+            foreach (Callback callback in postDrawQueue)
+            {
+                callback();
+            }
+        }
+
+        /// <summary>
+        /// Adds actions to the <see cref="postDrawQueue"/> which occur every frame.
+        /// </summary>
+        /// <param name="callback">The callback to execute every frame.</param>
+        internal static void AddToPostDrawQueue(Callback callback)
+        {
+            postDrawQueue.Add(callback);
+        }
+
+        /// <summary>
+        /// Disposes of all Action Group Manager elements.
+        /// </summary>
+        private void OnDestroy()
+        {
+            // Terminate all UI
+            foreach (KeyValuePair<UiType, UiObject> item in this.uiList)
+            {
+                item.Value.Dispose();
+            }
+
+            GameEvents.OnGameSettingsApplied.Remove(this.OnSettingsApplied);
+            GameEvents.onHideUI.Remove(this.HideUI);
+            GameEvents.onGameSceneSwitchRequested.Remove(this.ResetWindows);
+
+            // Save settings to disk
+            SettingsManager.Save();
+            VesselManager.Dispose();
+            Program.AddDebugLog("Visual User Interface Terminated.");
+        }
+
+        /// <summary>
+        /// The <see cref="MonoBehaviour"/> Awake event.
+        /// </summary>
+        private void Awake()
+        {
+            Program.AddDebugLog("Visual User Interface is awake.");
 
             if (HighLogic.CurrentGame != null)
-                uiSettings = HighLogic.CurrentGame.Parameters.CustomParams<VisualUiParameters>();
-
-            GameEvents.OnGameSettingsApplied.Add(OnSettingsApplied);
-            GameEvents.onHideUI.Add(HideUI);
-            GameEvents.onGameSceneSwitchRequested.Add(ResetWindows);
-
-            #if DEBUG
-                Localizer.SwitchToLanguage("en-us");
-            #endif
-        }
-
-        void Start()
-        {
-            _manager = this;
-            if (UiList == null)
-                UiList = new SortedList<UiType, UiObject>();
-
-            UiObject main;
-            UiObject recap;
-            if (!UiList.TryGetValue(UiType.Main, out main))
             {
-                main = new MainUi();
-                UiList.Add(UiType.Main, main);
+                UiSettings = HighLogic.CurrentGame.Parameters.CustomParams<VisualUiParameters>();
             }
 
-            if (!UiList.TryGetValue(UiType.Recap, out recap))
+            GameEvents.OnGameSettingsApplied.Add(this.OnSettingsApplied);
+            GameEvents.onHideUI.Add(this.HideUI);
+            GameEvents.onGameSceneSwitchRequested.Add(this.ResetWindows);
+        }
+
+        /// <summary>
+        /// The <see cref="MonoBehaviour"/> Start event.  Starts Action Group Manager's Visual component.
+        /// </summary>
+        private void Start()
+        {
+            singleton = this;
+            if (this.uiList == null)
             {
-                recap = new RecapUi(SettingsManager.Settings.GetValue<bool>(SettingsManager.IsRecapWindowVisible, false));
-                UiList.Add(UiType.Recap, recap);
+                this.uiList = new SortedList<UiType, UiObject>();
+            }
+
+            if (!this.uiList.TryGetValue(UiType.Main, out UiObject main))
+            {
+                main = new MainUi();
+                this.uiList.Add(UiType.Main, main);
+            }
+
+            if (!this.uiList.TryGetValue(UiType.Reference, out UiObject recap))
+            {
+                recap = new ReferenceUi(SettingsManager.Settings.GetValue<bool>(SettingsManager.IsReferenceWindowVisible, false));
+                this.uiList.Add(UiType.Reference, recap);
             }
 
             if (ToolbarManager.ToolbarAvailable)
             {
-                ActionGroupManager.AddDebugLog("Initializing Toolbar");
-                // Blizzy's Toolbar support
-                UiList.Add(UiType.Icon, new Toolbar(main, recap));
+                Program.AddDebugLog("Initializing Toolbar");
 
-                if (!uiSettings.toolbarListRightClick)
+                // Blizzy's Toolbar support
+                this.uiList.Add(UiType.Icon, new Toolbar(main, recap));
+
+                if (!UiSettings.ToolBarListRightClick)
                 {
-                    UiList.Add(UiType.RecapIcon, new ToolbarRecap(recap));
+                    this.uiList.Add(UiType.ReferenceIcon, new ToolbarReference(recap));
                 }
             }
             else
             {
-                ActionGroupManager.AddDebugLog("Initializing Application Launcher");
-                // Stock Application Launcher
-                UiList.Add(UiType.Icon, new AppLauncher(main, recap));
+                Program.AddDebugLog("Initializing Application Launcher");
 
-                if (!uiSettings.toolbarListRightClick)
+                // Stock Application Launcher
+                this.uiList.Add(UiType.Icon, new AppLauncher(main, recap));
+
+                if (!UiSettings.ToolBarListRightClick)
                 {
-                    UiList.Add(UiType.RecapIcon, new AppLauncherRecap(recap));
+                    this.uiList.Add(UiType.ReferenceIcon, new AppLauncherReference(recap));
                 }
             }
 
-            main.SetVisible(SettingsManager.Settings.GetValue<bool>(SettingsManager.IsMainWindowVisible));
-            ShowRecapWindow = SettingsManager.Settings.GetValue<bool>(SettingsManager.IsRecapWindowVisible, false);
-            ActionGroupManager.AddDebugLog("VisualUI has started.");
+            main.Visible = SettingsManager.Settings.GetValue<bool>(SettingsManager.IsMainWindowVisible);
+            this.ShowReferenceWindow = SettingsManager.Settings.GetValue<bool>(SettingsManager.IsReferenceWindowVisible, false);
+            Program.AddDebugLog("Visual User Interface has started.");
         }
 
-        void OnSettingsApplied()
+        /// <summary>
+        /// Handles the <see cref="GameEvents.OnGameSettingsApplied"/> event.
+        /// </summary>
+        private void OnSettingsApplied()
         {
             // Reloading Settings
             if (HighLogic.CurrentGame != null)
-                uiSettings = HighLogic.CurrentGame.Parameters.CustomParams<VisualUiParameters>();
+            {
+                UiSettings = HighLogic.CurrentGame.Parameters.CustomParams<VisualUiParameters>();
+            }
 
             // Restore remove the Action Group List Button
-            if (!uiSettings.toolbarListRightClick && !UiList.ContainsKey(UiType.RecapIcon))
+            if (!UiSettings.ToolBarListRightClick && !this.uiList.ContainsKey(UiType.ReferenceIcon))
             {
-                UiObject recap;
-                if (UiList.TryGetValue(UiType.Recap, out recap))
+                if (this.uiList.TryGetValue(UiType.Reference, out UiObject recap))
                 {
                     if (ToolbarManager.ToolbarAvailable)
                     {
-                        ActionGroupManager.AddDebugLog("Adding Action Group List Toolbar Button");
-                        UiList.Add(UiType.RecapIcon, new ToolbarRecap(recap));
+                        Program.AddDebugLog("Adding Action Group List Toolbar Button");
+                        this.uiList.Add(UiType.ReferenceIcon, new ToolbarReference(recap));
                     }
                     else
                     {
-                        ActionGroupManager.AddDebugLog("Adding Action Group List App Launcher Button");
-                        UiList.Add(UiType.RecapIcon, new AppLauncherRecap(recap));
+                        Program.AddDebugLog("Adding Action Group List App Launcher Button");
+                        this.uiList.Add(UiType.ReferenceIcon, new AppLauncherReference(recap));
                     }
-                        
                 }
             }
-            else if (uiSettings.toolbarListRightClick && UiList.ContainsKey(UiType.RecapIcon))
+            else if (UiSettings.ToolBarListRightClick && this.uiList.ContainsKey(UiType.ReferenceIcon))
             {
-                ActionGroupManager.AddDebugLog("Removing Action Group List Button");
-                UiList[UiType.RecapIcon].SetVisible(false);
-                UiList[UiType.RecapIcon].Terminate();
-                UiList.Remove(UiType.RecapIcon);
+                Program.AddDebugLog("Removing Action Group List Button");
+                this.uiList[UiType.ReferenceIcon].Visible = false;
+                this.uiList[UiType.ReferenceIcon].Dispose();
+                this.uiList.Remove(UiType.ReferenceIcon);
             }
-        }
-
-        public void UpdateIcon(bool val)
-        {
-            UiObject o;
-            if (UiList.TryGetValue(UiType.Icon, out o))
-                (o as IButtonBar).SwitchTexture(val);
-        }
-
-        // Clears out old windows without forcing them to hide permanently
-        public void ResetWindows(GameEvents.FromToAction<GameScenes, GameScenes> e)
-        {
-            if (e.from == GameScenes.FLIGHT && e.to != GameScenes.FLIGHT)
-            {
-                UiObject o;
-                if (UiList.TryGetValue(UiType.Recap, out o))
-                    (o as UiObject).SetVisible(false);
-
-                if (UiList.TryGetValue(UiType.Main, out o))
-                    (o as UiObject).SetVisible(false);
-            }
-        }
-
-        public void HideUI()
-        {
-            ShowMainWindow = false;
-            ShowRecapWindow = false;
-        }
-
-        public void OnGUI()
-        {
-            for (int i = 0; i < postDrawQueue.Count; i++)
-                postDrawQueue[i]();
-        }
-
-        static internal void AddToPostDrawQueue(Callback c)
-        {
-            postDrawQueue.Add(c);
-        }
-
-        void OnDestroy()
-        {
-            //Terminate all UI
-            for (int i = 0; i < UiList.Count; i++)
-                UiList[UiList.Keys[i]].Terminate();
-
-            GameEvents.OnGameSettingsApplied.Remove(OnSettingsApplied);
-            GameEvents.onHideUI.Remove(HideUI);
-            GameEvents.onGameSceneSwitchRequested.Remove(ResetWindows);
-
-            //Save settings to disk
-            SettingsManager.Settings.save();
-            VesselManager.Terminate();
-            ActionGroupManager.AddDebugLog("VisualUI Terminated.");
         }
     }
 }
-

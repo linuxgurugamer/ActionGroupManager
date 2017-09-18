@@ -1,82 +1,133 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
+﻿//-----------------------------------------------------------------------
+// <copyright file="Highlighter.cs" company="Aquila Enterprises">
+//     Copyright (c) Kevin Seiden. The MIT License.
+// </copyright>
+//-----------------------------------------------------------------------
 
 namespace ActionGroupManager
 {
-    class Highlighter
-    {
-        List<Part> internalHighlight;
-        
-        public Highlighter()
-        {
-            internalHighlight = new List<Part>();
-        }
+    using System.Collections.Generic;
 
+    using UnityEngine;
+
+    /// <summary>
+    /// Defines a structure for tracking the <see cref="Part"/>s highlighted by Action Group Manager.
+    /// </summary>
+    internal class Highlighter
+    {
+        /// <summary>
+        /// Contains a list of all <see cref="Part"/> being highlighted.
+        /// </summary>
+        private List<Part> internalHighlight = new List<Part>();
+
+        /// <summary>
+        /// Updates the highlighting on all configured parts.
+        /// </summary>
         public void Update()
         {
-            ActionGroupManager.AddDebugLog("Updating Highlight Color (" + VisualUi.uiSettings.highlightRed / 255f + ", " + VisualUi.uiSettings.highlightGreen / 255f + ", " + VisualUi.uiSettings.highlightBlue / 255f + ")", true);
-            Color c = new Color(VisualUi.uiSettings.highlightRed / 255f, VisualUi.uiSettings.highlightGreen / 255f, VisualUi.uiSettings.highlightBlue / 255f);
-            for(int i = 0; i < internalHighlight.Count; i++)
+            Program.AddDebugLog("Updating Highlight Color (" + (VisualUi.UiSettings.HighlightRed / 255f) + ", " + (VisualUi.UiSettings.HighlightGreen / 255f) + ", " + (VisualUi.UiSettings.HighlightBlue / 255f) + ")", true);
+            var c = new Color(VisualUi.UiSettings.HighlightRed / 255f, VisualUi.UiSettings.HighlightGreen / 255f, VisualUi.UiSettings.HighlightBlue / 255f);
+
+            foreach (Part part in this.internalHighlight)
             {
-                internalHighlight[i].SetHighlightColor(c);
-                internalHighlight[i].SetHighlight(true, false);
+                part.SetHighlightColor(c);
+                part.SetHighlight(true, false);
             }
         }
 
-        public void Add(Part p)
+        /// <summary>
+        /// Adds a part to be highlighted.
+        /// </summary>
+        /// <param name="part">The part to be highlighted.</param>
+        public void Add(Part part)
         {
-            if (internalHighlight.Contains(p))
-                return;
-
-            internalHighlight.Add(p);
-            ActionGroupManager.AddDebugLog("Adding Highlight Color (" + VisualUi.uiSettings.highlightRed / 255f + ", " + VisualUi.uiSettings.highlightGreen / 255f + ", " + VisualUi.uiSettings.highlightBlue / 255f + ") to " + p.name);
-            p.highlightColor = new Color(VisualUi.uiSettings.highlightRed / 255f, VisualUi.uiSettings.highlightGreen / 255f, VisualUi.uiSettings.highlightBlue / 255f);
-            p.SetHighlight(true, false);
+            if (!this.internalHighlight.Contains(part))
+            {
+                this.internalHighlight.Add(part);
+                Program.AddDebugLog("Adding Highlight Color (" + (VisualUi.UiSettings.HighlightRed / 255f) + ", " + (VisualUi.UiSettings.HighlightGreen / 255f) + ", " + (VisualUi.UiSettings.HighlightBlue / 255f) + ") to " + part.name);
+                part.highlightColor = new Color(VisualUi.UiSettings.HighlightRed / 255f, VisualUi.UiSettings.HighlightGreen / 255f, VisualUi.UiSettings.HighlightBlue / 255f);
+                part.SetHighlight(true, false);
+            }
         }
 
-        public void Add(BaseAction bA)
+        /*
+        /// <summary>
+        /// Adds the parent part of a <see cref="BaseAction"/> to be highlighted.
+        /// </summary>
+        /// <param name="action">The <see cref="BaseAction"/> of the part to be highlighted.</param>
+        public void Add(BaseAction action)
         {
-            Add(bA.listParent.part);
+            this.Add(action.listParent.part);
         }
+        */
 
+        /// <summary>
+        /// Gets a value indicating whether the highlighter contains a <see cref="Part"/>.
+        /// </summary>
+        /// <param name="p">The <see cref="Part"/> to search for.</param>
+        /// <returns>True if the highlighter contains the <see cref="Part"/>.</returns>
         public bool Contains(Part p)
         {
-            return internalHighlight.Contains(p);
+            return this.internalHighlight.Contains(p);
         }
 
+        /// <summary>
+        /// Removes all parts from the highlighter.
+        /// </summary>
         public void Clear()
         {
-            foreach (Part p in internalHighlight)
-                p.SetHighlightDefault();
-            internalHighlight.Clear();
-        }
-
-        public void Remove(Part p)
-        {
-            if (!internalHighlight.Contains(p))
-                return;
-
-            internalHighlight.Remove(p);
-            p.SetHighlightDefault();
-        }
-
-        public void Remove(BaseAction bA)
-        {
-            for(int i = 0; i < internalHighlight.Count; i++)
+            foreach (Part p in this.internalHighlight)
             {
-                if(internalHighlight[i] == bA.listParent.part)
+                p.SetHighlightDefault();
+            }
+
+            this.internalHighlight.Clear();
+        }
+
+        /// <summary>
+        /// Removes a part to be highlighted.
+        /// </summary>
+        /// <param name="part">The part to remove highlighting.</param>
+        public void Remove(Part part)
+        {
+            if (this.internalHighlight.Contains(part))
+            {
+                this.internalHighlight.Remove(part);
+                part.SetHighlightDefault();
+            }
+        }
+
+        /*
+        /// <summary>
+        /// Removes the parent part of a <see cref="BaseAction"/> to be highlighted.
+        /// </summary>
+        /// <param name="action">The <see cref="BaseAction"/> of the part to remove highlighting.</param>
+        public void Remove(BaseAction action)
+        {
+            for (int i = 0; i < this.internalHighlight.Count; i++)
+            {
+                if (this.internalHighlight[i] == action.listParent.part)
                 {
-                    Remove(bA.listParent.part);
+                    this.Remove(action.listParent.part);
                 }
             }
         }
+        */
 
-        public void Switch(Part p)
+        /// <summary>
+        /// Inverts the highlighting on a <see cref="Part"/>.
+        /// </summary>
+        /// <param name="part">The <see cref="Part"/> to invert highlighting.</param>
+        public void Switch(Part part)
         {
-            if (internalHighlight.Contains(p))
-                Remove(p);
+            if (this.internalHighlight.Contains(part))
+            {
+                this.Remove(part);
+            }
             else
-                Add(p);
+            {
+                this.Add(part);
+            }
         }
     }
 }

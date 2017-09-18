@@ -1,106 +1,32 @@
-﻿using System;
-using System.Collections.Generic;
+﻿//-----------------------------------------------------------------------
+// <copyright file="VesselManager.cs" company="Aquila Enterprises">
+//     Copyright (c) Kevin Seiden. The MIT License.
+// </copyright>
+//-----------------------------------------------------------------------
 
 namespace ActionGroupManager
 {
-    /*
-     * Model class
-     * Handle the active vessel, build parts catalog and can search in this catalog.
-     */
+    using System;
+    using System.Collections.Generic;
+
+    /// <summary>
+    /// Handle the active vessel, build parts catalog and can search in this catalog.
+    /// </summary>
     public class VesselManager
     {
-        //placeholder class
-        public class PartAction
-        {
-            public Part Part { get; set; }
-            public BaseAction Action { get; set; }
-        }
+        /// <summary>
+        /// A singleton for this object.
+        /// </summary>
+        private static VesselManager managerInstance;
 
-        #region Singleton
-        private static VesselManager _instance;
-        public static VesselManager Instance 
-        { 
-            get
-            {
-                if (_instance == null)
-                {
-
-                    ActionGroupManager.AddDebugLog("VesselPartManager instanciated.");
-
-                    _instance = new VesselManager();
-                    _instance.Initialize();
-                }
-                return _instance;
-            }
-            private set
-            {
-                Instance = value;
-            } 
-        }
-
+        /// <summary>
+        /// Prevents a default instance of the <see cref="VesselManager"/> class from being created.
+        /// </summary>
         private VesselManager()
         {
-
-        }
-        #endregion
-
-        void UnlinkEvents()
-        {
-            GameEvents.onVesselWasModified.Remove(new EventData<Vessel>.OnEvent(this.OnVesselModified));
-            GameEvents.onVesselChange.Remove(new EventData<Vessel>.OnEvent(this.OnVesselModified));
-            GameEvents.onUndock.Remove(new EventData<EventReport>.OnEvent(this.OnUndock));
-            GameEvents.onPartCouple.Remove(new EventData<GameEvents.FromToAction<Part, Part>>.OnEvent(this.OnPartCouple));
-        }
-
-        public static void Terminate()
-        {
-            _instance.UnlinkEvents();
-            _instance.ActiveVesselPartsList.Clear();
-            _instance.ActiveVessel = null;
-            _instance = null;
-
-            ActionGroupManager.AddDebugLog("VesselPartManager Terminated.");
-        }
-
-        List<Part> nonSortedPartList;
-        List<Part> ActiveVesselPartsList;
-        public Vessel ActiveVessel { get; set; }
-        public List<KSPActionGroup> AllActionGroups { get; set; }
-
-        public event EventHandler DatabaseUpdated;
-
-        #region Initialization stuff
-
-        private void OnPartCouple(GameEvents.FromToAction<Part, Part> data)
-        {
-            ActionGroupManager.AddDebugLog("Handling onPartCouple event.");
-            RebuildPartDatabase();
-        }
-
-        private void OnUndock(EventReport data)
-        {
-            ActionGroupManager.AddDebugLog("Handling onUndock event.");
-            RebuildPartDatabase();
-
-        }
-
-        private void OnVesselModified(Vessel data)
-        {
-            ActionGroupManager.AddDebugLog("Handling onVesselModified.");
-            if (data != ActiveVessel)
-            {
-                SetActiveVessel();
-            }
-
-            RebuildPartDatabase();
-        }
-
-        public void Initialize()
-        {
-            ActionGroupManager.AddDebugLog("VesselManager Initializing");
-            SetActiveVessel();
-            RebuildPartDatabase();
-            BuildActionGroupList();
+            Program.AddDebugLog("Vessel Manager Initializing");
+            this.ActiveVessel = FlightGlobals.ActiveVessel;
+            this.RebuildPartDatabase();
 
             GameEvents.onVesselWasModified.Add(new EventData<Vessel>.OnEvent(this.OnVesselModified));
             GameEvents.onVesselChange.Add(new EventData<Vessel>.OnEvent(this.OnVesselModified));
@@ -108,68 +34,140 @@ namespace ActionGroupManager
             GameEvents.onPartCouple.Add(new EventData<GameEvents.FromToAction<Part, Part>>.OnEvent(this.OnPartCouple));
         }
 
-        void BuildActionGroupList()
-        {
-            AllActionGroups = new List<KSPActionGroup>();
-            AllActionGroups.AddRange(Enum.GetValues(typeof(KSPActionGroup)) as KSPActionGroup[]);
-        }
+        /// <summary>
+        /// Event that is fired when the part database is rebuilt.
+        /// </summary>
+        public event EventHandler DatabaseUpdated;
 
-        /*Assign or switch active vessel
-         */
-        void SetActiveVessel()
+        /// <summary>
+        /// Gets a singleton reference for the active <see cref="VesselManager"/>
+        /// </summary>
+        public static VesselManager Instance
         {
-            ActionGroupManager.AddDebugLog("SetActiveVessel");
-            if (FlightGlobals.ActiveVessel == ActiveVessel)
-                return;
-
-            ActiveVessel = FlightGlobals.ActiveVessel;
-        }
-
-        /*Rebuild the list of parts from active vessel.
-         */
-        void RebuildPartDatabase()
-        {
-            ActionGroupManager.AddDebugLog("RebuildPartDatabase");
-            if (!ActiveVessel)
+            get
             {
-                ActionGroupManager.AddDebugLog("No active vessel selected.");
+                if (managerInstance == null)
+                {
+                    Program.AddDebugLog("Vessel Part Manager instantiated.");
+                    managerInstance = new VesselManager();
+                }
+
+                return managerInstance;
+            }
+        }
+
+        /// <summary>
+        /// Gets a list of parts on the active vessel that contain actions.
+        /// </summary>
+        public IEnumerable<Part> Parts { get; private set; }
+
+        /// <summary>
+        /// Gets the active vessel.
+        /// </summary>
+        public Vessel ActiveVessel { get; private set; }
+
+        /// <summary>
+        /// Disposes the VesselManager
+        /// </summary>
+        public static void Dispose()
+        {
+            managerInstance.UnlinkEvents();
+            managerInstance.ActiveVessel = null;
+            managerInstance = null;
+
+            Program.AddDebugLog("Vessel Part Manager Disposed.");
+        }
+
+        /// <summary>
+        /// Removes event registration.
+        /// </summary>
+        private void UnlinkEvents()
+        {
+            GameEvents.onVesselWasModified.Remove(new EventData<Vessel>.OnEvent(this.OnVesselModified));
+            GameEvents.onVesselChange.Remove(new EventData<Vessel>.OnEvent(this.OnVesselModified));
+            GameEvents.onUndock.Remove(new EventData<EventReport>.OnEvent(this.OnUndock));
+            GameEvents.onPartCouple.Remove(new EventData<GameEvents.FromToAction<Part, Part>>.OnEvent(this.OnPartCouple));
+        }
+        #region Initialization stuff
+
+        /// <summary>
+        /// Rebuild the list of parts from active vessel.
+        /// </summary>
+        private void RebuildPartDatabase()
+        {
+            Program.AddDebugLog("Rebuild Part Database");
+
+            if (!this.ActiveVessel)
+            {
+                Program.AddDebugLog("No active vessel selected.");
                 return;
             }
 
-            ActiveVesselPartsList = ActiveVessel.Parts.FindAll(
+            List<Part> parts = this.ActiveVessel.Parts.FindAll(
                 (p) =>
                 {
                     if (p.Actions.Count != 0)
-                        return true;
-
-                    for (int i = 0; i < p.Modules.Count; i++)
                     {
-                        if (p.Modules[i].Actions.Count != 0)
+                        return true;
+                    }
+
+                    foreach (PartModule module in p.Modules)
+                    {
+                        if (module.Actions.Count != 0)
+                        {
                             return true;
+                        }
                     }
 
                     return false;
                 });
-            nonSortedPartList = new List<Part>(ActiveVessel.Parts);
 
-            ActiveVesselPartsList.Sort(
+            parts.Sort(
                 (p1, p2) =>
                 {
                     return -p1.orgPos.y.CompareTo(p2.orgPos.y);
                 });
 
-            if (DatabaseUpdated != null)
-                DatabaseUpdated(this, EventArgs.Empty);
+            this.Parts = parts;
 
-            ActionGroupManager.AddDebugLog("Parts catalogue rebuilt.");
+            this.DatabaseUpdated?.Invoke(this, EventArgs.Empty);
+
+            Program.AddDebugLog("Parts catalog rebuilt.");
         }
 
-        #endregion
-
-        #region Request Methods for Parts listing
-        public List<Part> GetParts()
+        /// <summary>
+        /// Handles the <see cref="onPartCouple"/> event.
+        /// </summary>
+        /// <param name="data">The part begin coupled and the part being coupled to.</param>
+        private void OnPartCouple(GameEvents.FromToAction<Part, Part> data)
         {
-            return ActiveVesselPartsList;
+            Program.AddDebugLog("Handling Part Couple Event.");
+            this.RebuildPartDatabase();
+        }
+
+        /// <summary>
+        /// Handles the <see cref="onUndock"/> event.
+        /// </summary>
+        /// <param name="data">The <see cref="EventReport"/> arguments.</param>
+        private void OnUndock(EventReport data)
+        {
+            Program.AddDebugLog("Handling Undock Event.");
+            this.RebuildPartDatabase();
+        }
+
+        /// <summary>
+        /// Handles the <see cref="onVesselWasModified"/> event.
+        /// </summary>
+        /// <param name="data">The modified <see cref="Vessel"/></param>
+        private void OnVesselModified(Vessel data)
+        {
+            Program.AddDebugLog("Handling Vessel Modified Event.");
+            if (data != this.ActiveVessel)
+            {
+                this.ActiveVessel = FlightGlobals.ActiveVessel;
+            }
+
+            this.RebuildPartDatabase();
         }
         #endregion
     }

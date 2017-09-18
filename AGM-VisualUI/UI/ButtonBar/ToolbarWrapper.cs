@@ -26,7 +26,7 @@ using UnityEngine;
 
 
 // TODO: Change to your plugin's namespace here.
-namespace ActionGroupManager.UI.ButtonBar
+namespace ActionGroupManager
 {
 
 
@@ -583,7 +583,7 @@ namespace ActionGroupManager.UI.ButtonBar
         private Delegate attachEventHandler(EventInfo @event, string methodName, object realButton)
         {
             MethodInfo method = GetType().GetMethod(methodName, BindingFlags.NonPublic | BindingFlags.Instance);
-            Delegate d = Delegate.CreateDelegate(@event.EventHandlerType, this, method);
+            var d = Delegate.CreateDelegate(@event.EventHandlerType, this, method);
             @event.AddEventHandler(realButton, d);
             return d;
         }

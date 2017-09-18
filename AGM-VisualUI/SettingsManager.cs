@@ -1,38 +1,65 @@
-﻿using KSP.IO;
+﻿//-----------------------------------------------------------------------
+// <copyright file="SettingsManager.cs" company="Aquila Enterprises">
+//     Copyright (c) Kevin Seiden. The MIT License.
+// </copyright>
+//-----------------------------------------------------------------------
 
 namespace ActionGroupManager
 {
-    //Wrapper for PluginConfiguration
-    class SettingsManager
+    using KSP.IO;
+
+    /// <summary>
+    /// Hold non-parameter application settings.
+    /// </summary>
+    internal static class SettingsManager
     {
-        public static PluginConfiguration Settings { get; private set; }
+        /// <summary>
+        /// The settings string for storing whether the main window is visible.
+        /// </summary>
+        public const string IsMainWindowVisible = "IsMainWindowVisible";
 
-        public static readonly string IsMainWindowVisible = "IsMainWindowVisible";
-        public static readonly string MainWindowRect = "MainWindowRect";
-        public static readonly string OrderByStage = "OrderByStage";
-        public static readonly string RecapWindocRect = "RecapWindowRect";
-        public static readonly string IsRecapWindowVisible = "IsRecapWindowVisible";
+        /// <summary>
+        /// The settings string for storing the main window position.
+        /// </summary>
+        public const string MainWindowRect = "MainWindowRect";
 
-        /*
-        public static readonly string IsIconLocked = "IsIconLocked";
-        public static readonly string QuietMode = "QuietMode";
-        public static readonly string IconRect = "IconRect";
-        public static readonly string AutomaticPartCheck = "AutomaticPartCheck";
-        public static readonly string FrequencyOfAutomaticUpdate = "FrequencyOfAutomaticUpdate";
-        */
+        /// <summary>
+        /// The settings string for storing the state of the Order By Stage button.
+        /// </summary>
+        public const string OrderByStage = "OrderByStage";
+
+        /// <summary>
+        /// The settings string for storing the reference window is position.
+        /// </summary>
+        public const string ReferenceWindocRect = "RecapWindowRect";
+
+        /// <summary>
+        /// The settings string for storing whether the reference window is visible.
+        /// </summary>
+        public const string IsReferenceWindowVisible = "IsRecapWindowVisible";
+
+        /// <summary>
+        /// Initializes static members of the <see cref="SettingsManager"/> class.
+        /// </summary>
         static SettingsManager()
         {
-            
             Settings = PluginConfiguration.CreateForType<VisualUi>();
             Settings.load();
-            ActionGroupManager.AddDebugLog("UI Settings Loaded");
+            Program.AddDebugLog("UI Settings Loaded");
         }
 
-        static void Save()
+        /// <summary>
+        /// Gets the <see cref="PluginConfiguration"/> to access the application settings.
+        /// </summary>
+        public static PluginConfiguration Settings { get; private set; }
+
+        /// <summary>
+        /// Saves all settings.
+        /// </summary>
+        public static void Save()
         {
             Settings.save();
-            ActionGroupManager.AddDebugLog("UI Settings Saved");
+            Program.AddDebugLog("UI Settings Saved");
         }
-
     }
 }

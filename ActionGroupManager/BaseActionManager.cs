@@ -1,29 +1,46 @@
-﻿using System;
-using System.Collections.Generic;
-using ActionGroupManager.Extensions;
+﻿//-----------------------------------------------------------------------
+// <copyright file="BaseActionManager.cs" company="Aquila Enterprises">
+//     Copyright (c) Kevin Seiden. The MIT License.
+// </copyright>
+//-----------------------------------------------------------------------
 
 namespace ActionGroupManager
 {
-    static public class BaseActionFilter
+    using System;
+    using System.Collections.Generic;
+
+    /// <summary>
+    /// Defines a set of static methods for manipulating <see cref="BaseAction"/>.
+    /// </summary>
+    public static class BaseActionManager
     {
         /// <summary>
         /// Returns a list of base actions that exist for the provided part.
         /// </summary>
         /// <param name="part">The part to get base actions from.</param>
         /// <returns>The base actions available to the part.</returns>
-        public static List<BaseAction> FromParts(Part part)
+        public static ICollection<BaseAction> FromParts(Part part)
         {
-            List<BaseAction> ret = new List<BaseAction>();
+            var partList = new List<BaseAction>();
+            if (part != null)
+            {
+                // Add BaseActions in the part
+                foreach (BaseAction action in part.Actions)
+                {
+                    partList.Add(action);
+                }
 
-            int i;
-            for (i = 0; i < part.Actions.Count; i++)
-                ret.Add(part.Actions[i]);
+                // Add BaseActions in the part modules.
+                foreach (PartModule module in part.Modules)
+                {
+                    foreach (BaseAction action in module.Actions)
+                    {
+                        partList.Add(action);
+                    }
+                }
+            }
 
-            for (i = 0; i < part.Modules.Count; i++)
-                for (int j = 0; j < part.Modules[i].Actions.Count; j++)
-                    ret.Add(part.Modules[i].Actions[j]);
-
-            return ret;
+            return partList;
         }
 
         /// <summary>
@@ -31,36 +48,50 @@ namespace ActionGroupManager
         /// </summary>
         /// <param name="parts">A list of part to get base actions from.</param>
         /// <returns>The base actions available to the parts.</returns>
-        public static List<BaseAction> FromParts(List<Part> parts)
+        public static IEnumerable<BaseAction> FromParts(IEnumerable<Part> parts)
         {
-            List<BaseAction> ret = new List<BaseAction>();
+            var actionList = new List<BaseAction>();
 
-            for (int i = 0; i < parts.Count; i++)
+            if (parts != null)
             {
-                int j;
-                for(j = 0; j < parts[i].Actions.Count; j++)
-                    ret.Add(parts[i].Actions[j]);
+                foreach (Part part in parts)
+                {
+                    foreach (BaseAction action in part.Actions)
+                    {
+                        actionList.Add(action);
+                    }
 
-                for(j = 0; j < parts[i].Modules.Count; j++)
-                    for(int k = 0; k < parts[i].Modules[j].Actions.Count; k++)
-                        ret.Add(parts[i].Modules[j].Actions[k]);
+                    foreach (PartModule module in part.Modules)
+                    {
+                        foreach (BaseAction action in module.Actions)
+                        {
+                            actionList.Add(action);
+                        }
+                    }
+                }
             }
-            return ret;
+
+            return actionList;
         }
 
         /// <summary>
         /// Returns a list of base actions that exist for the provided parts in the provided action group.
         /// </summary>
         /// <param name="parts">A list of part to get base actions from.</param>
-        /// <param name="ag">The action group to filter actions by.</param>
+        /// <param name="group">The action group to filter actions by.</param>
         /// <returns>The base actions available to the parts that are in the action group.</returns>
-        public static List<BaseAction> FromParts(List<Part> parts, KSPActionGroup ag)
+        public static ICollection<BaseAction> FromParts(IEnumerable<Part> parts, KSPActionGroup group)
         {
-            List<BaseAction> list = FromParts(parts);
-            List<BaseAction> ret = new List<BaseAction>();
-            for (int i = 0; i < list.Count; i++)
-                if(ag.ContainsAction(list[i]))
-                    ret.Add(list[i]);
+            IEnumerable<BaseAction> list = FromParts(parts);
+            var ret = new List<BaseAction>();
+
+            foreach (BaseAction action in list)
+            {
+                if (group.ContainsAction(action))
+                {
+                    ret.Add(action);
+                }
+            }
 
             return ret;
         }
@@ -68,21 +99,26 @@ namespace ActionGroupManager
         /// <summary>
         /// Returns a list of action groups that the provided base action belongs to.
         /// </summary>
-        /// <param name="bA">The base action to find actiong groups for.</param>
+        /// <param name="action">The base action to find actiong groups for.</param>
         /// <returns>A list of action groups the base action is assigned to.</returns>
-        public static List<KSPActionGroup> GetActionGroupList(BaseAction bA)
+        public static ICollection<KSPActionGroup> GetActionGroupList(BaseAction action)
         {
-            List<KSPActionGroup> ret = new List<KSPActionGroup>();
-            KSPActionGroup[] groups = Enum.GetValues(typeof(KSPActionGroup)) as KSPActionGroup[];
+            var ret = new List<KSPActionGroup>();
+            var groups = Enum.GetValues(typeof(KSPActionGroup)) as KSPActionGroup[];
 
-            for (int i = 0; i < groups.Length; i++)
+            foreach (KSPActionGroup group in groups)
             {
-                if (groups[i] == KSPActionGroup.None || groups[i] == KSPActionGroup.REPLACEWITHDEFAULT)
+                if (group == KSPActionGroup.None || group == KSPActionGroup.REPLACEWITHDEFAULT)
+                {
                     continue;
+                }
 
-                if (groups[i].ContainsAction(bA))
-                    ret.Add(groups[i]);
+                if (group.ContainsAction(action))
+                {
+                    ret.Add(group);
+                }
             }
+
             return ret;
         }
     }

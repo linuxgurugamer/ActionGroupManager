@@ -1,5 +1,5 @@
 ﻿//-----------------------------------------------------------------------
-// <copyright file="Toolbar.cs" company="Aquila Enterprises">
+// <copyright file="ToolbarReference.cs" company="Aquila Enterprises">
 //     Copyright (c) Kevin Seiden. The MIT License.
 // </copyright>
 //-----------------------------------------------------------------------
@@ -11,19 +11,19 @@ namespace ActionGroupManager
     using KSP.Localization;
 
     /// <summary>
-    /// Defines an toolbar button to control the main Ui.
+    /// Defines an toolbar button to control the reference Ui.
     /// </summary>
-    internal class Toolbar : UiObject, IButtonBar
+    internal class ToolbarReference : UiObject, IButtonBar
     {
         /// <summary>
         /// The name of the On Toolbar Texture
         /// </summary>
-        private const string OnButton = "ToolbarOn";
+        private const string OnButton = "ToolbarListOn";
 
         /// <summary>
         /// The name of the Off Toolbar Texture
         /// </summary>
-        private const string OffButton = "ToolbarOff";
+        private const string OffButton = "ToolbarListOff";
 
         /// <summary>
         /// The image path for Action Group Manager
@@ -38,19 +38,24 @@ namespace ActionGroupManager
         /// <summary>
         /// The UiObjects controlled by the primary and secondary click.
         /// </summary>
-        private UiObject controlled, secondaryControlled;
+        private UiObject controlled;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Toolbar"/> class.
+        /// Initializes a new instance of the <see cref="ToolbarReference"/> class.
         /// </summary>
-        /// <param name="list">A list of one or two <see cref="UiObject"/> controlled by the toolbar button.</param>
-        public Toolbar(params object[] list)
+        /// <param name="list">A list of one <see cref="UiObject"/> controlled by the toolbar button.</param>
+        public ToolbarReference(params object[] list)
         {
-            string str = SettingsManager.Settings.GetValue<bool>(SettingsManager.IsMainWindowVisible, true) ? this.mainPath + OnButton : this.mainPath + OffButton;
+            if (list != null && list[0] != null)
+            {
+                if (list[0] != null)
+                {
+                    this.controlled = list[0] as UiObject;
+                }
+            }
 
-            this.mainButton = ToolbarManager.Instance.add("AGM", "AGMMainSwitch");
-            this.mainButton.ToolTip = Localizer.GetStringByTag("#autoLOC_AGM_004");
-            this.mainButton.TexturePath = str;
+            this.mainButton = ToolbarManager.Instance.add("AGMReference", "AGMReferenceSwitch");
+            this.mainButton.ToolTip = Localizer.GetStringByTag("#autoLOC_AGM_003");
             this.mainButton.Visibility = new GameScenesVisibility(GameScenes.FLIGHT);
             this.mainButton.OnClick +=
                 (e) =>
@@ -60,24 +65,9 @@ namespace ActionGroupManager
                         this.controlled.Visible = !this.controlled.Visible;
                         this.mainButton.TexturePath = this.controlled.Visible ? this.mainPath + OnButton : this.mainPath + OffButton;
                     }
-                    else if (e.MouseButton == 1 && VisualUi.UiSettings.ToolBarListRightClick)
-                    {
-                        this.secondaryControlled.Visible = !this.secondaryControlled.Visible;
-                    }
                 };
 
-            if (list != null)
-            {
-                if (list[0] != null)
-                {
-                    this.controlled = list[0] as UiObject;
-                }
-
-                if (list[1] != null)
-                {
-                    this.secondaryControlled = list[1] as UiObject;
-                }
-            }
+            this.SwitchTexture(this.controlled.Visible);
         }
 
         /// <summary>
@@ -85,15 +75,8 @@ namespace ActionGroupManager
         /// </summary>
         public override bool Visible
         {
-            get
-            {
-                return this.mainButton.Visible;
-            }
-
-            set
-            {
-                this.mainButton.Visible = value;
-            }
+            get { return this.mainButton.Visible; }
+            set { this.mainButton.Visible = value; }
         }
 
         /// <summary>
@@ -115,7 +98,7 @@ namespace ActionGroupManager
         /// <summary>
         /// Sets the texture of the toolbar button based on visibility.
         /// </summary>
-        /// <param name="visible">A value indicating whether the <see cref="MainUi"/> is visible.</param>
+        /// <param name="visible">A value indicating whether the <see cref="ReferenceUi"/> is visible.</param>
         public void SwitchTexture(bool visible)
         {
             this.mainButton.TexturePath = visible ? this.mainPath + OnButton : this.mainPath + OffButton;

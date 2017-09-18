@@ -1,27 +1,54 @@
-﻿namespace ActionGroupManager.UI
+﻿//-----------------------------------------------------------------------
+// <copyright file="UiObject.cs" company="Aquila Enterprises">
+//     Copyright (c) Kevin Seiden. The MIT License.
+// </copyright>
+//-----------------------------------------------------------------------
+
+namespace ActionGroupManager
 {
-    //Interface for all UI object
+    /// <summary>
+    /// The base class that defines the interactiions for all interface objects.
+    /// </summary>
     public abstract class UiObject
     {
-        bool visible;
+        /// <summary>
+        /// Indicates whether the object is visible to the user.
+        /// </summary>
+        private bool visible;
 
-        public abstract void Terminate();
-
-        public abstract void DoUILogic();
-
-        public bool IsVisible()
+        /// <summary>
+        /// Gets or sets a value indicating whether the object is visible to the user.
+        /// </summary>
+        public virtual bool Visible
         {
-            return visible;
+            get
+            {
+                return this.visible;
+            }
+
+            set
+            {
+                if (value && !this.visible)
+                {
+                    VisualUi.AddToPostDrawQueue(this.Paint);
+                }
+                else if (!value & this.visible)
+                {
+                    VisualUi.AddToPostDrawQueue(this.Paint);
+                }
+
+                this.visible = value;
+            }
         }
 
-        public virtual void SetVisible(bool vis)
-        {
-            if (vis && !visible)
-                    VisualUi.AddToPostDrawQueue(DoUILogic);
-            else if(!vis & visible)
-                    VisualUi.AddToPostDrawQueue(DoUILogic);
+        /// <summary>
+        /// Disposes of the UI object.
+        /// </summary>
+        public abstract void Dispose();
 
-            visible = vis;
-        }
+        /// <summary>
+        /// Performs UI actions per frame.
+        /// </summary>
+        public abstract void Paint();
     }
 }

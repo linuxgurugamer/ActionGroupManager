@@ -1,200 +1,373 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using ActionGroupManager.Extensions;
+﻿//-----------------------------------------------------------------------
+// <copyright file="PartManager.cs" company="Aquila Enterprises">
+//     Copyright (c) Kevin Seiden. The MIT License.
+// </copyright>
+//-----------------------------------------------------------------------
 
 namespace ActionGroupManager
 {
-    /*State filter.
-     * Listen to an event and change the filter according to the new one.
-     * GetCurrentParts return always the current filtered data. 
-     */
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
 
-    class PartFilter
+    /// <summary>
+    /// Represets a specific type of filter.
+    /// </summary>
+    internal enum FilterModification
     {
-        VesselManager manager;
-        public PartCategories CurrentPartCategory { get; set; }
-        public KSPActionGroup CurrentActionGroup { get; set; }
-        public string CurrentSearch { get; set; }
-        public int CurrentStage { get; set; }
-        public Part CurrentPart { get; set; }
-        public BaseAction CurrentAction { get; set; }
+        /// <summary>
+        /// Represents a change in the category filter.
+        /// </summary>
+        Category,
 
-        bool Dirty { get; set; }
+        /// <summary>
+        /// Represents a change in the action group filter.
+        /// </summary>
+        ActionGroup,
 
-        List<Part> returnPart;
-        SortedList<PartCategories, int> dic;
+        /// <summary>
+        /// Represents a change in the string filter.
+        /// </summary>
+        Search,
 
-        public PartFilter()
+        /// <summary>
+        /// Represents a change in the stage filter.
+        /// </summary>
+        Stage,
+
+        /// <summary>
+        /// Represents a change in the part filter.
+        /// </summary>
+        Part,
+
+        /// <summary>
+        /// Represents a change in the action filter.
+        /// </summary>
+        BaseAction,
+
+        /// <summary>
+        /// Represents clearing all filters.
+        /// </summary>
+        All
+    }
+
+    /// <summary>
+    /// Defines a class to maintain a subset of parts based on filter parameters selected by the user.
+    /// </summary>
+    internal class PartManager
+    {
+        /// <summary>
+        /// Contains a list of parts that meet the current selection of filters.
+        /// </summary>
+        private List<Part> filteredParts = new List<Part>();
+
+        /// <summary>
+        /// Contans a dictionary of how many parts are in each <see cref="PartCategories"/>.
+        /// </summary>
+        private SortedList<PartCategories, int> partCounts;
+
+        /// <summary>
+        /// A value indicating that the filter has changed but the part list has not been rebuilt for that change.
+        /// </summary>
+        private bool dirty = true;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PartManager"/> class.
+        /// </summary>
+        public PartManager()
         {
-            manager = VesselManager.Instance;
-
-            Initialize();
+            VesselManager.Instance.DatabaseUpdated += this.Manager_DatabaseUpdated;
         }
 
-        private void Initialize()
+        /// <summary>
+        /// Gets the currently selected part category filter.
+        /// </summary>
+        public PartCategories CurrentPartCategory { get; private set; } = PartCategories.none;
+
+        /// <summary>
+        /// Gets the currently selected action group filter.
+        /// </summary>
+        public KSPActionGroup CurrentActionGroup { get; private set; } = KSPActionGroup.None;
+
+        /// <summary>
+        /// Gets the current text filter.
+        /// </summary>
+        public string CurrentSearch { get; private set; } = string.Empty;
+
+        /// <summary>
+        /// Gets the current stage filter.
+        /// </summary>
+        public int CurrentStage { get; private set; } = int.MinValue;
+
+        /*
+        /// <summary>
+        /// Gets the current part filter.
+        /// </summary>
+        private Part CurrentPart { get; set; }
+
+        /// <summary>
+        /// Gets the current part action filter.
+        /// </summary>
+        private BaseAction CurrentAction { get; set; }
+        */
+
+        /// <summary>
+        /// Gets a list of <see cref="Part"/> matching the current filter.
+        /// </summary>
+        /// <returns>A list of filtered <see cref="Part"/> on the <see cref="Vesel"/>.</returns>
+        public ICollection<Part> FilteredParts
         {
-            CurrentPartCategory = PartCategories.none;
-            CurrentActionGroup = KSPActionGroup.None;
-            CurrentSearch = string.Empty;
-            CurrentStage = int.MinValue;
+            get
+            {
+                if (this.dirty)
+                {
+                    this.filteredParts.Clear();
 
-            returnPart = new List<Part>();
+                    IEnumerable<Part> baseList = VesselManager.Instance.Parts;
 
-            Dirty = true;
+                    if (this.CurrentPartCategory != PartCategories.none)
+                    {
+                        baseList = baseList.Where(this.FilterCategory);
+                    }
 
-            manager.DatabaseUpdated += manager_DatabaseUpdated;
+                    if (this.CurrentActionGroup != KSPActionGroup.None)
+                    {
+                        baseList = baseList.Where(this.FilterActionGroup);
+                    }
+
+                    if (!string.IsNullOrEmpty(this.CurrentSearch))
+                    {
+                        baseList = baseList.Where(this.FilterString);
+                    }
+
+                    if (this.CurrentStage != int.MinValue)
+                    {
+                        baseList = baseList.Where(this.FilterStage);
+                    }
+
+                    this.filteredParts.AddRange(baseList);
+                    this.dirty = false;
+                }
+
+                return this.filteredParts;
+            }
         }
 
-        void manager_DatabaseUpdated(object sender, EventArgs e)
+        /// <summary>
+        /// Gets a dictionary containing the number of parts in each <see cref="PartCategories"/>.
+        /// </summary>
+        public IDictionary<PartCategories, int> PartCountByCategory
         {
-            Dirty = true;
+            get
+            {
+                if (this.dirty)
+                {
+                    this.partCounts = new SortedList<PartCategories, int>();
+
+                    foreach (PartCategories category in Enum.GetValues(typeof(PartCategories)) as PartCategories[])
+                    {
+                        this.partCounts.Add(category, 0);
+                    }
+
+                    foreach (Part part in VesselManager.Instance.Parts)
+                    {
+                        this.partCounts[part.partInfo.category] += 1;
+                    }
+                }
+
+                return this.partCounts;
+            }
         }
 
-        public void ViewFilterChanged(object sender, FilterEventArgs e)
+        /// <summary>
+        /// Gets a collection of <see cref="KSPActionGroup"/> that the <see cref="Part"/> has actions assigned to.
+        /// </summary>
+        /// <param name="part">The <see cref="Part"/> to get the action group assignments for.</param>
+        /// <returns>A collection of <see cref="KSPActionGroup"/> that the <see cref="Part"/> has actions assigned to.</returns>
+        public static List<KSPActionGroup> GetActionGroupAttachedToPart(Part part)
         {
-            switch (e.Modified)
+            var ret = new List<KSPActionGroup>();
+
+            foreach (KSPActionGroup group in Enum.GetValues(typeof(KSPActionGroup)) as KSPActionGroup[])
+            {
+                if (group != KSPActionGroup.None)
+                {
+                    foreach (PartModule module in part.Modules)
+                    {
+                        foreach (BaseAction action in module.Actions)
+                        {
+                            if (group.ContainsAction(action) && !ret.Contains(group))
+                            {
+                                ret.Add(group);
+                            }
+                        }
+                    }
+                }
+            }
+
+            return ret;
+        }
+
+        /// <summary>
+        /// Gets a collection of <see cref="BaseAction"/> assigned to a <see cref="KSPActionGroup"/>
+        /// </summary>
+        /// <param name="group">The <see cref="KSPActionGroup"/> to get the action assignments for.</param>
+        /// <returns>A collection of <see cref="BaseAction"/> assigned to the <see cref="KSPActionGroup"/>.</returns>
+        public static List<BaseAction> GetBaseActionAttachedToActionGroup(KSPActionGroup group)
+        {
+            var ret = new List<BaseAction>();
+
+            foreach (Part part in VesselManager.Instance.Parts)
+            {
+                foreach (BaseAction action in part.Actions)
+                {
+                    if (group.ContainsAction(action))
+                    {
+                        ret.Add(action);
+                    }
+                }
+
+                foreach (PartModule module in part.Modules)
+                {
+                    foreach (BaseAction action in module.Actions)
+                    {
+                        if (group.ContainsAction(action))
+                        {
+                            ret.Add(action);
+                        }
+                    }
+                }
+            }
+
+            return ret;
+        }
+
+        /// <summary>
+        /// Handles the <see cref="MainUi.FilterChanged"/> event.
+        /// </summary>
+        /// <param name="sender">The object calling the event.</param>
+        /// <param name="args">The <see cref="FilterEventArgs"/> for the event.</param>
+        public void ViewFilterChanged(object sender, FilterEventArgs args)
+        {
+            switch (args.Modified)
             {
                 case FilterModification.Category:
-                    CurrentPartCategory = (PartCategories) e.Object;
+                    this.CurrentPartCategory = (PartCategories)args.Object;
                     break;
                 case FilterModification.ActionGroup:
-                    CurrentActionGroup = (KSPActionGroup)e.Object;
+                    this.CurrentActionGroup  = (KSPActionGroup)args.Object;
                     break;
                 case FilterModification.Search:
-                    CurrentSearch = e.Object as string;
+                    this.CurrentSearch       = args.Object as string;
                     break;
                 case FilterModification.Stage:
-                    CurrentStage = (int)e.Object;
+                    this.CurrentStage        = (int)args.Object;
                     break;
+                /*
                 case FilterModification.Part:
-                    CurrentPart = e.Object as Part;
+                    this.CurrentPart         = args.Object as Part;
                     break;
                 case FilterModification.BaseAction:
-                    CurrentAction = e.Object as BaseAction;
+                    this.CurrentAction       = args.Object as BaseAction;
                     break;
+                */
                 case FilterModification.All:
-                    Initialize();
+                    this.filteredParts.Clear();
+                    this.CurrentPartCategory = PartCategories.none;
+                    this.CurrentActionGroup  = KSPActionGroup.None;
+                    this.CurrentSearch       = string.Empty;
+                    this.CurrentStage        = int.MinValue;
                     break;
                 default:
                     break;
             }
 
-            Dirty = true;
+            this.dirty = true;
         }
 
-        public List<Part> GetCurrentParts()
+        /// <summary>
+        /// Handles an event that occurs when the vessel part database is rebuilt.
+        /// </summary>
+        /// <param name="sender">The <see cref="object"/> calling the event.</param>
+        /// <param name="e">Unused event arguments.</param>
+        private void Manager_DatabaseUpdated(object sender, EventArgs e)
         {
-            if (Dirty)
+            this.dirty = true;
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether the <see cref="Part"/> name contains the current search text.
+        /// </summary>
+        /// <param name="p">The <see cref="Part"/> to test.</param>
+        /// <returns>True if the <see cref="Part"/> name contains the search string.</returns>
+        private bool FilterString(Part p)
+        {
+            return string.IsNullOrEmpty(this.CurrentSearch) || p.partInfo.title.IndexOf(this.CurrentSearch, StringComparison.OrdinalIgnoreCase) >= 0;
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether the <see cref="Part"/> name is in the currently selected stage.
+        /// </summary>
+        /// <param name="p">The <see cref="Part"/> to test.</param>
+        /// <returns>True if the <see cref="Part"/> is in the currently selected stage.</returns>
+        private bool FilterStage(Part p)
+        {
+            return p.inverseStage == this.CurrentStage;
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether the <see cref="Part"/> is in the currently selected part category.
+        /// </summary>
+        /// <param name="part">The <see cref="Part"/> to test.</param>
+        /// <returns>True if the <see cref="Part"/> is in the selected part category.</returns>
+        private bool FilterCategory(Part part)
+        {
+            return part.partInfo.category == this.CurrentPartCategory;
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether the <see cref="Part"/> has any action in the currently selected action group.
+        /// </summary>
+        /// <param name="part">The <see cref="Part"/> to test.</param>
+        /// <returns>True if the <see cref="Part"/> has an action in the selected action group.</returns>
+        private bool FilterActionGroup(Part part)
+        {
+            foreach (BaseAction action in part.Actions)
             {
-                returnPart.Clear();
-
-
-                IEnumerable<Part> baseList = manager.GetParts();
-
-                if (CurrentPartCategory != PartCategories.none)
-                    baseList = baseList.Where(FilterCategory);
-
-                if (CurrentActionGroup != KSPActionGroup.None)
-                    baseList = baseList.Where(FilterActionGroup);
-
-                if (CurrentSearch != string.Empty)
-                    baseList = baseList.Where(FilterString);
-
-                if (CurrentStage != int.MinValue)
-                    baseList = baseList.Where(FilterStage);
-
-                returnPart.AddRange(baseList);
-
-                Dirty = false;
-            }
-            return returnPart;
-        }
-
-        bool FilterCategory(Part p)
-        {
-            return p.partInfo.category == CurrentPartCategory;
-        }
-
-        bool FilterActionGroup(Part p)
-        {
-            int i, j;
-            for(i = 0; i < p.Actions.Count; i++)
-                if (CurrentActionGroup.ContainsAction(p.Actions[i]))
+                if (this.CurrentActionGroup.ContainsAction(action))
+                {
                     return true;
-            
-            for(i = 0; i < p.Modules.Count; i++)
-                for(j = 0; j < p.Modules[i].Actions.Count; j++)
-                    if (CurrentActionGroup.ContainsAction(p.Modules[i].Actions[j]))
+                }
+            }
+
+            foreach (PartModule module in part.Modules)
+            {
+                foreach (BaseAction action in module.Actions)
+                {
+                    if (this.CurrentActionGroup.ContainsAction(action))
+                    {
                         return true;
+                    }
+                }
+            }
 
             return false;
         }
+    }
 
-        bool FilterString(Part p)
-        {
-            return (CurrentSearch != string.Empty && p.partInfo.title.IndexOf(CurrentSearch, StringComparison.InvariantCultureIgnoreCase) >= 0);
-        }
+    /// <summary>
+    /// Event arguments for the <see cref="MainUi.FilterChanged"/> event.
+    /// </summary>
+    internal class FilterEventArgs : EventArgs
+    {
+        /// <summary>
+        /// Gets or sets a value indicating what filter was altered.
+        /// </summary>
+        public FilterModification Modified { get; set; }
 
-        bool FilterStage(Part p)
-        {
-            return (p.inverseStage == CurrentStage);
-        }
-
-        public List<KSPActionGroup> GetActionGroupAttachedToPart(Part p)
-        {
-            List<KSPActionGroup> ret = new List<KSPActionGroup>();
-            KSPActionGroup[] ag = Enum.GetValues(typeof(KSPActionGroup)) as KSPActionGroup[];
-            int i, j, k;
-            for (i = 0; i < ag.Length; i++)
-            {
-                if (ag[i] == KSPActionGroup.None)
-                    continue;
-                for(j = 0; j < p.Modules.Count; j++)
-                    for(k = 0; k < p.Modules[j].Actions.Count; k++)
-                        if (ag[i].ContainsAction(p.Modules[j].Actions[k]) && !ret.Contains(ag[i]))
-                            ret.Add(ag[i]);
-            }
-
-            return ret;
-        }
-     
-        public List<BaseAction> GetBaseActionAttachedToActionGroup(KSPActionGroup ag)
-        {
-            List<Part> parts = manager.GetParts();
-
-            List<BaseAction> ret = new List<BaseAction>();
-            int i, j, k;
-            for (i = 0; i < parts.Count; i++)
-            { 
-                for(j = 0; j < parts[i].Actions.Count; j++)
-                    if (ag.ContainsAction(parts[i].Actions[j]))
-                        ret.Add(parts[i].Actions[j]);
-
-                for(j = 0; j < parts[i].Modules.Count; j++)
-                    for(k = 0; k < parts[i].Modules[j].Actions.Count; k++)
-                        if (ag.ContainsAction(parts[i].Modules[j].Actions[k]))
-                            ret.Add(parts[i].Modules[j].Actions[k]);
-            }
-            return ret;
-        }
-
-        public SortedList<PartCategories, int> GetNumberOfPartByCategory()
-        {
-            if (Dirty)
-            {
-                dic = new SortedList<PartCategories, int>();
-
-                int i;
-                PartCategories[] pc = Enum.GetValues(typeof(PartCategories)) as PartCategories[];
-                for (i = 0; i < pc.Length; i++)
-                    dic.Add(pc[i], 0);
-
-                List<Part> p = manager.GetParts();
-                for (i = 0; i < p.Count; i++)
-                    dic[p[i].partInfo.category] += 1;
-            }
-            return dic;
-        }
+        /// <summary>
+        /// Gets or sets an object associated with the changed filter.
+        /// </summary>
+        public object Object { get; set; }
     }
 }
