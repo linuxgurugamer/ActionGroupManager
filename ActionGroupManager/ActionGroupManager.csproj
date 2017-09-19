@@ -60,7 +60,9 @@
     <None Include="Flags\AGMFlag.dds">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Localization\de-de.cfg" />
+    <None Include="Localization\de-de.cfg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="Localization\en-us.cfg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
