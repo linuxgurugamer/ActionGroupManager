@@ -36,9 +36,14 @@ namespace ActionGroupManager
         private IButton mainButton;
 
         /// <summary>
-        /// The UiObjects controlled by the primary and secondary click.
+        /// The UiObject controlled by the primary click.
         /// </summary>
-        private UiObject controlled, secondaryControlled;
+        private UiObject controlled;
+
+        /// <summary>
+        /// The UiObject controlled by the secondary click.
+        /// </summary>
+        private UiObject secondaryControlled;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Toolbar"/> class.
@@ -81,7 +86,7 @@ namespace ActionGroupManager
         }
 
         /// <summary>
-        /// Gets a value indicating whether the toolbar button is visible.
+        /// Gets or sets a value indicating whether the toolbar button is visible.
         /// </summary>
         public override bool Visible
         {

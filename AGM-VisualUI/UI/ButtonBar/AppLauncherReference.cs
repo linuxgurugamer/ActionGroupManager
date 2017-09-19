@@ -58,7 +58,7 @@ namespace ActionGroupManager
         }
 
         /// <summary>
-        /// Gets a value indicating whether the application launcher button is visible.
+        /// Gets or sets a value indicating whether the application launcher button is visible.
         /// </summary>
         public override bool Visible
         {

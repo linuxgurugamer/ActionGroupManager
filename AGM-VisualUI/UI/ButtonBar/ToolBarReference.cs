@@ -1,6 +1,6 @@
 ﻿//-----------------------------------------------------------------------
 // <copyright file="ToolbarReference.cs" company="Aquila Enterprises">
-//     Copyright (c) Kevin Seiden. The MIT License.
+// Copyright (c) Kevin Seiden. The MIT License.
 // </copyright>
 //-----------------------------------------------------------------------
 
@@ -71,7 +71,7 @@ namespace ActionGroupManager
         }
 
         /// <summary>
-        /// Gets a value indicating whether the toolbar button is visible.
+        /// Gets or sets a value indicating whether the toolbar button is visible.
         /// </summary>
         public override bool Visible
         {
