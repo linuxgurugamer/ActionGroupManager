@@ -42,6 +42,12 @@ namespace ActionGroupManager
         /// </summary>
         private Part currentSelectedPart;
 
+                /// <summary>
+        /// A collection of <see cref="BaseAction"/>s to be added or removed from the current <see cref="KSPActionGroup"/>.
+        /// </summary>
+        /// <remarks>Actions are modified before each view repaints to avoid iteration errors.</remarks>
+        private List<KeyValuePair<BaseAction, ActionModifyState>> modifiedActions = new List<KeyValuePair<BaseAction, ActionModifyState>>();
+
         /// <summary>
         /// Contains a local cache of actions in the selected action group.
         /// </summary>
@@ -53,7 +59,8 @@ namespace ActionGroupManager
         private bool assignedActionsDirty = true;
 
         /// <summary>
-        /// The action group currently selected for editing.
+        /// <para>The action group currently selected for editing.</para>
+        /// <para>Do not alter this field directly.  Use the <see cref="SelectedActionGroup"/> property to ensure the <see cref="assignedActions"/> cache is updated.</para>
         /// </summary>
         private KSPActionGroup currentSelectedActionGroup = KSPActionGroup.Stage;
 
@@ -71,12 +78,6 @@ namespace ActionGroupManager
         /// A reference to the action group Scroll View
         /// </summary>
         private Vector2 actionList;
-
-        /// <summary>
-        /// A collection of <see cref="BaseAction"/>s to be added or removed from the current <see cref="KSPActionGroup"/>.
-        /// </summary>
-        /// <remarks>Actions are modified before each view repaints to avoid iteration errors.</remarks>
-        private List<KeyValuePair<BaseAction, ActionModifyState>> modifiedActions = new List<KeyValuePair<BaseAction, ActionModifyState>>();
 
         /// <summary>
         /// Indicates the user has clicked the delete all command and needs to confirm.
@@ -137,6 +138,23 @@ namespace ActionGroupManager
         }
 
         /// <summary>
+        /// Gets or sets the action group currently selected by the user.
+        /// </summary>
+        public KSPActionGroup SelectedActionGroup
+        {
+            get
+            {
+                return this.currentSelectedActionGroup;
+            }
+
+            set
+            {
+                this.currentSelectedActionGroup = value;
+                this.assignedActionsDirty = true;
+            }
+        }
+
+        /// <summary>
         /// Disposes of the view.
         /// </summary>
         public override void Dispose()
@@ -188,12 +206,12 @@ namespace ActionGroupManager
                     if (action.Value == ActionModifyState.Remove)
                     {
                         Program.AddDebugLog("Removing action with name: " + action.Key.name);
-                        this.currentSelectedActionGroup.RemoveAction(action.Key);
+                        this.SelectedActionGroup.RemoveAction(action.Key);
                     }
                     else
                     {
                         Program.AddDebugLog("Adding action with name: " + action.Key.name);
-                        this.currentSelectedActionGroup.AddAction(action.Key);
+                        this.SelectedActionGroup.AddAction(action.Key);
                     }
                 }
 
@@ -203,7 +221,7 @@ namespace ActionGroupManager
 
             if (this.assignedActionsDirty)
             {
-                this.assignedActions = PartManager.GetBaseActionAttachedToActionGroup(this.currentSelectedActionGroup);
+                this.assignedActions = PartManager.GetBaseActionAttachedToActionGroup(this.SelectedActionGroup);
                 this.assignedActions.Sort((ba1, ba2) => ba1.listParent.part.GetInstanceID().CompareTo(ba2.listParent.part.GetInstanceID()));
                 this.assignedActionsDirty = false;
             }
@@ -467,8 +485,7 @@ namespace ActionGroupManager
             // Create the button
             if (GUILayout.Toggle(group == this.currentSelectedActionGroup, content, textOnly ? Style.Button : Style.ButtonIcon))
             {
-                this.currentSelectedActionGroup = group;
-                this.assignedActionsDirty = true;
+                this.SelectedActionGroup = group;
             }
         }
 
@@ -595,8 +612,7 @@ namespace ActionGroupManager
                     var content = new GUIContent(group.ToShortString(), Localizer.Format(Localizer.GetStringByTag("#autoLOC_AGM_106"), group.displayDescription()));
                     if (GUILayout.Button(content, Style.GroupFindButton, GUILayout.Width(Style.UseUnitySkin ? 30 : 20)))
                     {
-                        this.currentSelectedActionGroup = group;
-                        this.assignedActionsDirty = true;
+                        this.SelectedActionGroup = group;
                     }
                 }
             }
@@ -621,7 +637,7 @@ namespace ActionGroupManager
                     // Add Action Group Find button
                     this.DrawFindActionGroupButton(action);
 
-                    if (this.currentSelectedActionGroup.Unlocked())
+                    if (this.SelectedActionGroup.Unlocked())
                     {
                         // Action Remove Buttons
                         if (this.assignedActions.Contains(action))
@@ -661,7 +677,7 @@ namespace ActionGroupManager
                 GUILayout.BeginVertical(); // Begin Actions List
                 GUILayout.Space(Style.BaseSkin.verticalScrollbar.margin.left);
 
-                if (this.currentSelectedActionGroup.Unlocked())
+                if (this.SelectedActionGroup.Unlocked())
                 {
                     this.DrawConfirmDeleteButton();
                 }
@@ -691,7 +707,7 @@ namespace ActionGroupManager
 
                     // Draw the action controls
                     GUILayout.BeginHorizontal();  // Begin Action Line
-                    if (this.currentSelectedActionGroup.Unlocked())
+                    if (this.SelectedActionGroup.Unlocked())
                     {
                         this.DrawRemoveActionButtons(action);
                     }
@@ -730,8 +746,7 @@ namespace ActionGroupManager
                             Style.Button,
                             GUILayout.Width(Style.UseUnitySkin ? 30 : 20)))
                     {
-                        this.currentSelectedActionGroup = ag;
-                        this.assignedActionsDirty = true;
+                        this.SelectedActionGroup = ag;
                     }
                 }
             }
@@ -762,7 +777,7 @@ namespace ActionGroupManager
 
                 if (GUILayout.Button(content, Style.Button, GUILayout.Width(25)))
                 {
-                    this.currentSelectedActionGroup.AddAction(action);
+                    this.SelectedActionGroup.AddAction(action);
                     if (!this.assignedActions.Contains(action))
                     {
                         this.modifiedActions.Add(new KeyValuePair<BaseAction, ActionModifyState>(action, ActionModifyState.Add));
@@ -830,12 +845,12 @@ namespace ActionGroupManager
             if (this.confirmDelete)
             {
                 // #autoLOC_AGM_054 = OK to delete all actions in <<1>>?
-                message = Localizer.Format(Localizer.GetStringByTag("#autoLOC_AGM_054"), this.currentSelectedActionGroup.displayDescription());
+                message = Localizer.Format(Localizer.GetStringByTag("#autoLOC_AGM_054"), this.SelectedActionGroup.displayDescription());
             }
             else
             {
                 // #autoLOC_AGM_053 = Remove all from <<1>>
-                message = Localizer.Format(Localizer.GetStringByTag("#autoLOC_AGM_053"), this.currentSelectedActionGroup.displayDescription());
+                message = Localizer.Format(Localizer.GetStringByTag("#autoLOC_AGM_053"), this.SelectedActionGroup.displayDescription());
             }
 
             if (GUILayout.Button(message, this.confirmDelete ? Style.ButtonStrongEmphasis : Style.ButtonEmphasis))
