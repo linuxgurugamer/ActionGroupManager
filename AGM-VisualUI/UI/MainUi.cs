@@ -42,18 +42,25 @@ namespace ActionGroupManager
         /// </summary>
         private Part currentSelectedPart;
 
+                /// <summary>
+        /// A collection of <see cref="BaseAction"/>s to be added or removed from the current <see cref="KSPActionGroup"/>.
+        /// </summary>
+        /// <remarks>Actions are modified before each view repaints to avoid iteration errors.</remarks>
+        private List<KeyValuePair<BaseAction, ActionModifyState>> modifiedActions = new List<KeyValuePair<BaseAction, ActionModifyState>>();
+
         /// <summary>
-        /// The actions in the selected action group.
+        /// Contains a local cache of actions in the selected action group.
         /// </summary>
         private List<BaseAction> assignedActions;
 
         /// <summary>
-        /// Indicates <see cref="assignedActions"/> is no longer sorted.
+        /// Indicates <see cref="assignedActions"/> needs to be reloaded at the next paint.
         /// </summary>
-        private bool actionsUnsorted = false;
+        private bool assignedActionsDirty = true;
 
         /// <summary>
-        /// The action group currently selected for editing.
+        /// <para>The action group currently selected for editing.</para>
+        /// <para>Do not alter this field directly.  Use the <see cref="SelectedActionGroup"/> property to ensure the <see cref="assignedActions"/> cache is updated.</para>
         /// </summary>
         private KSPActionGroup currentSelectedActionGroup = KSPActionGroup.Stage;
 
@@ -86,8 +93,6 @@ namespace ActionGroupManager
             this.mainWindow.width = this.mainWindow.width > 500 ? 500 : this.mainWindow.width;
             this.mainWindow.height = this.mainWindow.height > 400 ? 400 : this.mainWindow.height;
 
-            this.assignedActions = new List<BaseAction>();
-
             this.highlighter = new Highlighter();
 
             this.partFilter = new PartManager();
@@ -100,7 +105,23 @@ namespace ActionGroupManager
         public event EventHandler<FilterEventArgs> FilterChanged;
 
         /// <summary>
-        /// Gets or sets a value indicating whether the view is visible.
+        /// Represents the action to be performed on a <see cref="BaseAction"/> for selected <see cref="KSPActionGroup"/>.
+        /// </summary>
+        private enum ActionModifyState
+        {
+            /// <summary>
+            /// Indicates the action is being added to the action group.
+            /// </summary>
+            Add,
+
+            /// <summary>
+            /// Indicates the action is being removed from the action group.
+            /// </summary>
+            Remove,
+        }
+
+        /// <summary>
+        /// Sets a value indicating whether the view is visible.
         /// </summary>
         public override bool Visible
         {
@@ -113,6 +134,23 @@ namespace ActionGroupManager
                     this.currentSelectedPart = null;
                     this.highlighter.Clear();
                 }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the action group currently selected by the user.
+        /// </summary>
+        public KSPActionGroup SelectedActionGroup
+        {
+            get
+            {
+                return this.currentSelectedActionGroup;
+            }
+
+            set
+            {
+                this.currentSelectedActionGroup = value;
+                this.assignedActionsDirty = true;
             }
         }
 
@@ -131,6 +169,8 @@ namespace ActionGroupManager
         /// </summary>
         public override void Paint()
         {
+            this.UpdateActionLists();
+
             if (this.Visible && !PauseMenu.isOpen && !FlightResultsDialog.isDisplaying)
             {
                 if (!Style.UseUnitySkin)
@@ -147,10 +187,44 @@ namespace ActionGroupManager
         /// </summary>
         /// <param name="mod">The <see cref="FilterModification"/> being updated.</param>
         /// <param name="o">An object associated with the specific <see cref="FilterModification"/> type.</param>
-        private void OnUpdate(FilterModification mod, object o)
+        private void UpdateFilter(FilterModification mod, object o)
         {
             Program.AddDebugLog("Filter Change Event: " + mod.ToString());
             this.FilterChanged(this, new FilterEventArgs() { Modified = mod, Object = o });
+        }
+
+        /// <summary>
+        /// Performed actions queued in <see cref="modifiedActions"/>.
+        /// </summary>
+        private void UpdateActionLists()
+        {
+            // Remove actions between paints to prevent iteration and GUIClips errors
+            if (this.modifiedActions.Count > 0)
+            {
+                foreach (KeyValuePair<BaseAction, ActionModifyState> action in this.modifiedActions)
+                {
+                    if (action.Value == ActionModifyState.Remove)
+                    {
+                        Program.AddDebugLog("Removing action with name: " + action.Key.name);
+                        this.SelectedActionGroup.RemoveAction(action.Key);
+                    }
+                    else
+                    {
+                        Program.AddDebugLog("Adding action with name: " + action.Key.name);
+                        this.SelectedActionGroup.AddAction(action.Key);
+                    }
+                }
+
+                this.assignedActionsDirty = true;
+                this.modifiedActions.Clear();
+            }
+
+            if (this.assignedActionsDirty)
+            {
+                this.assignedActions = PartManager.GetBaseActionAttachedToActionGroup(this.SelectedActionGroup);
+                this.assignedActions.Sort((ba1, ba2) => ba1.listParent.part.GetInstanceID().CompareTo(ba2.listParent.part.GetInstanceID()));
+                this.assignedActionsDirty = false;
+            }
         }
 
         /// <summary>
@@ -159,11 +233,6 @@ namespace ActionGroupManager
         /// <param name="windowID">The ID of the window.</param>
         private void DrawMainView(int windowID)
         {
-            if (this.actionsUnsorted)
-            {
-                this.SortAssignedActions();
-            }
-
             if (!VisualUi.UiSettings.ClassicView)
             {
                 GUILayout.BeginHorizontal(); // Begin Collection area to include Category Buttons, Scroll Lists, and Action Group Buttons (New View)
@@ -186,7 +255,7 @@ namespace ActionGroupManager
                 GUILayout.EndHorizontal();
             }
 
-            this.DrawAgButtonList(VisualUi.UiSettings.ClassicView, /*VisualUi.uiSettings.classicView ||*/ VisualUi.UiSettings.TextActionGroupButtons);
+            this.DrawActionGroupSelector(VisualUi.UiSettings.ClassicView, /*VisualUi.uiSettings.classicView ||*/ VisualUi.UiSettings.TextActionGroupButtons);
             if (!VisualUi.UiSettings.ClassicView)
             {
                 // End Collection Area for Category buttons, Scroll Lists, and Action Group Buttons (New View)
@@ -251,7 +320,7 @@ namespace ActionGroupManager
                     continue;
                 }
 
-                bool initial      = count.Key == this.partFilter.CurrentPartCategory;
+                bool initial = count.Key == this.partFilter.CurrentPartCategory;
                 string buttonText = string.Empty;
                 GUIContent content;
 
@@ -302,11 +371,11 @@ namespace ActionGroupManager
                 {
                     if (!result)
                     {
-                        this.OnUpdate(FilterModification.Category, PartCategories.none);
+                        this.UpdateFilter(FilterModification.Category, PartCategories.none);
                     }
                     else
                     {
-                        this.OnUpdate(FilterModification.Category, count.Key);
+                        this.UpdateFilter(FilterModification.Category, count.Key);
                     }
                 }
 
@@ -336,7 +405,7 @@ namespace ActionGroupManager
         /// </summary>
         /// <param name="rowView">A value indicating that the buttons should be displayed in rows instead of columns.</param>
         /// <param name="textOnly">A value indicating that the buttons should be text based names instead of icons.</param>
-        private void DrawAgButtonList(bool rowView, bool textOnly)
+        private void DrawActionGroupSelector(bool rowView, bool textOnly)
         {
             int iconCount = 0;
 
@@ -370,7 +439,7 @@ namespace ActionGroupManager
                     }
                 }
 
-                this.DrawAgButton(group, textOnly);
+                this.DrawActionGroupSelectorButton(group, textOnly);
 
                 // Finish the layout for this button
                 if (!rowView && !textOnly && iconCount % 2 == 0)
@@ -393,7 +462,7 @@ namespace ActionGroupManager
         /// </summary>
         /// <param name="group">The action group button to draw.</param>
         /// <param name="textOnly">True the button should contain text instead of images.</param>
-        private void DrawAgButton(KSPActionGroup group, bool textOnly)
+        private void DrawActionGroupSelectorButton(KSPActionGroup group, bool textOnly)
         {
             List<BaseAction> actions = PartManager.GetBaseActionAttachedToActionGroup(group);
             GUIContent content;
@@ -416,15 +485,7 @@ namespace ActionGroupManager
             // Create the button
             if (GUILayout.Toggle(group == this.currentSelectedActionGroup, content, textOnly ? Style.Button : Style.ButtonIcon))
             {
-                this.currentSelectedActionGroup = group;
-                if (actions.Count > 0)
-                {
-                    this.assignedActions = actions;
-                }
-                else
-                {
-                    this.assignedActions.Clear();
-                }
+                this.SelectedActionGroup = group;
             }
         }
 
@@ -456,7 +517,7 @@ namespace ActionGroupManager
                 // Order parts by stage
                 for (int i = -1; i <= StageManager.LastStage; i++)
                 {
-                    this.OnUpdate(FilterModification.Stage, i);
+                    this.UpdateFilter(FilterModification.Stage, i);
                     list = this.partFilter.FilteredParts;
 
                     if (list.Count > 0)
@@ -474,7 +535,7 @@ namespace ActionGroupManager
                     }
                 }
 
-                this.OnUpdate(FilterModification.Stage, int.MinValue);
+                this.UpdateFilter(FilterModification.Stage, int.MinValue);
             }
 
             GUILayout.EndVertical(); // End Parts List
@@ -489,36 +550,22 @@ namespace ActionGroupManager
         {
             foreach (Part part in parts)
             {
-                bool initial, final;
-                List<KSPActionGroup> currentAG = PartManager.GetActionGroupAttachedToPart(part);
                 GUILayout.BeginHorizontal();
 
                 if (VisualUi.UiSettings.ClassicView)
                 {
-                    initial = this.highlighter.Contains(part);
-
-                    final = GUILayout.Toggle(
-                        initial,
-                        new GUIContent(Localizer.GetStringByTag("#autoLOC_AGM_154"), Localizer.GetStringByTag("#autoLOC_AGM_105")),
-                        Style.GroupFindButton,
-                        GUILayout.Width(20));
-
-                    if (final != initial)
-                    {
-                        this.highlighter.Switch(part);
-                    }
+                    this.DrawPartHighlightButton(part);
                 }
 
-                initial = part == this.currentSelectedPart;
-                string text = part.partInfo.title;
-
-                final = GUILayout.Toggle(initial, text, text.Length > 32 ? Style.ButtonPartCondensed : Style.ButtonPart);
+                bool initial = part == this.currentSelectedPart;
+                bool final = GUILayout.Toggle(initial, part.partInfo.title, part.partInfo.title.Length > 32 ? Style.ButtonPartCondensed : Style.ButtonPart);
                 if (initial != final)
                 {
                     if (final)
                     {
                         if (!VisualUi.UiSettings.ClassicView)
                         {
+                            // Highlight the selected part when not in classic view.
                             this.highlighter.Add(part);
                             this.highlighter.Remove(this.currentSelectedPart);
                         }
@@ -538,25 +585,8 @@ namespace ActionGroupManager
                     this.confirmDelete = false; // Reset the deletion confirmation
                 }
 
-                if (currentAG.Count > 0)
-                {
-                    foreach (KSPActionGroup group in currentAG)
-                    {
-                        if (group == KSPActionGroup.None)
-                        {
-                            continue;
-                        }
-
-                        if (part != this.currentSelectedPart)
-                        {
-                            if (GUILayout.Button(new GUIContent(group.ToShortString(), Localizer.Format(Localizer.GetStringByTag("#autoLOC_AGM_106"), group.displayDescription())), Style.GroupFindButton, GUILayout.Width(Style.UseUnitySkin ? 30 : 20)))
-                            {
-                                this.assignedActions = PartManager.GetBaseActionAttachedToActionGroup(group);
-                                this.currentSelectedActionGroup = group;
-                            }
-                        }
-                    }
-                }
+                // Draw the linked action group buttons.
+                this.DrawLinkedGroupButtons(part);
 
                 GUILayout.EndHorizontal();
 
@@ -568,124 +598,54 @@ namespace ActionGroupManager
         }
 
         /// <summary>
+        /// Draws buttons to allow the user to jump to a linked action group.
+        /// </summary>
+        /// <param name="part">The part to link the action group to.</param>
+        private void DrawLinkedGroupButtons(Part part)
+        {
+            foreach (KSPActionGroup group in PartManager.GetActionGroupAttachedToPart(part))
+            {
+                if (group != KSPActionGroup.None && part != this.currentSelectedPart)
+                {
+                    // #autoLOC_AGM_106 = Part has an action linked to action group <<1>>.
+                    var content = new GUIContent(group.ToShortString(), Localizer.Format(Localizer.GetStringByTag("#autoLOC_AGM_106"), group.displayDescription()));
+                    if (GUILayout.Button(content, Style.GroupFindButton, GUILayout.Width(Style.UseUnitySkin ? 30 : 20)))
+                    {
+                        this.SelectedActionGroup = group;
+                    }
+                }
+            }
+        }
+
+        /// <summary>
         /// Draws internal elements in <see cref="DrawPartButtons"/>.
         /// </summary>
         private void InternaDrawPartActions()
         {
             if (this.currentSelectedPart)
             {
-                IEnumerable<BaseAction> baseActions = BaseActionManager.FromParts(this.currentSelectedPart);
-                IEnumerable<BaseAction> symmetryActions;
-                ICollection<KSPActionGroup> actionGroups;
-
                 GUILayout.BeginVertical(); // Begin Action List
 
-                foreach (BaseAction ba in baseActions)
+                foreach (BaseAction action in BaseActionManager.FromParts(this.currentSelectedPart))
                 {
                     GUILayout.BeginHorizontal(); // Begin Action Controls
                     GUILayout.Space(20);
-                    GUILayout.Label(ba.guiName, Style.LabelExpand);  // Action Name
+                    GUILayout.Label(action.guiName, Style.LabelExpand);  // Action Name
                     GUILayout.FlexibleSpace();
 
                     // Add Action Group Find button
-                    if (BaseActionManager.GetActionGroupList(ba).Count > 0)
-                    {
-                        actionGroups = BaseActionManager.GetActionGroupList(ba);
-                        foreach (KSPActionGroup ag in actionGroups)
-                        {
-                            if (GUILayout.Button(
-                                    new GUIContent(ag.ToShortString(), Localizer.Format(Localizer.GetStringByTag("#autoLOC_AGM_107"), ag.ToString())),
-                                    Style.Button,
-                                    GUILayout.Width(Style.UseUnitySkin ? 30 : 20)))
-                            {
-                                this.assignedActions = PartManager.GetBaseActionAttachedToActionGroup(ag);
-                                this.currentSelectedActionGroup = ag;
-                            }
-                        }
-                    }
+                    this.DrawFindActionGroupButton(action);
 
-                    if (this.currentSelectedActionGroup.Unlocked())
+                    if (this.SelectedActionGroup.Unlocked())
                     {
                         // Action Remove Buttons
-                        if (this.assignedActions.Contains(ba))
+                        if (this.assignedActions.Contains(action))
                         {
-                            if (GUILayout.Button(
-                                new GUIContent(
-                                    Localizer.GetStringByTag("#autoLOC_AGM_155"),
-                                    Localizer.GetStringByTag("#autoLOC_AGM_108")),
-                                Style.Button,
-                                GUILayout.Width(20)))
-                            {
-                                this.currentSelectedActionGroup.RemoveAction(ba);
-                                this.assignedActions.Remove(ba);
-                                this.actionsUnsorted = true;
-                            }
-
-                            // Remove all symmetry parts.
-                            if (this.currentSelectedPart.symmetryCounterparts.Count > 0)
-                            {
-                                if (GUILayout.Button(
-                                    new GUIContent(
-                                        (this.currentSelectedPart.symmetryCounterparts.Count + 1).ToString(CultureInfo.InvariantCulture) + Localizer.GetStringByTag("#autoLOC_AGM_155"),
-                                        Localizer.GetStringByTag("#autoLOC_AGM_109")),
-                                    Style.Button,
-                                    GUILayout.Width(25)))
-                                {
-                                    symmetryActions = BaseActionManager.FromParts(this.currentSelectedPart.symmetryCounterparts);
-                                    foreach (BaseAction action in symmetryActions)
-                                    {
-                                        this.currentSelectedActionGroup.RemoveAction(action);
-                                        if (action.name == ba.name && this.assignedActions.Contains(action))
-                                        {
-                                            this.assignedActions.Remove(action);
-                                        }
-                                    }
-
-                                    this.currentSelectedActionGroup.RemoveAction(ba);
-                                    this.assignedActions.Remove(ba);
-                                    this.actionsUnsorted = true;
-                                }
-                            }
+                            this.DrawRemoveActionButtons(action);
                         }
                         else
                         {
-                            // Action Add Buttons
-                            if (GUILayout.Button(new GUIContent(Localizer.GetStringByTag("#autoLOC_AGM_156"), Localizer.GetStringByTag("#autoLOC_AGM_110")), Style.Button, GUILayout.Width(20)))
-                            {
-                                this.assignedActions.Add(ba);
-                                this.currentSelectedActionGroup.AddAction(ba);
-                                this.actionsUnsorted = true;
-                            }
-
-                            // Add all symmetry parts.
-                            if (this.currentSelectedPart.symmetryCounterparts.Count > 0)
-                            {
-                                if (GUILayout.Button(
-                                    new GUIContent(
-                                        Localizer.GetStringByTag("#autoLOC_AGM_156") + (this.currentSelectedPart.symmetryCounterparts.Count + 1).ToString(CultureInfo.InvariantCulture),
-                                        Localizer.GetStringByTag("#autoLOC_AGM_111")),
-                                    Style.Button,
-                                    GUILayout.Width(25)))
-                                {
-                                    this.currentSelectedActionGroup.AddAction(ba);
-                                    if (!this.assignedActions.Contains(ba))
-                                    {
-                                        this.assignedActions.Add(ba);
-                                    }
-
-                                    symmetryActions = BaseActionManager.FromParts(this.currentSelectedPart.symmetryCounterparts);
-                                    foreach (BaseAction action in symmetryActions)
-                                    {
-                                        if (action.name == ba.name && !this.assignedActions.Contains(action))
-                                        {
-                                            this.assignedActions.Add(action);
-                                            this.currentSelectedActionGroup.AddAction(action);
-                                        }
-                                    }
-
-                                    this.actionsUnsorted = true;
-                                }
-                            }
+                            this.DrawAddActionButtons(action);
                         }
                     }
 
@@ -716,14 +676,13 @@ namespace ActionGroupManager
                 GUILayout.BeginVertical(); // Begin Actions List
                 GUILayout.Space(Style.BaseSkin.verticalScrollbar.margin.left);
 
-                if (this.currentSelectedActionGroup.Unlocked())
+                if (this.SelectedActionGroup.Unlocked())
                 {
                     this.DrawConfirmDeleteButton();
                 }
 
                 // Draw the actions buttons
-                var removedActions = new List<BaseAction>();
-                Part currentDrawn  = null;
+                Part currentDrawn = null;
                 foreach (BaseAction action in this.assignedActions)
                 {
                     // Draw the part button if it hasn't been drawn already
@@ -747,38 +706,9 @@ namespace ActionGroupManager
 
                     // Draw the action controls
                     GUILayout.BeginHorizontal();  // Begin Action Line
-                    if (this.currentSelectedActionGroup.Unlocked())
+                    if (this.SelectedActionGroup.Unlocked())
                     {
-                        if (GUILayout.Button(
-                            new GUIContent(
-                                Localizer.GetStringByTag("#autoLOC_AGM_155"),
-                                Localizer.GetStringByTag("#autoLOC_AGM_108")),
-                            Style.Button,
-                            GUILayout.Width(20)))
-                        {
-                            removedActions.Add(action);
-                        }
-
-                        if (action.listParent.part.symmetryCounterparts.Count > 0)
-                        {
-                            if (GUILayout.Button(
-                                new GUIContent(
-                                    (action.listParent.part.symmetryCounterparts.Count + 1).ToString(CultureInfo.InvariantCulture) + Localizer.GetStringByTag("#autoLOC_AGM_155"),
-                                    Localizer.GetStringByTag("#autoLOC_AGM_109")),
-                                Style.Button,
-                                GUILayout.Width(25)))
-                            {
-                                foreach (BaseAction symmetryAction in BaseActionManager.FromParts(action.listParent.part.symmetryCounterparts))
-                                {
-                                    if (symmetryAction.name == action.name && this.assignedActions.Contains(symmetryAction))
-                                    {
-                                        removedActions.Add(symmetryAction);
-                                    }
-                                }
-
-                                removedActions.Add(action);
-                            }
-                        }
+                        this.DrawRemoveActionButtons(action);
                     }
 
                     // Draw the action name
@@ -788,33 +718,121 @@ namespace ActionGroupManager
                     // Draw the find button (Classic View)
                     if (VisualUi.UiSettings.ClassicView)
                     {
-                        if (GUILayout.Button(new GUIContent(Localizer.GetStringByTag("#autoLOC_AGM_157"), Localizer.GetStringByTag("#autoLOC_AGM_112")), Style.Button, GUILayout.Width(20)))
-                        {
-                            this.confirmDelete = false; // Reset the deletion confirmation
-                            this.currentSelectedPart = action.listParent.part;
-                        }
+                        this.DrawFindButton(action);
                     }
 
                     GUILayout.EndHorizontal(); // End Action Line
-                }
-
-                // Remove actions after the paint to prevent iteration and GUIClips errors
-                if (removedActions.Count > 0)
-                {
-                    foreach (BaseAction action in removedActions)
-                    {
-                        Program.AddDebugLog("Removing Symmetry Action with Name: " + action.name);
-                        this.currentSelectedActionGroup.RemoveAction(action);
-                        this.assignedActions.Remove(action);
-                    }
-
-                    this.actionsUnsorted = true;
                 }
 
                 GUILayout.EndVertical(); // End Actions List
             }
 
             GUILayout.EndScrollView(); // End Actions List
+        }
+
+        /// <summary>
+        /// Draws the find action group button in the Part Scroll List.
+        /// </summary>
+        /// <param name="action">The action to draw the button for.</param>
+        private void DrawFindActionGroupButton(BaseAction action)
+        {
+            if (BaseActionManager.GetActionGroupList(action).Count > 0)
+            {
+                foreach (KSPActionGroup ag in BaseActionManager.GetActionGroupList(action))
+                {
+                    if (GUILayout.Button(
+                            new GUIContent(ag.ToShortString(), Localizer.Format(Localizer.GetStringByTag("#autoLOC_AGM_107"), ag.ToString())),
+                            Style.Button,
+                            GUILayout.Width(Style.UseUnitySkin ? 30 : 20)))
+                    {
+                        this.SelectedActionGroup = ag;
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Draws the add action and add symmetry actions button to the line.
+        /// </summary>
+        /// <param name="action">The <see cref="BaseAction"/> controlled by the buttons.</param>
+        private void DrawAddActionButtons(BaseAction action)
+        {
+            // Single action add.
+            // #autoLOC_AGM_156 = >
+            // #autoLOC_AGM_110 = Add to selection.
+            if (GUILayout.Button(new GUIContent(Localizer.GetStringByTag("#autoLOC_AGM_156"), Localizer.GetStringByTag("#autoLOC_AGM_110")), Style.Button, GUILayout.Width(20)))
+            {
+                this.modifiedActions.Add(new KeyValuePair<BaseAction, ActionModifyState>(action, ActionModifyState.Add));
+            }
+
+            // Add all symmetry parts.
+            if (this.currentSelectedPart.symmetryCounterparts.Count > 0)
+            {
+                // #autoLOC_AGM_156 = >
+                // #autoLOC_AGM_111 = Add part and all symmetry linked parts to selection.
+                var content = new GUIContent(
+                    Localizer.GetStringByTag("#autoLOC_AGM_156") + (this.currentSelectedPart.symmetryCounterparts.Count + 1).ToString(CultureInfo.InvariantCulture),
+                    Localizer.GetStringByTag("#autoLOC_AGM_111"));
+
+                if (GUILayout.Button(content, Style.Button, GUILayout.Width(25)))
+                {
+                    this.SelectedActionGroup.AddAction(action);
+                    if (!this.assignedActions.Contains(action))
+                    {
+                        this.modifiedActions.Add(new KeyValuePair<BaseAction, ActionModifyState>(action, ActionModifyState.Add));
+                    }
+
+                    // Add all symmetrical action.
+                    foreach (BaseAction symmetryAction in BaseActionManager.FromParts(this.currentSelectedPart.symmetryCounterparts))
+                    {
+                        if (symmetryAction.name == action.name && !this.assignedActions.Contains(symmetryAction))
+                        {
+                            this.modifiedActions.Add(new KeyValuePair<BaseAction, ActionModifyState>(symmetryAction, ActionModifyState.Add));
+                        }
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Draws the remove action and remove symmetry actions button to the line.
+        /// </summary>
+        /// <param name="action">The <see cref="BaseAction"/> controlled by the buttons.</param>
+        private void DrawRemoveActionButtons(BaseAction action)
+        {
+            // Single action removal.
+            // #autoLOC_AGM_155 = <
+            // #autoLOC_AGM_108 = Remove from selection.
+            if (GUILayout.Button(
+                new GUIContent(Localizer.GetStringByTag("#autoLOC_AGM_155"), Localizer.GetStringByTag("#autoLOC_AGM_108")),
+                Style.Button,
+                GUILayout.Width(20)))
+            {
+                this.modifiedActions.Add(new KeyValuePair<BaseAction, ActionModifyState>(action, ActionModifyState.Remove));
+            }
+
+            // All symmetrical action removal.
+            if (action.listParent.part.symmetryCounterparts.Count > 0)
+            {
+                // #autoLOC_AGM_155 = <
+                // #autoLOC_AGM_109 = Remove part and all symmetry linked parts from selection.
+                var content = new GUIContent(
+                    (action.listParent.part.symmetryCounterparts.Count + 1).ToString(CultureInfo.InvariantCulture) + Localizer.GetStringByTag("#autoLOC_AGM_155"),
+                    Localizer.GetStringByTag("#autoLOC_AGM_109"));
+
+                if (GUILayout.Button(content, Style.Button, GUILayout.Width(25)))
+                {
+                    foreach (BaseAction symmetryAction in BaseActionManager.FromParts(action.listParent.part.symmetryCounterparts))
+                    {
+                        if (symmetryAction.name == action.name && this.assignedActions.Contains(symmetryAction))
+                        {
+                            this.modifiedActions.Add(new KeyValuePair<BaseAction, ActionModifyState>(symmetryAction, ActionModifyState.Remove));
+                        }
+                    }
+
+                    this.modifiedActions.Add(new KeyValuePair<BaseAction, ActionModifyState>(action, ActionModifyState.Remove));
+                }
+            }
         }
 
         /// <summary>
@@ -826,12 +844,12 @@ namespace ActionGroupManager
             if (this.confirmDelete)
             {
                 // #autoLOC_AGM_054 = OK to delete all actions in <<1>>?
-                message = Localizer.Format(Localizer.GetStringByTag("#autoLOC_AGM_054"), this.currentSelectedActionGroup.displayDescription());
+                message = Localizer.Format(Localizer.GetStringByTag("#autoLOC_AGM_054"), this.SelectedActionGroup.displayDescription());
             }
             else
             {
                 // #autoLOC_AGM_053 = Remove all from <<1>>
-                message = Localizer.Format(Localizer.GetStringByTag("#autoLOC_AGM_053"), this.currentSelectedActionGroup.displayDescription());
+                message = Localizer.Format(Localizer.GetStringByTag("#autoLOC_AGM_053"), this.SelectedActionGroup.displayDescription());
             }
 
             if (GUILayout.Button(message, this.confirmDelete ? Style.ButtonStrongEmphasis : Style.ButtonEmphasis))
@@ -849,10 +867,9 @@ namespace ActionGroupManager
                             this.highlighter.Remove(action.listParent.part);
                         }
 
-                        this.currentSelectedActionGroup.RemoveAction(action);
+                        this.modifiedActions.Add(new KeyValuePair<BaseAction, ActionModifyState>(action, ActionModifyState.Remove));
                     }
 
-                    this.assignedActions.Clear();
                     this.confirmDelete = false;
                 }
             }
@@ -872,6 +889,7 @@ namespace ActionGroupManager
             else
             {
                 // "Find" function (New View)
+                // #autoLOC_AGM_112 = Find action in parts list.
                 if (GUILayout.Button(new GUIContent(part.partInfo.title, Localizer.GetStringByTag("#autoLOC_AGM_112")), part.partInfo.title.Length > 32 ? Style.ButtonPartCondensed : Style.ButtonPart))
                 {
                     this.confirmDelete = false; // Reset the deletion confirmation
@@ -882,6 +900,15 @@ namespace ActionGroupManager
             }
         }
 
+        private void DrawFindButton(BaseAction action)
+        {
+            if (GUILayout.Button(new GUIContent(Localizer.GetStringByTag("#autoLOC_AGM_157"), Localizer.GetStringByTag("#autoLOC_AGM_112")), Style.Button, GUILayout.Width(20)))
+            {
+                this.confirmDelete = false; // Reset the deletion confirmation
+                this.currentSelectedPart = action.listParent.part;
+            }
+        }
+
         /// <summary>
         /// Draws a button to highlight parts in classic view.
         /// </summary>
@@ -889,6 +916,9 @@ namespace ActionGroupManager
         private void DrawPartHighlightButton(Part part)
         {
             bool initial = this.highlighter.Contains(part);
+
+            // #autoLOC_AGM_154 = !
+            // #autoLOC_AGM_105 = Highlight the part.
             bool final = GUILayout.Toggle(initial, new GUIContent(Localizer.GetStringByTag("#autoLOC_AGM_154"), Localizer.GetStringByTag("#autoLOC_AGM_105")), Style.GroupFindButton, GUILayout.Width(20));
             if (final != initial)
             {
@@ -902,30 +932,26 @@ namespace ActionGroupManager
         private void DrawSearch()
         {
             GUILayout.BeginHorizontal();
-            GUILayout.Label(Localizer.GetStringByTag("#autoLOC_AGM_051"), Style.Label); // autoLoc = Part Search :
+
+            // autoLoc = Part Search:
+            GUILayout.Label(Localizer.GetStringByTag("#autoLOC_AGM_051"), Style.Label);
             GUILayout.Space(5);
             string searchString = GUILayout.TextField(this.partFilter.CurrentSearch, Style.BaseSkin.textField);
             if (this.partFilter.CurrentSearch != searchString)
             {
-                this.OnUpdate(FilterModification.Search, searchString);
+                this.UpdateFilter(FilterModification.Search, searchString);
             }
 
             GUILayout.Space(5);
+
+            // # autoLOC_AGM_153 = X
+            // # autoLOC_AGM_113 = Remove all text from the input box.
             if (GUILayout.Button(new GUIContent(Localizer.GetStringByTag("#autoLOC_AGM_153"), Localizer.GetStringByTag("#autoLOC_AGM_113")), Style.Button, GUILayout.Width(Style.Button.fixedHeight)))
             {
-                this.OnUpdate(FilterModification.Search, string.Empty);
+                this.UpdateFilter(FilterModification.Search, string.Empty);
             }
 
             GUILayout.EndHorizontal();
-        }
-
-        /// <summary>
-        /// Sorts the list of <see cref="BaseAction"/> in the current selected part.
-        /// </summary>
-        private void SortAssignedActions()
-        {
-            this.assignedActions.Sort((ba1, ba2) => ba1.listParent.part.GetInstanceID().CompareTo(ba2.listParent.part.GetInstanceID()));
-            this.actionsUnsorted = false;
         }
     }
 }

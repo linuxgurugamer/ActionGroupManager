@@ -178,7 +178,7 @@ namespace ActionGroupManager
         {
             Program.AddDebugLog("Visual User Interface is awake.");
 
-            KSP.Localization.Localizer.SwitchToLanguage("es-es");
+            ////KSP.Localization.Localizer.SwitchToLanguage("es-es");
 
             if (HighLogic.CurrentGame != null)
             {

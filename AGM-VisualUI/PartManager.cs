@@ -255,13 +255,13 @@ namespace ActionGroupManager
                     this.CurrentPartCategory = (PartCategories)args.Object;
                     break;
                 case FilterModification.ActionGroup:
-                    this.CurrentActionGroup  = (KSPActionGroup)args.Object;
+                    this.CurrentActionGroup = (KSPActionGroup)args.Object;
                     break;
                 case FilterModification.Search:
-                    this.CurrentSearch       = args.Object as string;
+                    this.CurrentSearch = args.Object as string;
                     break;
                 case FilterModification.Stage:
-                    this.CurrentStage        = (int)args.Object;
+                    this.CurrentStage = (int)args.Object;
                     break;
                 /*
                 case FilterModification.Part:
@@ -274,9 +274,9 @@ namespace ActionGroupManager
                 case FilterModification.All:
                     this.filteredParts.Clear();
                     this.CurrentPartCategory = PartCategories.none;
-                    this.CurrentActionGroup  = KSPActionGroup.None;
-                    this.CurrentSearch       = string.Empty;
-                    this.CurrentStage        = int.MinValue;
+                    this.CurrentActionGroup = KSPActionGroup.None;
+                    this.CurrentSearch = string.Empty;
+                    this.CurrentStage = int.MinValue;
                     break;
                 default:
                     break;

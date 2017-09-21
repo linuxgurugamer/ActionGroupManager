@@ -15,6 +15,8 @@
 * Removed excess padding on icon buttons reduced size slightly.
 * Removed excess padding on part list buttons and removed "normal" image.
 * Increased the part name characters from 32 to 40 before the font is downsized.
+* Improved code maintainability, readability, and documentation.
+* Reduced cyclomatic complexity.
 
 Version 2.1.1 - June 30, 2017
 * Add icons similar to the VAB/SPH category icons

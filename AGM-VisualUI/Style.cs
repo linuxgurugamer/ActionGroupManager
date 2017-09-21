@@ -13,7 +13,6 @@ namespace ActionGroupManager
     /// </summary>
     internal static class Style
     {
-        #region Color Definitions
         /// <summary>
         /// The "cream" color that can be seen in many KSP elements.
         /// </summary>
@@ -45,7 +44,6 @@ namespace ActionGroupManager
         /// </summary>
         public static readonly Color Maroon = new Color(0.5f, 0, 0);
         */
-        #endregion
 
         /// <summary>
         /// Initializes static members of the <see cref="Style"/> class.
@@ -232,7 +230,6 @@ namespace ActionGroupManager
         /// </summary>
         public static GUISkin BaseSkin { get; } = UseUnitySkin ? GUI.skin : HighLogic.Skin;
 
-        #region Style Definitions
         /// <summary>
         /// Gets the style for Windows.
         /// </summary>
@@ -309,6 +306,5 @@ namespace ActionGroupManager
         /// Gets the style for <see cref="Part"/> buttons with long names.
         /// </summary>
         public static GUIStyle ButtonPartCondensed { get; private set; }
-        #endregion
     }
 }
