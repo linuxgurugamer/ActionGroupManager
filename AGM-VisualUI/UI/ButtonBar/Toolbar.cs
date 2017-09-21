@@ -26,6 +26,16 @@ namespace ActionGroupManager
         private const string OffButton = "ToolbarOff";
 
         /// <summary>
+        /// The name of the On Toolbar Texture with the Reference turned on.
+        /// </summary>
+        private const string OnListOnButton = "ToolbarOnListOn";
+
+        /// <summary>
+        /// The name of the Off Toolbar Texture with the Reference turned off.
+        /// </summary>
+        private const string OffListOnButton = "ToolbarOffListOn";
+
+        /// <summary>
         /// The image path for Action Group Manager
         /// </summary>
         private readonly string mainPath = Program.ModPath + "Resources/";
@@ -63,11 +73,12 @@ namespace ActionGroupManager
                     if (e.MouseButton == 0)
                     {
                         this.controlled.Visible = !this.controlled.Visible;
-                        this.mainButton.TexturePath = this.controlled.Visible ? this.mainPath + OnButton : this.mainPath + OffButton;
+                        this.mainButton.TexturePath = this.GetTexture();
                     }
                     else if (e.MouseButton == 1 && VisualUi.UiSettings.ToolBarListRightClick)
                     {
                         this.secondaryControlled.Visible = !this.secondaryControlled.Visible;
+                        this.mainButton.TexturePath = this.GetTexture();
                     }
                 };
 
@@ -124,6 +135,36 @@ namespace ActionGroupManager
         public void SwitchTexture(bool visible)
         {
             this.mainButton.TexturePath = visible ? this.mainPath + OnButton : this.mainPath + OffButton;
+        }
+
+        /// <summary>
+        /// Gets the texture based on the visible button.
+        /// </summary>
+        /// <returns>A texture path as a string.</returns>
+        private string GetTexture()
+        {
+            if (this.controlled.Visible)
+            {
+                if (this.secondaryControlled.Visible)
+                {
+                    return this.mainPath + OnListOnButton;
+                }
+                else
+                {
+                    return this.mainPath + OnButton;
+                }
+            }
+            else
+            {
+                if (this.secondaryControlled.Visible)
+                {
+                    return this.mainPath + OffListOnButton;
+                }
+                else
+                {
+                    return this.mainPath + OffButton;
+                }
+            }
         }
     }
 }

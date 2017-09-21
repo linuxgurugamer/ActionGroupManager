@@ -178,48 +178,5 @@ namespace ActionGroupManager
                 this.SwitchTexture(this.controlled.Visible);
             }
         }
-
-        /*
-        /// <summary>
-        /// Handles the <see cref="ApplicationLauncherButton.onHover"/> callback.
-        /// </summary>
-        private void OnHover()
-        {
-            Program.AddDebugLog("Primary Launcher Button Hover");
-
-            Program.AddDebugLog("Retrieving Localization");
-            string title = "Action Group Manager";
-            string help = "Left Click: Action Group Manager\nRight Click: Action Group List";
-
-            Program.AddDebugLog("Retrieving Button Anchor");
-            Vector3 anchor = this.mainButton.GetAnchor();
-
-            Program.AddDebugLog("Calculating Hover Dialog Position");
-            var location = new Rect((anchor.x / Screen.width) + 0.5f, (anchor.y / Screen.width) + 0.5f, 200, 10);
-
-            Program.AddDebugLog("Creating Hover Dialog");
-            var dialog = new MultiOptionDialog(title, help, title, new UISkinDef(), location);
-            Program.AddDebugLog("Displaying Hover Dialog");
-            if (dialog == null)
-            {
-                Program.AddDebugLog("DIALOG IS NULL!");
-            }
-
-            toolTip = PopupDialog.SpawnPopupDialog(new Vector2(1, 0), new Vector2(1, 0), dialog, false, dialog.UISkinDef, false);
-        }
-
-        /// <summary>
-        /// Handles the <see cref="ApplicationLauncherButton.onHoverOut"/> callback.
-        /// </summary>
-        private void OnHoverOut()
-        {
-            Program.AddDebugLog("Primary Launcher Button Hover Out");
-            if (toolTip != null)
-            {
-                toolTip.Dismiss();
-                toolTip = null;
-            }
-        }
-        */
     }
 }
