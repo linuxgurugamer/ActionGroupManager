@@ -550,7 +550,6 @@ namespace ActionGroupManager
         {
             foreach (Part part in parts)
             {
-                List<KSPActionGroup> currentAG = PartManager.GetActionGroupAttachedToPart(part);
                 GUILayout.BeginHorizontal();
 
                 if (VisualUi.UiSettings.ClassicView)

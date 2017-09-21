@@ -61,11 +61,8 @@ namespace ActionGroupManager
         /// <param name="list">A list of one or two <see cref="UiObject"/> controlled by the toolbar button.</param>
         public Toolbar(params object[] list)
         {
-            string str = SettingsManager.Settings.GetValue<bool>(SettingsManager.IsMainWindowVisible, true) ? this.mainPath + OnButton : this.mainPath + OffButton;
-
             this.mainButton = ToolbarManager.Instance.add("AGM", "AGMMainSwitch");
             this.mainButton.ToolTip = Localizer.GetStringByTag("#autoLOC_AGM_004");
-            this.mainButton.TexturePath = str;
             this.mainButton.Visibility = new GameScenesVisibility(GameScenes.FLIGHT);
             this.mainButton.OnClick +=
                 (e) =>
@@ -94,6 +91,8 @@ namespace ActionGroupManager
                     this.secondaryControlled = list[1] as UiObject;
                 }
             }
+
+            this.mainButton.TexturePath = this.GetTexture();
         }
 
         /// <summary>
@@ -134,7 +133,7 @@ namespace ActionGroupManager
         /// <param name="visible">A value indicating whether the <see cref="MainUi"/> is visible.</param>
         public void SwitchTexture(bool visible)
         {
-            this.mainButton.TexturePath = visible ? this.mainPath + OnButton : this.mainPath + OffButton;
+            this.mainButton.TexturePath = this.GetTexture();
         }
 
         /// <summary>

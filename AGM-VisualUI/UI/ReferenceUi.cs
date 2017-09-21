@@ -56,6 +56,11 @@ namespace ActionGroupManager
         {
             if (this.Visible && !PauseMenu.isOpen && !FlightResultsDialog.isDisplaying)
             {
+                if (!Style.UseUnitySkin)
+                {
+                    GUI.skin = HighLogic.Skin;
+                }
+
                 // #autoLOC_AGM_003 = Action Group List
                 this.referenceWindowSize = GUILayout.Window(
                     this.GetHashCode(),

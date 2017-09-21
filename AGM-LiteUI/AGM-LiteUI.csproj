@@ -40,17 +40,12 @@
     </AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <ExcludeFromStyleCop>True</ExcludeFromStyleCop>
     </Compile>
     <Compile Include="TweakableUi.cs">
       <ExcludeFromStyleCop>True</ExcludeFromStyleCop>
     </Compile>
-    <Compile Include="UIActionGroupManager.cs" />
-    <Compile Include="UIBaseActionManager.cs" />
-    <Compile Include="UIPartManager.cs" />
-    <Compile Include="UIRootManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ActionGroupManager\ActionGroupManager.csproj">
