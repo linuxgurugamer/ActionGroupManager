@@ -14,15 +14,6 @@ namespace ActionGroupManager
     public class VisualUiParameters : GameParameters.CustomParameterNode
     {
         /// <summary>
-        /// Gets <see cref="string.Empty"/>.
-        /// </summary>
-        /// <remarks>
-        /// #autoLOC_AGM_059 = Restart Required
-        /// </remarks>
-        [GameParameters.CustomStringParameterUI("#autoLOC_AGM_059", autoPersistance = false)]
-        public string Restart { get; } = string.Empty; // This is needed to show the title of the field, but the field is unused.
-
-        /// <summary>
         /// Gets or sets the red value for part highlighting.
         /// </summary>
         /// <remarks>
@@ -56,8 +47,8 @@ namespace ActionGroupManager
         /// Gets or sets a value indicating whether all parts will be deselected when Action Group Manager is closed.
         /// </summary>
         /// <remarks>
-        /// #autoLOC_AGM_071 = Deselect Part on Window Close
-        /// #autoLOC_AGM_121 = Deselect the part when the main window is closer, removing all highlighting.
+        /// #autoLOC_AGM_071 = De-select Part on Window Close
+        /// #autoLOC_AGM_121 = De-select the part when the main window is closer, removing all highlighting.
         /// </remarks>
         [GameParameters.CustomParameterUI("#autoLOC_AGM_071", toolTip = "#autoLOC_AGM_125", autoPersistance = true)]
         public bool DeselectPart { get; set; } = false;
@@ -101,6 +92,15 @@ namespace ActionGroupManager
         /// </remarks>
         [GameParameters.CustomParameterUI("#autoLOC_AGM_063", toolTip = "#autoLOC_AGM_119", autoPersistance = true)]
         public bool TextActionGroupButtons { get; set; } = false;
+
+        /// <summary>
+        /// Gets <see cref="string.Empty"/>.
+        /// </summary>
+        /// <remarks>
+        /// #autoLOC_AGM_059 = May Require Restart
+        /// </remarks>
+        [GameParameters.CustomStringParameterUI("#autoLOC_AGM_059", toolTip = "#autoLOC_AGM_059", autoPersistance = false)]
+        public string Restart { get; } = string.Empty; // This is needed to show the title of the field, but the field is unused.
 
         /// <summary>
         /// Gets or sets a value indicating whether the default Unity skin will be used.

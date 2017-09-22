@@ -607,8 +607,17 @@ namespace ActionGroupManager
             {
                 if (group != KSPActionGroup.None && part != this.currentSelectedPart)
                 {
-                    // #autoLOC_AGM_106 = Part has an action linked to action group <<1>>.
-                    var content = new GUIContent(group.ToShortString(), Localizer.Format(Localizer.GetStringByTag("#autoLOC_AGM_106"), group.displayDescription()));
+                    GUIContent content;
+                    if (true)//VisualUi.UiSettings.TextActionGroupButtons)
+                    {
+                        // #autoLOC_AGM_106 = Part has an action linked to action group <<1>>.
+                        content = new GUIContent(group.ToShortString(), Localizer.Format(Localizer.GetStringByTag("#autoLOC_AGM_106"), group.displayDescription()));
+                    }
+                    else
+                    {
+                        // #autoLOC_AGM_106 = Part has an action linked to action group <<1>>.
+                        content = new GUIContent(group.GetTexture(), Localizer.Format(Localizer.GetStringByTag("#autoLOC_AGM_106"), group.displayDescription()));
+                    }
                     if (GUILayout.Button(content, Style.GroupFindButton, GUILayout.Width(Style.UseUnitySkin ? 30 : 20)))
                     {
                         this.SelectedActionGroup = group;
@@ -738,14 +747,32 @@ namespace ActionGroupManager
         {
             if (BaseActionManager.GetActionGroupList(action).Count > 0)
             {
-                foreach (KSPActionGroup ag in BaseActionManager.GetActionGroupList(action))
+                foreach (KSPActionGroup group in BaseActionManager.GetActionGroupList(action))
                 {
-                    if (GUILayout.Button(
-                            new GUIContent(ag.ToShortString(), Localizer.Format(Localizer.GetStringByTag("#autoLOC_AGM_107"), ag.ToString())),
-                            Style.Button,
-                            GUILayout.Width(Style.UseUnitySkin ? 30 : 20)))
+                    GUIContent content;
+                    GUILayoutOption width;
+                    // Configure the button
+                    if (true)//VisualUi.UiSettings.TextActionGroupButtons)
                     {
-                        this.SelectedActionGroup = ag;
+                        content = new GUIContent(
+                           group.ToShortString(),
+                           Localizer.Format(Localizer.GetStringByTag("#autoLOC_AGM_107"), group.ToString()));
+                        width = GUILayout.Width(Style.UseUnitySkin ? 30 : 20);
+                    }
+                    else
+                    {
+                        content = new GUIContent(
+                            group.GetTexture(),
+                            Localizer.Format(Localizer.GetStringByTag("#autoLOC_AGM_107"), group.ToString()));
+                        width = GUILayout.Width(20);
+                    }
+
+                    if (GUILayout.Button(
+                        content,
+                        Style.Button,
+                        width))
+                    {
+                        this.SelectedActionGroup = group;
                     }
                 }
             }
