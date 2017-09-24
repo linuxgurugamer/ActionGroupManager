@@ -158,6 +158,7 @@
     <None Include="Resources\Light.dds">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="Resources\Motor.dds" />
     <None Include="Resources\Payload.dds">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -176,6 +177,7 @@
     <None Include="Resources\Stage.dds">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="Resources\Steering.dds" />
     <None Include="Resources\Structural.dds">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
