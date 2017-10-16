@@ -11,7 +11,7 @@ namespace ActionGroupManager
     /// <summary>
     /// Defines an extension class for <see cref="PartCategories"/>.
     /// </summary>
-    public static class PartCategoryExt
+    public static class PartCategoryExtensions
     {
         /// <summary>
         /// Returns the texture associated with this <see cref="PartCategories"/>.

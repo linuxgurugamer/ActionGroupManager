@@ -1,4 +1,7 @@
-﻿Version 2.2.0 - September 22, 2017
+﻿Version 2.2.1 - October 16, 2017
+* Compiled against KSP 1.3.1
+
+Version 2.2.0 - September 22, 2017
 * Fixed debug flag left on disabling localization
 * Fixed null reference when removing an action using the buttons in the right hand scroll list.
 * Fixed Classic View & Text Button options no longer require return to Space Center.

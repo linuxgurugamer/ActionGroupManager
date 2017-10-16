@@ -65,6 +65,7 @@
     </Reference>
     <Reference Include="UnityEngine.UI">
       <HintPath>D:\Steam Library\steamapps\common\Kerbal Space Program\KSP_x64_Data\Managed\UnityEngine.UI.dll</HintPath>
+      <Private>False</Private>
     </Reference>
   </ItemGroup>
   <ItemGroup>
