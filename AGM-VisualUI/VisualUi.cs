@@ -211,29 +211,10 @@ namespace ActionGroupManager
                 this.uiList.Add(UiType.Reference, recap);
             }
 
-            if (ToolbarManager.ToolbarAvailable)
+            this.uiList.Add(UiType.Icon, new ToolbarController(main, recap));
+            if (!UiSettings.ToolBarListRightClick)
             {
-                Program.AddDebugLog("Initializing Toolbar");
-
-                // Blizzy's Toolbar support
-                this.uiList.Add(UiType.Icon, new Toolbar(main, recap));
-
-                if (!UiSettings.ToolBarListRightClick)
-                {
-                    this.uiList.Add(UiType.ReferenceIcon, new ToolbarReference(recap));
-                }
-            }
-            else
-            {
-                Program.AddDebugLog("Initializing Application Launcher");
-
-                // Stock Application Launcher
-                this.uiList.Add(UiType.Icon, new AppLauncher(main, recap));
-
-                if (!UiSettings.ToolBarListRightClick)
-                {
-                    this.uiList.Add(UiType.ReferenceIcon, new AppLauncherReference(recap));
-                }
+                this.uiList.Add(UiType.ReferenceIcon, new ToolbarControllerReference(recap));
             }
 
             main.Visible = SettingsManager.Settings.GetValue<bool>(SettingsManager.IsMainWindowVisible);
@@ -257,16 +238,8 @@ namespace ActionGroupManager
             {
                 if (this.uiList.TryGetValue(UiType.Reference, out UiObject recap))
                 {
-                    if (ToolbarManager.ToolbarAvailable)
-                    {
-                        Program.AddDebugLog("Adding Action Group List Toolbar Button");
-                        this.uiList.Add(UiType.ReferenceIcon, new ToolbarReference(recap));
-                    }
-                    else
-                    {
-                        Program.AddDebugLog("Adding Action Group List App Launcher Button");
-                        this.uiList.Add(UiType.ReferenceIcon, new AppLauncherReference(recap));
-                    }
+                    Program.AddDebugLog("Adding Action Group List ToolbarController Button");
+                    this.uiList.Add(UiType.ReferenceIcon, new ToolbarControllerReference(recap));
                 }
             }
             else if (UiSettings.ToolBarListRightClick && this.uiList.ContainsKey(UiType.ReferenceIcon))

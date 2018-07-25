@@ -35,7 +35,7 @@ namespace ActionGroupManager
         /// <param name="verbose">Indicates if the log is repeated frequently.</param>
         public static void AddDebugLog(string message, bool verbose)
         {
-            if (Settings != null && Settings.BasicLogging && (!verbose || Settings.VerboseLogging))
+            //if (Settings != null && Settings.BasicLogging && (!verbose || Settings.VerboseLogging))
             {
                 Debug.Log("<color=#800000ff>[Action Group Manager]</color> " + message);
             }

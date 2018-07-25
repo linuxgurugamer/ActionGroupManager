@@ -1,0 +1,3 @@
+Replaced Toolbar code with ToolbarController, reduced code size by 10k
+Added support for ClickThroughBlocker
+Added AssemblyVersion.tt to put version number into dll

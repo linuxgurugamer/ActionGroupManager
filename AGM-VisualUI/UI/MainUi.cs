@@ -11,10 +11,10 @@ namespace ActionGroupManager
     using System.Globalization;
     using System.Reflection;
 
+    using ClickThroughFix;
     using KSP.Localization;
     using KSP.UI.Dialogs;
     using KSP.UI.Screens;
-
     using UnityEngine;
 
     /// <summary>
@@ -178,7 +178,7 @@ namespace ActionGroupManager
                     GUI.skin = HighLogic.Skin;
                 }
 
-                this.mainWindow = GUILayout.Window(this.GetHashCode(), this.mainWindow, this.DrawMainView, Localizer.Format(Localizer.GetStringByTag("#autoLOC_AGM_001"), VesselManager.Instance.ActiveVessel.GetName()), Style.Window);
+                this.mainWindow = ClickThruBlocker.GUILayoutWindow(this.GetHashCode(), this.mainWindow, this.DrawMainView, Localizer.Format(Localizer.GetStringByTag("#autoLOC_AGM_001"), VesselManager.Instance.ActiveVessel.GetName()), Style.Window);
             }
         }
 
@@ -618,6 +618,7 @@ namespace ActionGroupManager
                         // #autoLOC_AGM_106 = Part has an action linked to action group <<1>>.
                         content = new GUIContent(group.GetTexture(), Localizer.Format(Localizer.GetStringByTag("#autoLOC_AGM_106"), group.displayDescription()));
                     }
+
                     if (GUILayout.Button(content, Style.GroupFindButton, GUILayout.Width(Style.UseUnitySkin ? 30 : 20)))
                     {
                         this.SelectedActionGroup = group;

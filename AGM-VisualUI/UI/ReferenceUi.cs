@@ -9,10 +9,9 @@ namespace ActionGroupManager
     using System;
     using System.Collections.Generic;
     using System.Text;
-
+    using ClickThroughFix;
     using KSP.Localization;
     using KSP.UI.Dialogs;
-
     using UnityEngine;
 
     /// <summary>
@@ -62,7 +61,7 @@ namespace ActionGroupManager
                 }
 
                 // #autoLOC_AGM_003 = Action Group List
-                this.referenceWindowSize = GUILayout.Window(
+                this.referenceWindowSize = ClickThruBlocker.GUILayoutWindow(
                     this.GetHashCode(),
                     this.referenceWindowSize,
                     new GUI.WindowFunction(this.DoMyReferenceView),
