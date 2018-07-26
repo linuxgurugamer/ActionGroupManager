@@ -1,0 +1,9 @@
+2.2.2.1
+	Updated .version file for this branch
+	Added button to map view
+
+2.2.2
+	Replaced Toolbar code with ToolbarController, reduced code size by 10k
+	Added support for ClickThroughBlocker
+	Added AssemblyVersion.tt to put version number into dll
+	Updated .version file to support 1.4
