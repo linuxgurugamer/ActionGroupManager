@@ -17,7 +17,7 @@ namespace ActionGroupManager
     /// <summary>
     /// Main entry point for the visual user interface component of Action Group Manager.
     /// </summary>
-    [KSPAddon(KSPAddon.Startup.Flight, false)]
+    [KSPAddon(KSPAddon.Startup.Flight, true)]
     public class VisualUi : MonoBehaviour
     {
         /// <summary>
@@ -173,11 +173,11 @@ namespace ActionGroupManager
 
         /// <summary>
         /// The <see cref="MonoBehaviour"/> Awake event.
-        /// </summary>
+        /// </summary> 
         private void Awake()
         {
             Program.AddDebugLog("Visual User Interface is awake.");
-
+            DontDestroyOnLoad(this);
             if (HighLogic.CurrentGame != null)
             {
                 UiSettings = HighLogic.CurrentGame.Parameters.CustomParams<VisualUiParameters>();
@@ -196,6 +196,7 @@ namespace ActionGroupManager
             singleton = this;
             if (this.uiList == null)
             {
+                Program.AddDebugLog("Creating: Start this.uiList ");
                 this.uiList = new SortedList<UiType, UiObject>();
             }
 
@@ -207,14 +208,20 @@ namespace ActionGroupManager
 
             if (!this.uiList.TryGetValue(UiType.Reference, out UiObject recap))
             {
+                Program.AddDebugLog("Creating: ReferenceUi ");
                 recap = new ReferenceUi(SettingsManager.Settings.GetValue<bool>(SettingsManager.IsReferenceWindowVisible, false));
                 this.uiList.Add(UiType.Reference, recap);
             }
-
-            this.uiList.Add(UiType.Icon, new ToolbarController(main, recap));
+            if (!this.uiList.ContainsKey(UiType.Icon))
+            {
+                this.uiList.Add(UiType.Icon, new ToolbarController(main, recap));
+            }
             if (!UiSettings.ToolBarListRightClick)
             {
-                this.uiList.Add(UiType.ReferenceIcon, new ToolbarControllerReference(recap));
+                if (!this.uiList.ContainsKey(UiType.ReferenceIcon))
+                {
+                    this.uiList.Add(UiType.ReferenceIcon, new ToolbarControllerReference(recap));
+                }
             }
 
             main.Visible = SettingsManager.Settings.GetValue<bool>(SettingsManager.IsMainWindowVisible);

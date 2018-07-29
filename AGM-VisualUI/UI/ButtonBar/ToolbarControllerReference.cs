@@ -28,7 +28,7 @@ namespace ActionGroupManager
         internal const string OffButton = "ToolbarListOff";
 
         internal const string MODID = "AGM_NS";
-        internal const string MODNAME = "#autoLOC_AGM_003";
+        internal const string MODNAME = "#autoLOC_AGM_003"; // Action Group Reference
         /// <summary>
         /// The image path for Action Group Manager
         /// </summary>
@@ -50,6 +50,7 @@ namespace ActionGroupManager
         /// <param name="list">A list of one <see cref="UiObject"/> controlled by the AppLauncherReference button.</param>
         public ToolbarControllerReference(params object[] list)
         {
+            Program.AddDebugLog("ToolbarControllerReference ctor");
             if (list != null && list[0] != null)
             {
                 this.controlled = list[0] as UiObject;

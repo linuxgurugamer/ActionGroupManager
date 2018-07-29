@@ -35,6 +35,7 @@ namespace ActionGroupManager
         /// <param name="visible">A value indicating whether the view is visible.</param>
         public ReferenceUi(bool visible)
         {
+            Program.AddDebugLog("ReferenceUi ctor");
             this.referenceWindowSize = SettingsManager.Settings.GetValue<Rect>(SettingsManager.ReferenceWindocRect, new Rect(200, 200, 250, 100));
             this.Visible = visible;
         }
@@ -130,7 +131,7 @@ namespace ActionGroupManager
                 }
             }
 
-            Program.AddDebugLog("Total List Line Height: " + (listCount * 27), true);
+            //Program.AddDebugLog("Total List Line Height: " + (listCount * 27), true);
             this.referenceWindowSize.height = Math.Max(listCount * 27, 100); // Set the minimum size
             this.referenceWindowSize.height = Math.Min(this.referenceWindowSize.height, 500); // Set the Maximum size
 
