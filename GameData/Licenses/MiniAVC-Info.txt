@@ -1,0 +1,5 @@
+﻿MiniAVC
+Authors: Cybutek
+Version: 1.0.3.3
+Website: http://forum.kerbalspaceprogram.com/index.php?/topic/72169-13-12
+License: GPLv3
