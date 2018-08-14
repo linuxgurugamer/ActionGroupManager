@@ -1,3 +1,10 @@
+2.2.2.3
+	Changed tooltip from Action GroupReferece to Action Group Manager
+	Removed extra .version file
+
+2.2.2.2
+	Fixed issue where reference window would be replicated if a revert was done while it was visible
+
 2.2.2.1
 	Updated .version file for this branch
 	Added button to map view

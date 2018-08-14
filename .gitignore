@@ -221,3 +221,8 @@ pip-log.txt
 .mr.developer.cfg
 /.vs/config
 /.vs/
+*
+!*.cs
+*.csproj
+*.sln
+!ActionGroupManager.version

@@ -28,7 +28,7 @@ namespace ActionGroupManager
         internal const string OffButton = "ToolbarListOff";
 
         internal const string MODID = "AGM_NS";
-        internal const string MODNAME = "#autoLOC_AGM_003"; // Action Group Reference
+        internal const string MODNAME = "#autoLOC_AGM_004"; // Action Group Reference
         /// <summary>
         /// The image path for Action Group Manager
         /// </summary>
