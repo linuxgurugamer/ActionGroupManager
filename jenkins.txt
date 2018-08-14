@@ -29,6 +29,8 @@
 
 # 2:PROJNAME, PROJFILE, VERSIONFILE, PLUGINSFOLDER
 2:ActionGroupManager,ActionGroupManager/ActionGroupManager.csproj,ActionGroupManager.version,GameData/AquilaEnterprises/ActionGroupManager/Plugins
+2:AGM-LiteUI,AGM-LiteUI/AGM-LiteUI.csproj,ActionGroupManager.version,GameData/AquilaEnterprises/ActionGroupManager/Plugins
+2:AGM-VisualUI,AGM-VisualUI/AGM-VisualUI.csproj,ActionGroupManager.version,GameData/AquilaEnterprises/ActionGroupManager/Plugins
 
 # 3:SOURCEFILE, DESTDIR
 3:ActionGroupManager.version,GameData/AquilaEnterprises
