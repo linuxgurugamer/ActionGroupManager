@@ -1,3 +1,7 @@
+2.2.3
+	Adoption by Linuxgurugamer
+	Added MIT license to release and root directory
+
 2.2.2.3
 	Changed tooltip from Action GroupReferece to Action Group Manager
 	Removed extra .version file
