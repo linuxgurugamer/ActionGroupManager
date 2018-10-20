@@ -1,3 +1,6 @@
+2.2.3.1
+	Version bump for 1.5 rebuild
+
 2.2.3
 	Adoption by Linuxgurugamer
 	Added MIT license to release and root directory

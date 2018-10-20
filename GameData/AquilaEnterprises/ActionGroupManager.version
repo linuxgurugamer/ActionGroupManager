@@ -1,6 +1,6 @@
 ﻿{
     "NAME":"Action Group Manager",
-    "URL":"https://raw.githubusercontent.com/linuxgurugamer/ActionGroupManager/master/ActionGroupManager.version",
+    "URL":"http://ksp.spacetux.net/avc/ActionGroupManager",
     "DOWNLOAD": "https://github.com/linuxgurugamer/ActionGroupManager/releases",
     "CHANGELOG": "https://raw.githubusercontent.com/Alshain01/ActionGroupManager/master/Changelog.txt",
     "GITHUB":
@@ -14,24 +14,24 @@
         "MAJOR":2,
         "MINOR":2,
         "PATCH":3,
-        "BUILD":0
+        "BUILD":1
     },
     "KSP_VERSION":
     {
         "MAJOR":1,
-        "MINOR":4,
+        "MINOR":5,
         "PATCH":1
     },
     "KSP_VERSION_MIN":
     {
         "MAJOR":1,
-        "MINOR":4,
+        "MINOR":5,
         "PATCH":1
     },
     "KSP_VERSION_MAX":
     {
         "MAJOR":1,
-        "MINOR":4,
+        "MINOR":5,
         "PATCH":99
     }
 }
