@@ -37,7 +37,7 @@ namespace ActionGroupManager
         {
             //if (Settings != null && Settings.BasicLogging && (!verbose || Settings.VerboseLogging))
             {
-                Debug.Log("<color=#800000ff>[Action Group Manager]</color> " + message);
+                Debug.Log("[Action Group Manager] " + message);
             }
         }
 
@@ -55,10 +55,10 @@ namespace ActionGroupManager
         /// </summary>
         public void Awake()
         {
-            Debug.Log("<color=#800000ff>[Action Group Manager]</color> is Awake.");
+            Debug.Log("[Action Group Manager] is Awake.");
             if (HighLogic.CurrentGame != null)
             {
-                Debug.Log("<color=#800000ff>[Action Group Manager]</color> Current Game Located.");
+                Debug.Log("[Action Group Manager] Current Game Located.");
                 Settings = HighLogic.CurrentGame.Parameters.CustomParams<Parameters>();
                 AddDebugLog("Game Settings Loaded.");
             }

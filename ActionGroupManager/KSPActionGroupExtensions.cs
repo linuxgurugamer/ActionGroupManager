@@ -54,11 +54,38 @@ namespace ActionGroupManager
                 return true;
             }
 
-            float level = Math.Max(
-                ScenarioUpgradeableFacilities.GetFacilityLevel(SpaceCenterFacility.SpaceplaneHangar),
-                ScenarioUpgradeableFacilities.GetFacilityLevel(SpaceCenterFacility.VehicleAssemblyBuilding));
+            //float level = Math.Max(
+            //    ScenarioUpgradeableFacilities.GetFacilityLevel(SpaceCenterFacility.SpaceplaneHangar),
+            //    ScenarioUpgradeableFacilities.GetFacilityLevel(SpaceCenterFacility.VehicleAssemblyBuilding));
 
-            return level > 0.5f || (level > 0.0f && !group.ToString().Contains("Custom"));
+            var sphLevel = ScenarioUpgradeableFacilities.GetFacilityLevel(SpaceCenterFacility.SpaceplaneHangar);
+            var vabLevel = ScenarioUpgradeableFacilities.GetFacilityLevel(SpaceCenterFacility.VehicleAssemblyBuilding);
+
+            if (group < KSPActionGroup.Custom01)
+            {
+                if (GameVariables.Instance.UnlockedActionGroupsStock(vabLevel, true))
+                {
+                    return true;
+                }
+                if (GameVariables.Instance.UnlockedActionGroupsStock(sphLevel, false))
+                {
+                    return true;
+                }
+            }
+            else
+            {
+                if (GameVariables.Instance.UnlockedActionGroupsCustom(vabLevel, true))
+                {
+                    return true;
+                }
+                if (GameVariables.Instance.UnlockedActionGroupsCustom(sphLevel, false))
+                {
+                    return true;
+                }
+            }
+            return false;
+
+            //return level > 0.5f || (level > 0.0f && !group.ToString().Contains("Custom"));
         }
 
         /// <summary>

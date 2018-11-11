@@ -695,6 +695,7 @@ namespace ActionGroupManager
                 Part currentDrawn = null;
                 foreach (BaseAction action in this.assignedActions)
                 {
+
                     // Draw the part button if it hasn't been drawn already
                     if (currentDrawn != action.listParent.part)
                     {
