@@ -556,7 +556,8 @@ namespace ActionGroupManager
         private void SetupRootModule()
         {
             Program.AddDebugLog("Lite Ui: Setup root !");
-
+            if (VesselManager.Instance == null || VesselManager.Instance.ActiveVessel == null)
+                return;
             if (!VesselManager.Instance.ActiveVessel.rootPart.Modules.Contains("UIRootManager"))
             {
                 rootManager = VesselManager.Instance.ActiveVessel.rootPart.AddModule("UIRootManager") as UIRootManager;
