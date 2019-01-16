@@ -1,8 +1,10 @@
 2.2.4
+	Add check in the SetupRootModule() for null refs
+
+2.2.3.3
 	Added russion translation, thanks github user @yadenisyur
 	Fixed action groups being available in flight when buildings have not been upgraded
 	Removed color code from log messages
-	Add check in the SetupRootModule() for null refs
 
 2.2.3.2
 	Added dependency check
