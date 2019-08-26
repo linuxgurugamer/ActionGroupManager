@@ -1,3 +1,6 @@
+2.2.5.1
+	Fixed NullRef which occurred when vessel and/or parts are destroyed
+
 2.2.5
 	Version bump for 1.7.2
 	Updated AssemblyVersion.tt

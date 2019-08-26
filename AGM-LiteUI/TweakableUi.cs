@@ -43,8 +43,6 @@ namespace ActionGroupManager
 
         public UIBaseActionManager Current { get; set; }
 
-
-
         public void Initialize()
         {
             // #autoLOC_AGM_254 = AGM: <<1>>
@@ -144,7 +142,6 @@ namespace ActionGroupManager
 
         public bool IsActionGroupsVisible { get; set; }
 
-
         public bool IsSymmetryModeVisible { get; set; }
 
         public UIPartManager(Part p)
@@ -160,7 +157,7 @@ namespace ActionGroupManager
 
             if (Part.Modules.Contains("UIBaseActionManager") || Part.Modules.Contains("UIActionGroupManager"))
             {
-                //if the part already contains actionManager class, we clean them.
+                // if the part already contains actionManager class, we clean them.
 
                 List<PartModule> toRemove = new List<PartModule>();
                 foreach (PartModule item in Part.Modules)
@@ -173,12 +170,12 @@ namespace ActionGroupManager
                     Part.Modules.Remove(mod);
             }
 
-
-            //We create our base action list
+            // We create our base action list
             foreach (BaseAction ba in BaseActionManager.FromParts(p))
             {
-                //We create the module through AddModule to get the initialization done
+                // We create the module through AddModule to get the initialization done
                 UIBaseActionManager man = Part.AddModule("UIBaseActionManager") as UIBaseActionManager;
+
                 // and we remove it to avoid bloating an eventual save.
                 Part.Modules.Remove(man);
 
@@ -192,7 +189,7 @@ namespace ActionGroupManager
             }
 
             // and our action group list
-            //First two specific uiactionmanager as folder.
+            // First two specific uiactionmanager as folder.
             UIActionGroupManager agm = Part.AddModule("UIActionGroupManager") as UIActionGroupManager;
             Part.Modules.Remove(agm);
 
@@ -217,7 +214,7 @@ namespace ActionGroupManager
 
             actionGroupList.Add(agm);
 
-            //and the rest of action groups
+            // and the rest of action groups
             foreach (KSPActionGroup ag in Enum.GetValues(typeof(KSPActionGroup)))
             {
                 if (ag == KSPActionGroup.None)
@@ -428,7 +425,7 @@ namespace ActionGroupManager
         {
             if (IsFolderVisible)
             {
-                //Folder already visible, so clean the folders, and redisplay all baseaction
+                // Folder already visible, so clean the folders, and redisplay all baseaction
                 foreach (UIActionGroupManager item in actionGroupList)
                 {
                     item.Events[UIActionGroupManager.EVENTNAME].guiActive = false;
@@ -448,8 +445,8 @@ namespace ActionGroupManager
             {
                 foreach (UIBaseActionManager item in baseActionList)
                 {
-                    //There is a weird issue, if there is only one action on the part, and so we don't want to hide any other actions
-                    //the folder won't show. So a dirty solution is to hide this part when it's the only one.
+                    // There is a weird issue, if there is only one action on the part, and so we don't want to hide any other actions
+                    // the folder won't show. So a dirty solution is to hide this part when it's the only one.
                     if (item == obj && baseActionList.Count > 1)
                         continue;
 
@@ -482,6 +479,7 @@ namespace ActionGroupManager
                     man.Events[UIBaseActionManager.EVENTNAME].guiActive = true;
                     man.Events[UIBaseActionManager.EVENTNAME].active = true;
                 }
+
                 foreach (UIActionGroupManager item in actionGroupList)
                 {
                     Part.Modules.Add(item);
@@ -556,8 +554,12 @@ namespace ActionGroupManager
         private void SetupRootModule()
         {
             Program.AddDebugLog("Lite Ui: Setup root !");
-            if (VesselManager.Instance == null || VesselManager.Instance.ActiveVessel == null)
+            if (VesselManager.Instance == null || VesselManager.Instance.ActiveVessel == null||
+                VesselManager.Instance.ActiveVessel.rootPart == null || VesselManager.Instance.ActiveVessel.rootPart.Modules == null ||
+                VesselManager.Instance.ActiveVessel.Parts == null)
                 return;
+
+            
             if (!VesselManager.Instance.ActiveVessel.rootPart.Modules.Contains("UIRootManager"))
             {
                 rootManager = VesselManager.Instance.ActiveVessel.rootPart.AddModule("UIRootManager") as UIRootManager;
@@ -574,7 +576,7 @@ namespace ActionGroupManager
                 this.Active = rootManager.enable;
             }
 
-            //Case of docked vessel : Remove other Root manager
+            // Case of docked vessel : Remove other Root manager
             foreach (Part p in VesselManager.Instance.ActiveVessel.Parts)
             {
                 if (p == VesselManager.Instance.ActiveVessel.rootPart)
@@ -597,15 +599,14 @@ namespace ActionGroupManager
             rootManager.Clicked += rootManager_Clicked;
 
             // #autoLOC_AGM_250 = AGM: Enable
-            rootManager.Events[UIRootManager.EVENTNAME].guiName = Localizer.GetStringByTag("#autoLOC_AGM_250");
+            if (rootManager.Events != null && rootManager.Events.Contains(UIRootManager.EVENTNAME))
+                rootManager.Events[UIRootManager.EVENTNAME].guiName = Localizer.GetStringByTag("#autoLOC_AGM_250");
         }
-
 
         private void OnUndock(EventReport data)
         {
             SetupRootModule();
         }
-
 
         private void OnVesselChange(Vessel data)
         {
