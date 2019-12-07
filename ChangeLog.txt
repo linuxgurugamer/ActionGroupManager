@@ -1,3 +1,9 @@
+ChangeLog
+
+2.2.6
+		Added InstallChecker
+		Updated for KSP 1.8
+
 2.2.5.1
 	Fixed NullRef which occurred when vessel and/or parts are destroyed
 
