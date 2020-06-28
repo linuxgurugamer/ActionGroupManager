@@ -1,5 +1,8 @@
 ChangeLog
 
+2.2.6.1
+	Removed some log spam
+
 2.2.6
 		Added InstallChecker
 		Updated for KSP 1.8
