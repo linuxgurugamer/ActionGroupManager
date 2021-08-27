@@ -1,5 +1,9 @@
 ChangeLog
 
+2.2.6.3
+	Added AssemblyFileVersion
+	Updated version file for 1.12
+
 2.2.6.2
 	Fixed flag image format to DX5
 
