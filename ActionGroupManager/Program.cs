@@ -66,6 +66,11 @@ namespace ActionGroupManager
             GameEvents.OnGameSettingsApplied.Add(this.OnSettingsApplied);
         }
 
+        void OnDestroy()
+        {
+            GameEvents.OnGameSettingsApplied.Remove(this.OnSettingsApplied);
+        }
+
         /// <summary>
         /// Handles the <see cref="GameEvents.OnGameSettingsApplied"/> event.
         /// </summary>
