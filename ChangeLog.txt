@@ -1,5 +1,10 @@
 ChangeLog
 
+2.2.6.5
+	updated README with web page
+	Updated version file to use gihub for new version info
+	Updated AquilaEnterprises /Flag/AGMFlag.dds to DXT5 format (may have already been done)
+
 2.2.6.4
 	Fixed small memory leak
 
